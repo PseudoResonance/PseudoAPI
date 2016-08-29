@@ -1,0 +1,20 @@
+WolfLeader116's License
+This license applies to all users of WolfLeader116's Bukkit/Spigot/BungeeCord plugins.
+A user is anyone who has run (loaded as a Bukkit/Spigot/BungeeCord plugin) the compiled jar (Java) file from any source, viewed the source code from any source, used the source code from any source.
+Removal or modification of this license is NOT PERMITTED and any copies or modifications of my software and code MUST use and contain this license.
+Any unofficial, redistributing, sources of this software or source code (other than GitHub, Drone, Bukkit or SpigotMC) MUST be reported to WolfLeader116 immediately.
+
+Compiled Jar
+Redistribution is NOT allowed.
+Do NOT "debrand" (Remove or obfuscate my name and any links to my websites/downloads) the plugin.
+Do NOT use a jar that you are not able to download at https://drone.io/github.com/WolfLeader116.
+Monetization is NOT allowed.
+
+Source Code
+You may fork my source code as long as you provide my name and a link to my original source code with your fork.
+You may modify, recompile and distribute modified source code or a compiled jar ONLY if my original compiled jar and source code are free to access and use and ONLY in the forums of bukkit.org and spigotmc.org.
+You may use an unlimited percentage of my code in your personal projects as long as you provide my name and a link to my original source code and my original compiled jar with your personal project and do NOT monetize your personal project.
+You may view and learn from my code.
+Monetization is NOT allowed when using my code unless otherwise specified by me below.
+Your work MUST be open source unless otherwise specified in the link below:
+https://github.com/WolfLeader116/RESOURCES/blob/master/DISTRIBUTION%20LICENSE

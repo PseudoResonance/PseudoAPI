@@ -1,0 +1,66 @@
+#######################
+#WolfAPI Bukkit Config#
+#######################
+
+#DO NOT CHANGE THIS LINE! YOUR CONFIG WILL BE RESET UPON LOADING IF THIS LINE IS EDITED!
+Version: 1
+
+#########
+#Plugins#
+#########
+
+#Hide plugins from players?
+HidePlugins: true
+
+#Allow players to see WolfAPI plugins?
+AllowWolfAPI: true
+
+
+##########################
+#BungeeCord Configuration#
+##########################
+
+#Is server on BungeeCord network?
+BungeeEnabled: false
+
+
+######
+#Chat#
+######
+
+#Plugin Info Border Color
+BorderColor: DARK_AQUA
+
+#Plugin Info Title Color
+TitleColor: GOLD
+
+#Help Command Color
+CommandColor: RED
+
+#Help Description Color
+DescriptionColor: AQUA
+
+#Message Text Color
+TextColor: GREEN
+
+#Message Prefix Color
+PrefixColor: BLUE
+
+#Error Text Color
+ErrorColor: RED
+
+#Error Prefix Color
+ErrorPrefixColor: BLUE
+
+#Plugin Message Format
+#{name} = Plugin Formal Name
+#{nickname} = Plugin Nickname (If Present, Otherwise Formal)
+#{player} = Player Name
+#{playernick} = Player Nickname
+#{message} = Message
+#Color Codes Enabled
+MessageFormat: "{nickname}&l> {message}"
+
+#Click Command Event
+#Suggest or Run Command
+ClickEvent: Run

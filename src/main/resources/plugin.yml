@@ -1,0 +1,31 @@
+name: WolfAPI
+author: WolfLeader116
+main: io.github.wolfleader116.wolfapi.bukkit.WolfAPI
+version: Pre-1.0
+description: An API for Easy Access to Resources
+commands:
+  wolfapi:
+    description: WolfAPI Menu
+  plugins:
+    description: Plugins
+    permission: wolfapi.plugins
+    aliases: [pl]
+  allplugins:
+    description: All plugins
+    permission: wolfapi.allplugins
+    aliases: [allpl]
+permissions:
+  wolfapi.plugins:
+    description: Allows the player to see WolfAPI plugins
+    default: true
+  wolfapi.allplugins:
+    description: Allows the player to see all plugins
+    default: op
+    children:
+      wolfapi.plugins: true
+  wolfapi.*
+    description: Gives the user all wolfapi permissions
+    default: op
+    children:
+      wolfapi.plugins: true
+      wolfapi.allplugins: true
