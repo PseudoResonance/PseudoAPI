@@ -12,7 +12,7 @@ public class MainCommand implements CommandExecutor {
 	
 	protected WolfPlugin plugin;
 	
-	MainCommand(WolfPlugin plugin) {
+	public MainCommand(WolfPlugin plugin) {
 		this.plugin = plugin;
 	}
 

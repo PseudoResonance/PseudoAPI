@@ -14,7 +14,7 @@ public class HelpSC implements SubCommandExecutor {
 	protected WolfPlugin plugin;
 	protected Message message;
 
-	HelpSC(WolfPlugin plugin) {
+	public HelpSC(WolfPlugin plugin) {
 		this.plugin = plugin;
 		this.message = new Message(plugin);
 	}
