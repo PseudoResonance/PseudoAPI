@@ -6,7 +6,7 @@ public class CommandDescription {
 	private String description = "";
 	private String permission = "";
 	
-	CommandDescription(String command, String description, String permission) {
+	public CommandDescription(String command, String description, String permission) {
 		this.command = command;
 		this.description = description;
 		this.permission = permission;
