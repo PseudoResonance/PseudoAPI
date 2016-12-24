@@ -20,6 +20,7 @@ public class WolfPlugin extends JavaPlugin {
 	private List<String> loadBefore = new ArrayList<String>();
 	private Map<String, Map<String, Object>> commands = new HashMap<String, Map<String, Object>>();
 	private List<Permission> permissions = new ArrayList<Permission>();
+	private String output = "";
 	protected Map<String, SubCommandExecutor> subCommands = new HashMap<String, SubCommandExecutor>();
 	protected List<CommandDescription> commandDescriptions = new ArrayList<CommandDescription>();
 	
@@ -36,6 +37,41 @@ public class WolfPlugin extends JavaPlugin {
 		loadBefore = this.getDescription().getLoadBefore();
 		commands = this.getDescription().getCommands();
 		permissions = this.getDescription().getPermissions();
+		if (name == null) {
+			name = "";
+		}
+		if (prefix == null) {
+			prefix = "";
+		}
+		if (description == null) {
+			description = "";
+		}
+		if (authors == null) {
+			authors = new ArrayList<String>();
+		}
+		if (version == null) {
+			version = "";
+		}
+		if (depend == null) {
+			depend = new ArrayList<String>();
+		}
+		if (softDepend == null) {
+			softDepend = new ArrayList<String>();
+		}
+		if (loadBefore == null) {
+			loadBefore = new ArrayList<String>();
+		}
+		if (commands == null) {
+			commands = new HashMap<String, Map<String, Object>>();
+		}
+		if (permissions == null) {
+			permissions = new ArrayList<Permission>();
+		}
+		if (prefix.equals("")) {
+			output = name;
+		} else {
+			output = prefix;
+		}
 		PluginController.pluginLoaded(this);
 	}
 	
@@ -53,11 +89,7 @@ public class WolfPlugin extends JavaPlugin {
 	}
 	
 	public String getOutputName() {
-		if (prefix.equals("")) {
-			return name;
-		} else {
-			return prefix;
-		}
+		return output;
 	}
 	
 	public String getPluginDescription() {

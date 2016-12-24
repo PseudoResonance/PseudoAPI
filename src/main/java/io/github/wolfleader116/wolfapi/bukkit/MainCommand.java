@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,8 +20,8 @@ public class MainCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) {
 			List<String> messages = new ArrayList<String>();
-			messages.add(WolfAPI.border + "===---" + WolfAPI.title + plugin.getPluginName() + " Info" + WolfAPI.border + "---===");
-			messages.add(WolfAPI.description + plugin.getPluginName() + " Version " + plugin.getVersion() + ".");
+			messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + plugin.getPluginName() + " Info" + ConfigOptions.border + "---===");
+			messages.add(ConfigOptions.description + plugin.getPluginName() + " Version " + plugin.getVersion() + ".");
 			String developers = "";
 			for (int i = 0; i <= plugin.getAuthors().size() - 1; i++) {
 				if (i >= 1) {
@@ -30,14 +29,20 @@ public class MainCommand implements CommandExecutor {
 				}
 				developers = developers + plugin.getAuthors().get(i);
 			}
-			messages.add(WolfAPI.description + "Was developed by " + developers + ".");
-			messages.add(WolfAPI.description + "Use " + WolfAPI.command + "/" + cmd.getName() + " help " + WolfAPI.description + "for commands.");
+			messages.add(ConfigOptions.description + "Was developed by " + developers + ".");
+			messages.add(ConfigOptions.description + "Use " + ConfigOptions.command + "/" + cmd.getName() + " help " + ConfigOptions.description + "for commands.");
+			Message.sendMessage(sender, messages);
 			return true;
 		} else {
 			Map<String, SubCommandExecutor> subCommands = plugin.subCommands;
 			for (String sc : subCommands.keySet()) {
 				if (args[0].equalsIgnoreCase(sc)) {
-					String[] newArgs = (String[]) ArrayUtils.removeElement(args, 0);
+					List<String> argsList = new ArrayList<String>();
+					for (String s : args) {
+						argsList.add(s);
+					}
+					argsList.remove(0);
+					String[] newArgs = argsList.toArray(new String[argsList.size()]);
 					subCommands.get(sc).onCommand(sender, cmd, label, newArgs);
 					return true;
 				}

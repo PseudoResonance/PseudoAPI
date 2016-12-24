@@ -3,6 +3,7 @@ author: WolfLeader116
 main: io.github.wolfleader116.wolfapi.bukkit.WolfAPI
 version: Pre-1.0
 description: An API for Easy Access to Resources
+softdepend: [Essentials]
 commands:
   wolfapi:
     description: WolfAPI Menu
@@ -23,8 +24,8 @@ permissions:
     default: op
     children:
       wolfapi.plugins: true
-  wolfapi.*
-    description: Gives the user all wolfapi permissions
+  wolfapi.*:
+    description: Gives the user all WolfAPI permissions
     default: op
     children:
       wolfapi.plugins: true

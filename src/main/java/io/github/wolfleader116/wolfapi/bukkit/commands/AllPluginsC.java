@@ -6,20 +6,19 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import io.github.wolfleader116.wolfapi.bukkit.Errors;
 import io.github.wolfleader116.wolfapi.bukkit.Message;
-import io.github.wolfleader116.wolfapi.bukkit.PluginController;
 import io.github.wolfleader116.wolfapi.bukkit.WolfAPI;
-import io.github.wolfleader116.wolfapi.bukkit.WolfPlugin;
 
 public class AllPluginsC implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("allpl")) {
+		if (cmd.getName().equalsIgnoreCase("allplugins")) {
 			if (!(sender instanceof Player)) {
 				String pluginlist = "";
-				WolfPlugin[] plugins = PluginController.getPlugins();
+				Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
 				int pluginsfound = plugins.length;
 				for(int i = 0; i < plugins.length; i++) {
 					if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
@@ -44,10 +43,9 @@ public class AllPluginsC implements CommandExecutor {
 			} else {
 				if (sender.hasPermission("wolfapi.allplugins")) {
 					String pluginlist = "";
-					WolfPlugin[] plugins = PluginController.getPlugins();
+					Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
 					int pluginsfound = plugins.length;
 					for(int i = 0; i < plugins.length; i++) {
-						pluginsfound = pluginsfound + 1;
 						if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
 							String add = "";
 							if (pluginlist == "") {

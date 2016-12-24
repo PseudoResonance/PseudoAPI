@@ -8,10 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.HoverEvent.Action;
 
 public class HelpSC implements SubCommandExecutor {
 
@@ -38,19 +34,19 @@ public class HelpSC implements SubCommandExecutor {
 			}
 		}
 		List<Object> messages = new ArrayList<Object>();
-		messages.add(WolfAPI.border + "===---" + WolfAPI.title + plugin.getPluginName() + " Help" + WolfAPI.border + "---===");
+		messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + plugin.getPluginName() + " Help" + ConfigOptions.border + "---===");
 		if (args.length == 0) {
 			for (int i = 0; i <= 9; i++) {
 				if (i < commands.size()) {
 					CommandDescription cd = commands.get(i);
-					messages.add(new ComponentBuilder("/" + cmd.getName().toLowerCase() + " " + ChatColor.stripColor(cd.getCommand())).color(WolfAPI.command).event(new ClickEvent(WolfAPI.clickEvent, "/" + cmd.getName().toLowerCase() + " " + ChatColor.stripColor(cd.getCommand()))).event(new HoverEvent(Action.SHOW_TEXT, new ComponentBuilder("Click to run the Command!").color(WolfAPI.description).create())).append(" " + ChatColor.stripColor(cd.getDescription())).color(WolfAPI.description).create());
+					messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + plugin.getOutputName() + ":" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
 				}
 			}
 			if (commands.size() > 10) {
 				int total = (int) Math.ceil(commands.size() / 10);
-				messages.add(WolfAPI.border + "===---" + WolfAPI.title + "Page 1 of " + total + WolfAPI.border + "---===");
+				messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of " + total + ConfigOptions.border + "---===");
 			} else {
-				messages.add(WolfAPI.border + "===---" + WolfAPI.title + "Page 1 of 1" + WolfAPI.border + "---===");
+				messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of 1" + ConfigOptions.border + "---===");
 			}
 			Message.sendMessage(sender, messages);
 			return true;
@@ -68,13 +64,13 @@ public class HelpSC implements SubCommandExecutor {
 					for (int i = (page - 1) * 10; i <= ((page - 1) * 10) + 9; i++) {
 						if (i < commands.size()) {
 							CommandDescription cd = commands.get(i);
-							messages.add(WolfAPI.command + "/" + cmd.getName().toLowerCase() + " " + ChatColor.stripColor(cd.getCommand()) + " " + WolfAPI.description + ChatColor.stripColor(cd.getDescription()));
+							messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
 						}
 					}
 					if (commands.size() > 10) {
-						messages.add(WolfAPI.border + "===---" + WolfAPI.title + "Page 1 of " + total + WolfAPI.border + "---===");
+						messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of " + total + ConfigOptions.border + "---===");
 					} else {
-						messages.add(WolfAPI.border + "===---" + WolfAPI.title + "Page 1 of 1" + WolfAPI.border + "---===");
+						messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of 1" + ConfigOptions.border + "---===");
 					}
 					Message.sendMessage(sender, messages);
 					return true;

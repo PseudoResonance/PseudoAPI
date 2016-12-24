@@ -3,7 +3,7 @@
 #######################
 
 #DO NOT CHANGE THIS LINE! YOUR CONFIG WILL BE RESET UPON LOADING IF THIS LINE IS EDITED!
-Version: 1
+Version: 4
 
 #########
 #Plugins#
@@ -22,6 +22,9 @@ AllowWolfAPI: true
 
 #Is server on BungeeCord network?
 BungeeEnabled: false
+
+#Allow BungeeCord to override config? (If BungeeEnabled is true)
+BungeeOverride: true
 
 
 ######
@@ -44,13 +47,13 @@ DescriptionColor: AQUA
 TextColor: GREEN
 
 #Message Prefix Color
-PrefixColor: BLUE
+PrefixColor: BLUE,BOLD
 
 #Error Text Color
 ErrorColor: RED
 
 #Error Prefix Color
-ErrorPrefixColor: BLUE
+ErrorPrefixColor: BLUE,BOLD
 
 #Plugin Message Format
 #{name} = Plugin Formal Name
@@ -59,8 +62,12 @@ ErrorPrefixColor: BLUE
 #{playernick} = Player Nickname
 #{message} = Message
 #Color Codes Enabled
-MessageFormat: "{nickname}&l> {message}"
+MessageFormat: "{nickname}> {message}"
 
 #Click Command Event
 #Suggest or Run Command
 ClickEvent: Run
+
+#Console Format
+#Is newest console message at top or bottom?
+ConsoleFormat: bottom
