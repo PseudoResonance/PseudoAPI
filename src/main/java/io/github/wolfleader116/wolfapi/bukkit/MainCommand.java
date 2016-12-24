@@ -19,7 +19,7 @@ public class MainCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) {
-			List<String> messages = new ArrayList<String>();
+			List<Object> messages = new ArrayList<Object>();
 			messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + plugin.getPluginName() + " Info" + ConfigOptions.border + "---===");
 			messages.add(ConfigOptions.description + plugin.getPluginName() + " Version " + plugin.getVersion() + ".");
 			String developers = "";
@@ -30,7 +30,7 @@ public class MainCommand implements CommandExecutor {
 				developers = developers + plugin.getAuthors().get(i);
 			}
 			messages.add(ConfigOptions.description + "Was developed by " + developers + ".");
-			messages.add(ConfigOptions.description + "Use " + ConfigOptions.command + "/" + cmd.getName() + " help " + ConfigOptions.description + "for commands.");
+			messages.add(new ElementBuilder(new ChatElement(ConfigOptions.description + "Use "), new ChatElement(ConfigOptions.command + "/" + cmd.getName() + " help", new ChatComponent(ConfigOptions.clickEvent, "/" + plugin.getOutputName() + ":" + cmd.getName() + " help"), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(ConfigOptions.description + " for commands.")).build());
 			Message.sendMessage(sender, messages);
 			return true;
 		} else {

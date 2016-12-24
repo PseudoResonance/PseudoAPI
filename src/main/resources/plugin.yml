@@ -1,7 +1,7 @@
 name: WolfAPI
 author: WolfLeader116
 main: io.github.wolfleader116.wolfapi.bukkit.WolfAPI
-version: Pre-1.0
+version: 1.0
 description: An API for Easy Access to Resources
 softdepend: [Essentials]
 commands:
