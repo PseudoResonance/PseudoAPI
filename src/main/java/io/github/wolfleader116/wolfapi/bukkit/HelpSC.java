@@ -43,7 +43,7 @@ public class HelpSC implements SubCommandExecutor {
 				}
 			}
 			if (commands.size() > 10) {
-				int total = (int) Math.ceil(commands.size() / 10);
+				int total = (int) Math.ceil((double)commands.size() / 10);
 				messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of " + total + ConfigOptions.border + "---===");
 			} else {
 				messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of 1" + ConfigOptions.border + "---===");
@@ -53,7 +53,7 @@ public class HelpSC implements SubCommandExecutor {
 		} else {
 			if (isInteger(args[0])) {
 				int page = Integer.parseInt(args[0]);
-				int total = (int) Math.ceil(commands.size() / 10);
+				int total = (int) Math.ceil((double)commands.size() / 10);
 				if (page > total) {
 					message.sendPluginError(sender, Errors.CUSTOM, "Only " + total + " pages available!");
 					return false;
