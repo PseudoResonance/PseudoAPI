@@ -30,7 +30,7 @@ public class ResetSC implements SubCommandExecutor {
 				WolfAPI.message.sendPluginMessage(sender, "Plugin config reset!");
 				return true;
 			} else {
-				WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+				WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "reset the config!");
 				return false;
 			}
 		} else {

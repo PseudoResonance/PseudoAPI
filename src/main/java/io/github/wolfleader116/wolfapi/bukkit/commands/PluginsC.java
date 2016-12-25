@@ -79,7 +79,7 @@ public class PluginsC implements CommandExecutor {
 						messages.add("Plugins (" + pluginsfound + "): " + pluginlist);
 						Message.sendMessage(sender, messages);
 					} else {
-						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
 						return false;
 					}
 				}
@@ -134,7 +134,7 @@ public class PluginsC implements CommandExecutor {
 						}
 						Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
 					} else {
-						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
 						return false;
 					}
 				}
@@ -195,7 +195,8 @@ public class PluginsC implements CommandExecutor {
 						messages.add("Plugins (" + pluginsfound + "): " + pluginlist);
 						Message.sendMessage(sender, messages);
 					} else {
-						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
+						return false;
 					}
 				}
 			}

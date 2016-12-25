@@ -66,7 +66,7 @@ public class AllPluginsC implements CommandExecutor {
 					}
 					Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
 				} else {
-					WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+					WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
 					return false;
 				}
 			}

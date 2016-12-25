@@ -25,7 +25,7 @@ public class ReloadSC implements SubCommandExecutor {
 				WolfAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
 				return true;
 			} else {
-				WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+				WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "reload the config!");
 				return false;
 			}
 		} else {
