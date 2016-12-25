@@ -1,7 +1,13 @@
 package io.github.wolfleader116.wolfapi.bukkit;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+
+import com.xxmicloxx.noteblockapi.SongPlayer;
 
 import io.github.wolfleader116.wolfapi.bukkit.commands.AllPluginsC;
 import io.github.wolfleader116.wolfapi.bukkit.commands.PluginsC;
@@ -19,6 +25,9 @@ public class WolfAPI extends WolfPlugin implements Listener {
 	private static HelpSC helpSubCommand;
 	private static PluginsC pluginsCommand;
 	private static AllPluginsC allPluginsCommand;
+	
+    public static HashMap<String, ArrayList<SongPlayer>> playingSongs = new HashMap<String, ArrayList<SongPlayer>>();
+    public static HashMap<String, Byte> playerVolume = new HashMap<String, Byte>();
 	
 	@Override
 	public void onEnable() {
@@ -43,6 +52,7 @@ public class WolfAPI extends WolfPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		super.onDisable();
+        Bukkit.getScheduler().cancelTasks(this);
 	}
 
 	private void initializeCommands() {
@@ -76,5 +86,31 @@ public class WolfAPI extends WolfPlugin implements Listener {
 		this.commandDescriptions.add(new CommandDescription("plugins", "Shows plugins", "wolfapi.plugins"));
 		this.commandDescriptions.add(new CommandDescription("allplugins", "Shows all plugins", "wolfapi.allplugins"));
 	}
+
+    public static boolean isReceivingSong(Player p) {
+        return ((playingSongs.get(p.getName()) != null) && (!playingSongs.get(p.getName()).isEmpty()));
+    }
+
+    public static void stopPlaying(Player p) {
+        if (playingSongs.get(p.getName()) == null) {
+            return;
+        }
+        for (SongPlayer s : playingSongs.get(p.getName())) {
+            s.removePlayer(p);
+        }
+    }
+
+    public static void setPlayerVolume(Player p, byte volume) {
+        playerVolume.put(p.getName(), volume);
+    }
+
+    public static byte getPlayerVolume(Player p) {
+        Byte b = playerVolume.get(p.getName());
+        if (b == null) {
+            b = 100;
+            playerVolume.put(p.getName(), b);
+        }
+        return b;
+    }
 
 }

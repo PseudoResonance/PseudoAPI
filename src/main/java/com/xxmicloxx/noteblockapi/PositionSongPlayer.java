@@ -3,6 +3,8 @@ package com.xxmicloxx.noteblockapi;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import io.github.wolfleader116.wolfapi.bukkit.WolfAPI;
+
 public class PositionSongPlayer extends SongPlayer {
 
     private Location targetLocation;
@@ -25,7 +27,7 @@ public class PositionSongPlayer extends SongPlayer {
             // not in same world
             return;
         }
-        byte playerVolume = NoteBlockPlayerMain.getPlayerVolume(p);
+        byte playerVolume = WolfAPI.getPlayerVolume(p);
 
         for (Layer l : song.getLayerHashMap().values()) {
             Note note = l.getNote(tick);

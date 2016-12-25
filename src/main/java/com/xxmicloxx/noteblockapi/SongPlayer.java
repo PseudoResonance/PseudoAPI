@@ -3,6 +3,8 @@ package com.xxmicloxx.noteblockapi;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import io.github.wolfleader116.wolfapi.bukkit.WolfAPI;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -131,13 +133,12 @@ public abstract class SongPlayer {
         synchronized (this) {
             if (!playerList.contains(p.getName())) {
                 playerList.add(p.getName());
-                ArrayList<SongPlayer> songs = NoteBlockPlayerMain.plugin.playingSongs
-                        .get(p.getName());
+                ArrayList<SongPlayer> songs = WolfAPI.playingSongs.get(p.getName());
                 if (songs == null) {
                     songs = new ArrayList<SongPlayer>();
                 }
                 songs.add(this);
-                NoteBlockPlayerMain.plugin.playingSongs.put(p.getName(), songs);
+                WolfAPI.playingSongs.put(p.getName(), songs);
             }
         }
     }
@@ -193,13 +194,12 @@ public abstract class SongPlayer {
     public void removePlayer(Player p) {
         synchronized (this) {
             playerList.remove(p.getName());
-            if (NoteBlockPlayerMain.plugin.playingSongs.get(p.getName()) == null) {
+            if (WolfAPI.playingSongs.get(p.getName()) == null) {
                 return;
             }
-            ArrayList<SongPlayer> songs = new ArrayList<SongPlayer>(
-                    NoteBlockPlayerMain.plugin.playingSongs.get(p.getName()));
+            ArrayList<SongPlayer> songs = new ArrayList<SongPlayer>(WolfAPI.playingSongs.get(p.getName()));
             songs.remove(this);
-            NoteBlockPlayerMain.plugin.playingSongs.put(p.getName(), songs);
+            WolfAPI.playingSongs.put(p.getName(), songs);
             if (playerList.isEmpty() && autoDestroy) {
                 SongEndEvent event = new SongEndEvent(this);
                 Bukkit.getPluginManager().callEvent(event);

@@ -2,6 +2,7 @@ package io.github.wolfleader116.wolfapi.bukkit.commands;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import io.github.wolfleader116.wolfapi.bukkit.ConfigOptions;
 import io.github.wolfleader116.wolfapi.bukkit.Errors;
@@ -12,15 +13,32 @@ public class ReloadSC implements SubCommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		try {
-			WolfAPI.plugin.reloadConfig();
-		} catch (Exception e) {
-			WolfAPI.message.sendPluginError(sender, Errors.GENERIC);
-			return false;
+		if (sender instanceof Player) {
+			if (sender.hasPermission(cmd.getPermission())) {
+				try {
+					WolfAPI.plugin.reloadConfig();
+				} catch (Exception e) {
+					WolfAPI.message.sendPluginError(sender, Errors.GENERIC);
+					return false;
+				}
+				ConfigOptions.reloadConfig();
+				WolfAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
+				return true;
+			} else {
+				WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+				return false;
+			}
+		} else {
+			try {
+				WolfAPI.plugin.reloadConfig();
+			} catch (Exception e) {
+				WolfAPI.message.sendPluginError(sender, Errors.GENERIC);
+				return false;
+			}
+			ConfigOptions.reloadConfig();
+			WolfAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
+			return true;
 		}
-		ConfigOptions.reloadConfig();
-		WolfAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
-		return true;
 	}
 
 }

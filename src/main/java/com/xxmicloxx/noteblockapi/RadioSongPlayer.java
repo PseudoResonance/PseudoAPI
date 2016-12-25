@@ -2,6 +2,8 @@ package com.xxmicloxx.noteblockapi;
 
 import org.bukkit.entity.Player;
 
+import io.github.wolfleader116.wolfapi.bukkit.WolfAPI;
+
 public class RadioSongPlayer extends SongPlayer {
 
     public RadioSongPlayer(Song song) {
@@ -10,7 +12,7 @@ public class RadioSongPlayer extends SongPlayer {
 
     @Override
     public void playTick(Player p, int tick) {
-        byte playerVolume = NoteBlockPlayerMain.getPlayerVolume(p);
+        byte playerVolume = WolfAPI.getPlayerVolume(p);
 
         for (Layer l : song.getLayerHashMap().values()) {
             Note note = l.getNote(tick);

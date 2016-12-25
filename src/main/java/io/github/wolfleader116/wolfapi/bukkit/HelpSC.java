@@ -24,7 +24,7 @@ public class HelpSC implements SubCommandExecutor {
 		List<CommandDescription> commands = new ArrayList<CommandDescription>();
 		if (sender instanceof Player) {
 			for (CommandDescription cd : plugin.commandDescriptions) {
-				if (((Player) sender).hasPermission(cd.getPermission())) {
+				if (cd.getPermission() == "" || ((Player) sender).hasPermission(cd.getPermission())) {
 					commands.add(cd);
 				}
 			}
