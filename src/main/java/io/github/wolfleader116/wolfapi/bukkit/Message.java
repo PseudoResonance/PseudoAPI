@@ -3,6 +3,7 @@ package io.github.wolfleader116.wolfapi.bukkit;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Particle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -93,7 +94,7 @@ public class Message {
 		case GENERIC:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -103,7 +104,7 @@ public class Message {
 		case CUSTOM:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -113,7 +114,7 @@ public class Message {
 		case NEVER_JOINED:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -123,7 +124,7 @@ public class Message {
 		case NOT_A_NUMBER:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -133,7 +134,7 @@ public class Message {
 		case NOT_LOADED:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -143,7 +144,7 @@ public class Message {
 		case NOT_ONLINE:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -153,7 +154,7 @@ public class Message {
 		case NO_PERMISSION:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -163,7 +164,7 @@ public class Message {
 		default:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -192,7 +193,7 @@ public class Message {
 		case GENERIC:
 			if (sender instanceof Player) {
 				try {
-					ParticleEffect.FIREWORKS_SPARK.sendToPlayer((Player) sender, ((Player) sender).getLocation(), (float) 0.8, (float) 0.8, (float) 0.8, (float) 0, 5);
+					((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
