@@ -51,32 +51,37 @@ public class PluginsC implements CommandExecutor {
 					messages.add("Plugins (" + pluginsfound + "): " + pluginlist);
 					Message.sendMessage(sender, messages);
 				} else {
-					String pluginlist = "";
-					WolfPlugin[] plugins = PluginController.getPlugins();
-					int pluginsfound = plugins.length;
-					for(int i = 0; i < plugins.length; i++) {
-						if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
-							String add = "";
-							if (pluginlist == "") {
-								add = ChatColor.GREEN + plugins[i].getName();
+					if (sender.hasPermission("wolfapi.plugins")) {
+						String pluginlist = "";
+						WolfPlugin[] plugins = PluginController.getPlugins();
+						int pluginsfound = plugins.length;
+						for(int i = 0; i < plugins.length; i++) {
+							if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
+								String add = "";
+								if (pluginlist == "") {
+									add = ChatColor.GREEN + plugins[i].getName();
+								} else {
+									add = ChatColor.RESET + ", " + ChatColor.GREEN + plugins[i].getName();
+								}
+								pluginlist = pluginlist + add;
 							} else {
-								add = ChatColor.RESET + ", " + ChatColor.GREEN + plugins[i].getName();
+								String add = "";
+								if (pluginlist == "") {
+									add = ChatColor.RED + plugins[i].getName();
+								} else {
+									add = ChatColor.RESET + ", " + ChatColor.RED + plugins[i].getName();
+								}
+								pluginlist = pluginlist + add;
 							}
-							pluginlist = pluginlist + add;
-						} else {
-							String add = "";
-							if (pluginlist == "") {
-								add = ChatColor.RED + plugins[i].getName();
-							} else {
-								add = ChatColor.RESET + ", " + ChatColor.RED + plugins[i].getName();
-							}
-							pluginlist = pluginlist + add;
 						}
+						List<String> messages = new ArrayList<String>();
+						messages.add(ConfigOptions.error + "Please note that all of these plugins are privately developed, but are open source at WolfLeader116's GitHub. Read the license before using!");
+						messages.add("Plugins (" + pluginsfound + "): " + pluginlist);
+						Message.sendMessage(sender, messages);
+					} else {
+						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+						return false;
 					}
-					List<String> messages = new ArrayList<String>();
-					messages.add(ConfigOptions.error + "Please note that all of these plugins are privately developed, but are open source at WolfLeader116's GitHub. Read the license before using!");
-					messages.add("Plugins (" + pluginsfound + "): " + pluginlist);
-					Message.sendMessage(sender, messages);
 				}
 			} if (!(ConfigOptions.hidePlugins)) {
 				if (!(sender instanceof Player)) {
@@ -104,29 +109,34 @@ public class PluginsC implements CommandExecutor {
 					}
 					Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
 				} else {
-					String pluginlist = "";
-					Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
-					int pluginsfound = plugins.length;
-					for(int i = 0; i < plugins.length; i++) {
-						if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
-							String add = "";
-							if (pluginlist == "") {
-								add = ChatColor.GREEN + plugins[i].getName();
+					if (sender.hasPermission("wolfapi.plugins")) {
+						String pluginlist = "";
+						Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
+						int pluginsfound = plugins.length;
+						for(int i = 0; i < plugins.length; i++) {
+							if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
+								String add = "";
+								if (pluginlist == "") {
+									add = ChatColor.GREEN + plugins[i].getName();
+								} else {
+									add = ChatColor.RESET + ", " + ChatColor.GREEN + plugins[i].getName();
+								}
+								pluginlist = pluginlist + add;
 							} else {
-								add = ChatColor.RESET + ", " + ChatColor.GREEN + plugins[i].getName();
+								String add = "";
+								if (pluginlist == "") {
+									add = ChatColor.RED + plugins[i].getName();
+								} else {
+									add = ChatColor.RESET + ", " + ChatColor.RED + plugins[i].getName();
+								}
+								pluginlist = pluginlist + add;
 							}
-							pluginlist = pluginlist + add;
-						} else {
-							String add = "";
-							if (pluginlist == "") {
-								add = ChatColor.RED + plugins[i].getName();
-							} else {
-								add = ChatColor.RESET + ", " + ChatColor.RED + plugins[i].getName();
-							}
-							pluginlist = pluginlist + add;
 						}
+						Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
+					} else {
+						WolfAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, " view plugins!");
+						return false;
 					}
-					Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
 				}
 			} if (ConfigOptions.hidePlugins && !(ConfigOptions.allowWolfAPI)) {
 				if (!(sender instanceof Player)) {

@@ -16,7 +16,7 @@ public class ResetSC implements SubCommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof Player) {
-			if (sender.hasPermission(cmd.getPermission())) {
+			if (sender.hasPermission("wolfapi.reset")) {
 				try {
 					File conf = new File(WolfAPI.plugin.getDataFolder(), "config.yml");
 					conf.delete();

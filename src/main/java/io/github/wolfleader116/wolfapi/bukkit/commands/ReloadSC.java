@@ -14,7 +14,7 @@ public class ReloadSC implements SubCommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (sender instanceof Player) {
-			if (sender.hasPermission(cmd.getPermission())) {
+			if (sender.hasPermission("wolfapi.reload")) {
 				try {
 					WolfAPI.plugin.reloadConfig();
 				} catch (Exception e) {
