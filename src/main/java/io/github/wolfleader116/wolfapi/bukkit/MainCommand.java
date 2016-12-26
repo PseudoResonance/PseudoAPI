@@ -47,6 +47,7 @@ public class MainCommand implements CommandExecutor {
 					return true;
 				}
 			}
+			new Message(plugin).sendPluginError(sender, Errors.CUSTOM, "Unknown subcommand. Type \"/" + cmd.getName() + " help\" for help.");
 		}
 		return false;
 	}
