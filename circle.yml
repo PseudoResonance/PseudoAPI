@@ -1,0 +1,8 @@
+machine:
+  java:
+    version: oraclejdk8
+dependencies:
+  pre:
+    - java -version
+    - mvn -version
+    - mvn clean install
