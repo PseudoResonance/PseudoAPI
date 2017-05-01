@@ -8,4 +8,4 @@ dependencies:
     - mvn clean install
 general:
   artifacts:
-    - "WolfAPI.jar"
+    - "target/WolfAPI.jar"
