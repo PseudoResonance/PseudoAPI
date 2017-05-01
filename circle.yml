@@ -6,3 +6,6 @@ dependencies:
     - java -version
     - mvn -version
     - mvn clean install
+general:
+  artifacts:
+    - "WolfAPI.jar"
