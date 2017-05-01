@@ -1,9 +1,8 @@
 name: WolfAPI
 author: WolfLeader116
 main: io.github.wolfleader116.wolfapi.bukkit.WolfAPI
-version: 1.0.9
+version: 2.0
 description: An API for Easy Access to Resources
-softdepend: [Essentials]
 commands:
   wolfapi:
     description: WolfAPI Menu
@@ -24,9 +23,17 @@ permissions:
     default: op
     children:
       wolfapi.plugins: true
+  wolfapi.reload:
+    description: Allows the player to reload the plugin
+    default: op
+  wolfapi.reset:
+    description: Allows the player to reset the plugin
+    default: op
   wolfapi.*:
     description: Gives the user all WolfAPI permissions
     default: op
     children:
       wolfapi.plugins: true
       wolfapi.allplugins: true
+      wolfapi.reload: true
+      wolfapi.reset: true

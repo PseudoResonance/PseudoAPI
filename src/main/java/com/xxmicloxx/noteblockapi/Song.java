@@ -14,6 +14,8 @@ public class Song {
     private String description;
     private float speed;
     private float delay;
+    private String originalAuthor;
+    private byte timeSignature;
 
     public Song(Song other) {
         this.speed = other.getSpeed();
@@ -25,11 +27,11 @@ public class Song {
         this.author = other.getAuthor();
         this.description = other.getDescription();
         this.path = other.getPath();
+        this.originalAuthor = other.getOriginalAuthor();
+        this.timeSignature = other.getTimeSignature();
     }
 
-    public Song(float speed, HashMap<Integer, Layer> layerHashMap,
-                short songHeight, final short length, String title, String author,
-                String description, File path) {
+    public Song(float speed, HashMap<Integer, Layer> layerHashMap, short songHeight, final short length, String title, String author, String description, File path, String originalAuthor, byte timeSignature) {
         this.speed = speed;
         delay = 20 / speed;
         this.layerHashMap = layerHashMap;
@@ -75,5 +77,13 @@ public class Song {
 
     public float getDelay() {
         return delay;
+    }
+    
+    public String getOriginalAuthor() {
+    	return originalAuthor;
+    }
+    
+    public byte getTimeSignature() {
+    	return timeSignature;
     }
 }

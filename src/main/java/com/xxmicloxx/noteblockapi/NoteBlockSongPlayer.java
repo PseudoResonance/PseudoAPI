@@ -43,12 +43,11 @@ public class NoteBlockSongPlayer extends SongPlayer {
             if (note == null) {
                 continue;
             }
-            p.playNote(noteBlock.getLocation(), Instrument.getBukkitInstrument(note.getInstrument()),
-                    new org.bukkit.Note(note.getKey() - 33));
-            p.playSound(noteBlock.getLocation(),
-                    Instrument.getInstrument(note.getInstrument()),
-                    (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f,
-                    NotePitch.getPitch(note.getKey() - 33));
+            if (Instrument.getBukkitInstrument(note.getInstrument()) == org.bukkit.Instrument.PIANO) {
+                p.playSound(noteBlock.getLocation(), "p" + NotePitch.getNote(note.getKey()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, 1f);
+            } else {
+            	p.playSound(noteBlock.getLocation(), Instrument.getInstrument(note.getInstrument()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, NotePitch.getPitch(note.getKey()));
+            }
         }
     }
 }

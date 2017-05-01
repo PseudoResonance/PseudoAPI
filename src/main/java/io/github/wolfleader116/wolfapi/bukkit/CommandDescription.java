@@ -5,11 +5,19 @@ public class CommandDescription {
 	private String command = "";
 	private String description = "";
 	private String permission = "";
+	private boolean runnable = true;
 	
 	public CommandDescription(String command, String description, String permission) {
 		this.command = command;
 		this.description = description;
 		this.permission = permission;
+	}
+	
+	public CommandDescription(String command, String description, String permission, boolean runnable) {
+		this.command = command;
+		this.description = description;
+		this.permission = permission;
+		this.runnable = runnable;
 	}
 	
 	public String getCommand() {
@@ -22,6 +30,10 @@ public class CommandDescription {
 	
 	public String getPermission() {
 		return permission;
+	}
+	
+	public boolean getRunnable() {
+		return runnable;
 	}
 
 }

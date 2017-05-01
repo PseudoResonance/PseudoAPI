@@ -39,7 +39,11 @@ public class HelpSC implements SubCommandExecutor {
 			for (int i = 0; i <= 9; i++) {
 				if (i < commands.size()) {
 					CommandDescription cd = commands.get(i);
-					messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + plugin.getOutputName() + ":" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+					if (cd.getRunnable()) {
+						messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+					} else {
+						messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+					}
 				}
 			}
 			if (commands.size() > 10) {
@@ -64,7 +68,11 @@ public class HelpSC implements SubCommandExecutor {
 					for (int i = (page - 1) * 10; i <= ((page - 1) * 10) + 9; i++) {
 						if (i < commands.size()) {
 							CommandDescription cd = commands.get(i);
-							messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+							if (cd.getRunnable()) {
+								messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+							} else {
+								messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+							}
 						}
 					}
 					if (commands.size() > 10) {

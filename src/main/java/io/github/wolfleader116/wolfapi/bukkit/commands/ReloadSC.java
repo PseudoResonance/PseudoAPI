@@ -4,7 +4,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import io.github.wolfleader116.wolfapi.bukkit.ConfigOptions;
 import io.github.wolfleader116.wolfapi.bukkit.Errors;
 import io.github.wolfleader116.wolfapi.bukkit.SubCommandExecutor;
 import io.github.wolfleader116.wolfapi.bukkit.WolfAPI;
@@ -21,7 +20,7 @@ public class ReloadSC implements SubCommandExecutor {
 					WolfAPI.message.sendPluginError(sender, Errors.GENERIC);
 					return false;
 				}
-				ConfigOptions.reloadConfig();
+				WolfAPI.getConfigOptions().reloadConfig();
 				WolfAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
 				return true;
 			} else {
@@ -35,7 +34,7 @@ public class ReloadSC implements SubCommandExecutor {
 				WolfAPI.message.sendPluginError(sender, Errors.GENERIC);
 				return false;
 			}
-			ConfigOptions.reloadConfig();
+			WolfAPI.getConfigOptions().reloadConfig();
 			WolfAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
 			return true;
 		}

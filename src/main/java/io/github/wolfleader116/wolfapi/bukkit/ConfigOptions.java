@@ -4,9 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.wolfleader116.wolfapi.bukkit.data.Data;
 import net.md_5.bungee.api.ChatColor;
 
-public class ConfigOptions {
+public class ConfigOptions implements ConfigOption {
 	
 	public static String border = "";
 	public static String title = "";
@@ -26,11 +27,9 @@ public class ConfigOptions {
 	public static boolean allowWolfAPI = true;
 	
 	public static boolean bungeeEnabled = false;
-	public static boolean bungeeOverride = false;
 	
 	public static boolean updateConfig() {
-		reloadConfig();
-		if (WolfAPI.plugin.getConfig().getInt("Version") == 4) {
+		if (WolfAPI.plugin.getConfig().getInt("Version") == 5) {
 			Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date!");
 		} else {
 			try {
@@ -50,6 +49,7 @@ public class ConfigOptions {
 				}
 				WolfAPI.plugin.saveDefaultConfig();
 				WolfAPI.plugin.reloadConfig();
+				WolfAPI.getConfigOptions().reloadConfig();
 				Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date! Old config file renamed to " + oldFile + ".");
 			} catch (Exception e) {
 				Message.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
@@ -59,7 +59,7 @@ public class ConfigOptions {
 		return true;
 	}
 	
-	public static void reloadConfig() {
+	public void reloadConfig() {
 		try {
 			String s = WolfAPI.plugin.getConfig().getString("BungeeEnabled");
 			if (s.equalsIgnoreCase("true")) {
@@ -73,24 +73,9 @@ public class ConfigOptions {
 		} catch (Exception e) {
 			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for BungeeEnabled!");
 		}
-		try {
-			if (bungeeEnabled) {
-				String s = WolfAPI.plugin.getConfig().getString("BungeeOverride");
-				if (s.equalsIgnoreCase("true")) {
-					bungeeOverride = true;
-				} else if (s.equalsIgnoreCase("false")) {
-					bungeeOverride = false;
-				} else {
-					bungeeEnabled = false;
-					Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for BungeeOverride!");
-				}
-			}
-		} catch (Exception e) {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for BungeeOverride!");
-		}
 		String mf = WolfAPI.plugin.getConfig().getString("MessageFormat");
 		if (mf == null) {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for BungeeOverride!");
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for MessageFormat!");
 			messageFormat = "{nickname}> {message}";
 		} else {
 			messageFormat = mf;
@@ -281,6 +266,7 @@ public class ConfigOptions {
 		} else if (WolfAPI.plugin.getConfig().getString("ClickEvent").equalsIgnoreCase("suggest")) {
 			clickEvent = ComponentType.SUGGEST_COMMAND;
 		}
+		Data.loadBackends();
 	}
 	
 	public static String arrayToString(ChatColor[] cc) {

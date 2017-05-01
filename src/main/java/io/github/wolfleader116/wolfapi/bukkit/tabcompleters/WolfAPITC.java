@@ -14,14 +14,18 @@ public class WolfAPITC implements TabCompleter {
 		List<String> possible = new ArrayList<String>();
 		if (args.length == 1) {
 			possible.add("help");
-			possible.add("reload");
-			possible.add("reset");
+			if (sender.hasPermission("wolfapi.reload")) {
+				possible.add("reload");
+			}
+			if (sender.hasPermission("wolfapi.reset")) {
+				possible.add("reset");
+			}
 			if (args[0].equalsIgnoreCase("")) {
 				return possible;
 			} else {
 				List<String> checked = new ArrayList<String>();
 				for (String check : possible) {
-					if (check.startsWith(args[0])) {
+					if (check.toLowerCase().startsWith(args[0].toLowerCase())) {
 						checked.add(check);
 					}
 				}

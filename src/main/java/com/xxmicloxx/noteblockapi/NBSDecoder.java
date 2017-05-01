@@ -26,12 +26,12 @@ public class NBSDecoder {
             short songHeight = readShort(dis);
             String title = readString(dis);
             String author = readString(dis);
-            readString(dis);
+            String originalAuthor = readString(dis);
             String description = readString(dis);
             float speed = readShort(dis) / 100f;
             dis.readBoolean(); // auto-save
             dis.readByte(); // auto-save duration
-            dis.readByte(); // x/4ths, time signature
+            byte timeSignature = dis.readByte(); // x/4ths, time signature
             readInt(dis); // minutes spent on project
             readInt(dis); // left clicks (why?)
             readInt(dis); // right clicks (why?)
@@ -65,7 +65,7 @@ public class NBSDecoder {
                     l.setVolume(dis.readByte());
                 }
             }
-            return new Song(speed, layerHashMap, songHeight, length, title, author, description, decodeFile);
+            return new Song(speed, layerHashMap, songHeight, length, title, author, description, decodeFile, originalAuthor, timeSignature);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

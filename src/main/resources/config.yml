@@ -3,7 +3,7 @@
 #######################
 
 #DO NOT CHANGE THIS LINE! YOUR CONFIG WILL BE RESET UPON LOADING IF THIS LINE IS EDITED!
-Version: 4
+Version: 5
 
 #########
 #Plugins#
@@ -16,15 +16,40 @@ HidePlugins: true
 AllowWolfAPI: true
 
 
+##############
+#Data Storage#
+##############
+
+#Data backend configuration
+Backend: file
+
+#Define backends here:
+Backends:
+  file:
+    type: file
+    file: data.yml
+  mysql:
+    type: mysql
+    host: 127.0.0.1
+    port: 3306
+    username: username
+    password: password
+    database: WolfPlugins
+    prefix: "Wolf_"
+  sqlite:
+    type: sqlite
+    database: plugins/WolfAPI/data
+    username: username
+    password: password
+    prefix: "Wolf_"
+
+
 ##########################
 #BungeeCord Configuration#
 ##########################
 
 #Is server on BungeeCord network?
 BungeeEnabled: false
-
-#Allow BungeeCord to override config? (If BungeeEnabled is true)
-BungeeOverride: true
 
 
 ######
@@ -70,4 +95,5 @@ ClickEvent: Run
 
 #Console Format
 #Is newest console message at top or bottom?
+#Usually top for Multicraft and bottom for self-hosted servers
 ConsoleFormat: bottom
