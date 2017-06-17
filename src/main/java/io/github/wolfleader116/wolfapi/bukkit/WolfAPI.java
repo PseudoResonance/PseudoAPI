@@ -81,6 +81,7 @@ public class WolfAPI extends WolfPlugin implements Listener {
 	private void initializeCommands() {
 		this.getCommand("wolfapi").setExecutor(mainCommand);
 		this.getCommand("plugins").setExecutor(pluginsCommand);
+		this.getCommand("pl").setExecutor(pluginsCommand);
 		this.getCommand("allplugins").setExecutor(allPluginsCommand);
 	}
 

@@ -34,11 +34,7 @@ public class PositionSongPlayer extends SongPlayer {
             if (note == null) {
                 continue;
             }
-            if (Instrument.getBukkitInstrument(note.getInstrument()) == org.bukkit.Instrument.PIANO) {
-                p.playSound(targetLocation, "p" + NotePitch.getNote(note.getKey()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, 1f);
-            } else {
-            	p.playSound(targetLocation, Instrument.getInstrument(note.getInstrument()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, NotePitch.getPitch(note.getKey()));
-            }
+        	p.playSound(targetLocation, Instrument.getInstrument(note.getInstrument()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, NotePitch.getPitch(note.getKey()));
         }
     }
 }

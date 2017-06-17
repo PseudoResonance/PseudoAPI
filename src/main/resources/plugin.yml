@@ -1,7 +1,7 @@
 name: WolfAPI
 author: WolfLeader116
 main: io.github.wolfleader116.wolfapi.bukkit.WolfAPI
-version: 2.0
+version: 2.0.1
 description: An API for Easy Access to Resources
 commands:
   wolfapi:
@@ -9,7 +9,9 @@ commands:
   plugins:
     description: Plugins
     permission: wolfapi.plugins
-    aliases: [pl]
+  pl:
+    description: Plugins
+    permission: wolfapi.plugins
   allplugins:
     description: All plugins
     permission: wolfapi.allplugins
