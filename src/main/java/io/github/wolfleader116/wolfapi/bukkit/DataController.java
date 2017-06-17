@@ -47,7 +47,7 @@ public class DataController {
 				con = DriverManager.getConnection("jdbc:mysql://" + mb.getHost() + ":" + mb.getPort() + "/" + mb.getDatabase(), mb.getUsername(), mb.getPassword());
 				s = con.createStatement();
 				prefix = mb.getPrefix();
-				s.executeUpdate("CREATE TABLE IF NOT EXISTS `" + prefix + "Anvils` (x int, y int, z int, world VARCHAR(100));");
+				s.executeUpdate("CREATE TABLE IF NOT EXISTS `" + prefix + "UUIDS` (uuid VARCHAR(100), name VARCHAR(100));");
 			} catch (SQLException | ClassNotFoundException e) {
 				e.printStackTrace();
 				error = true;
@@ -59,7 +59,7 @@ public class DataController {
 				con = DriverManager.getConnection("jdbc:sqlite:" + sb.getLocation().toString() + ".db");
 				s = con.createStatement();
 				prefix = sb.getPrefix();
-				s.executeUpdate("CREATE TABLE IF NOT EXISTS `" + prefix + "Anvils` (x int, y int, z int, world VARCHAR(100));");
+				s.executeUpdate("CREATE TABLE IF NOT EXISTS `" + prefix + "UUIDS` (uuid VARCHAR(100), name VARCHAR(100));");
 			} catch (SQLException | ClassNotFoundException e) {
 				e.printStackTrace();
 				error = true;
