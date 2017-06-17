@@ -267,6 +267,7 @@ public class ConfigOptions implements ConfigOption {
 			clickEvent = ComponentType.SUGGEST_COMMAND;
 		}
 		Data.loadBackends();
+		DataController.updateBackend();
 	}
 	
 	public static String arrayToString(ChatColor[] cc) {
