@@ -64,6 +64,13 @@ public class WolfAPI extends WolfPlugin implements Listener {
         Bukkit.getScheduler().cancelTasks(this);
 	}
 	
+	public static String getName(String uuid) {
+		return DataController.getName(uuid);
+	}
+	public static String getUUID(String name) {
+		return DataController.getUUID(name);
+	}
+	
 	public static void registerConfig(ConfigOption r) {
 		config.add(r);
 	}
