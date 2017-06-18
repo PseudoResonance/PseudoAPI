@@ -15,6 +15,7 @@ import io.github.wolfleader116.wolfapi.bukkit.commands.PluginsC;
 import io.github.wolfleader116.wolfapi.bukkit.commands.ReloadSC;
 import io.github.wolfleader116.wolfapi.bukkit.commands.ResetSC;
 import io.github.wolfleader116.wolfapi.bukkit.events.CommandPreprocessEH;
+import io.github.wolfleader116.wolfapi.bukkit.events.PlayerJoinEH;
 import io.github.wolfleader116.wolfapi.bukkit.messaging.PluginMessenger;
 import io.github.wolfleader116.wolfapi.bukkit.tabcompleters.WolfAPITC;
 
@@ -108,6 +109,7 @@ public class WolfAPI extends WolfPlugin implements Listener {
 		    this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeSpigot", pcl = new PluginChannelListener());
 		}
 		getServer().getPluginManager().registerEvents(new CommandPreprocessEH(), this);
+		getServer().getPluginManager().registerEvents(new PlayerJoinEH(), this);
 	}
 
 	private void setCommandDescriptions() {
