@@ -65,10 +65,10 @@ public class WolfAPI extends WolfPlugin implements Listener {
         Bukkit.getScheduler().cancelTasks(this);
 	}
 	
-	public static String getName(String uuid) {
+	public static String getPlayerName(String uuid) {
 		return DataController.getName(uuid);
 	}
-	public static String getUUID(String name) {
+	public static String getPlayerUUID(String name) {
 		return DataController.getUUID(name);
 	}
 	
