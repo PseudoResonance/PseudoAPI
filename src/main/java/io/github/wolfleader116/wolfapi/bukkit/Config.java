@@ -8,11 +8,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.Plugin;
 
 public class Config {
 
-	private final Plugin PLUGIN;
+	private final WolfPlugin PLUGIN;
 	private final String FILENAME;
 	private final File FOLDER;
 	private FileConfiguration config;
@@ -77,13 +76,7 @@ public class Config {
 	}
 
 	public void saveDefaultConfig() {
-		if (configFile == null) {
-			configFile = new File(this.PLUGIN.getDataFolder(), this.FILENAME);
-		}
-
-		if (!configFile.exists()) {
-			this.PLUGIN.saveResource(this.FILENAME, false);
-		}
+		this.PLUGIN.saveJarResource(this.FILENAME, false);
 	}
 
 	public void save() {

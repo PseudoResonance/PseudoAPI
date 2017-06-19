@@ -134,6 +134,9 @@ public class WolfPlugin extends JavaPlugin {
 	public void saveJarResource(String name, boolean overwrite) {
 		File targetFile = new File(this.getDataFolder() + File.pathSeparator + name);
 		if ((targetFile.exists() && overwrite) || !targetFile.exists()) {
+			if (targetFile.exists()) {
+				targetFile.delete();
+			}
 			try {
 				InputStream initialStream = this.getResource(name);
 				byte[] buffer;
