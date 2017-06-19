@@ -1,5 +1,10 @@
 package io.github.wolfleader116.wolfapi.bukkit;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +14,7 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class WolfPlugin extends JavaPlugin {
-	
+
 	private String name = "";
 	private String prefix = "";
 	private String description = "";
@@ -23,7 +28,8 @@ public class WolfPlugin extends JavaPlugin {
 	private String output = "";
 	protected Map<String, SubCommandExecutor> subCommands = new HashMap<String, SubCommandExecutor>();
 	protected List<CommandDescription> commandDescriptions = new ArrayList<CommandDescription>();
-	
+	public Message message;
+
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -72,56 +78,76 @@ public class WolfPlugin extends JavaPlugin {
 		} else {
 			output = prefix;
 		}
+		message = new Message(this);
 		PluginController.pluginLoaded(this);
 	}
-	
+
 	@Override
 	public void onDisable() {
 		super.onDisable();
 	}
-	
+
 	public String getPluginName() {
 		return name;
 	}
-	
+
 	public String getPrefix() {
 		return prefix;
 	}
-	
+
 	public String getOutputName() {
 		return output;
 	}
-	
+
 	public String getPluginDescription() {
 		return description;
 	}
-	
+
 	public List<String> getAuthors() {
 		return authors;
 	}
-	
+
 	public String getVersion() {
 		return version;
 	}
-	
+
 	public List<String> getDepend() {
 		return depend;
 	}
-	
+
 	public List<String> getSoftDepend() {
 		return softDepend;
 	}
-	
+
 	public List<String> getLoadBefore() {
 		return loadBefore;
 	}
-	
+
 	public Map<String, Map<String, Object>> getCommands() {
 		return commands;
 	}
-	
+
 	public List<Permission> getPermissions() {
 		return permissions;
+	}
+
+	public void saveJarResource(String name, boolean overwrite) {
+		File targetFile = new File(this.getDataFolder() + File.pathSeparator + name);
+		if ((targetFile.exists() && overwrite) || !targetFile.exists()) {
+			try {
+				InputStream initialStream = this.getResource(name);
+				byte[] buffer;
+				buffer = new byte[initialStream.available()];
+				initialStream.read(buffer);
+				OutputStream outStream = new FileOutputStream(targetFile);
+				outStream.write(buffer);
+				initialStream.close();
+				outStream.close();
+			} catch (IOException e) {
+				Message.sendConsoleMessage("Plugin: " + this.name + " failed to save resource: " + name);
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
