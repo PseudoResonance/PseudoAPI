@@ -76,7 +76,12 @@ public class Config {
 	}
 
 	public void saveDefaultConfig() {
-		this.PLUGIN.saveJarResource(this.FILENAME, false);
+		if (configFile == null) {
+			configFile = new File(this.FOLDER, this.FILENAME);
+		}
+		if (!configFile.exists()) {
+			this.PLUGIN.saveResource(this.FILENAME, false);
+		}
 	}
 
 	public void save() {

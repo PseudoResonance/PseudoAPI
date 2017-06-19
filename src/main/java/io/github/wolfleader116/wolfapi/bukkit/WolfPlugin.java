@@ -1,10 +1,5 @@
 package io.github.wolfleader116.wolfapi.bukkit;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -129,28 +124,6 @@ public class WolfPlugin extends JavaPlugin {
 
 	public List<Permission> getPermissions() {
 		return permissions;
-	}
-
-	public void saveJarResource(String name, boolean overwrite) {
-		File targetFile = new File(this.getDataFolder() + File.pathSeparator + name);
-		if ((targetFile.exists() && overwrite) || !targetFile.exists()) {
-			if (targetFile.exists()) {
-				targetFile.delete();
-			}
-			try {
-				InputStream initialStream = this.getResource(name);
-				byte[] buffer;
-				buffer = new byte[initialStream.available()];
-				initialStream.read(buffer);
-				OutputStream outStream = new FileOutputStream(targetFile);
-				outStream.write(buffer);
-				initialStream.close();
-				outStream.close();
-			} catch (IOException e) {
-				Message.sendConsoleMessage("Plugin: " + this.name + " failed to save resource: " + name);
-				e.printStackTrace();
-			}
-		}
 	}
 
 }
