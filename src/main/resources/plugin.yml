@@ -1,7 +1,7 @@
 name: WolfAPI
 author: WolfLeader116
 main: io.github.wolfleader116.wolfapi.bukkit.WolfAPI
-version: 2.1.10
+version: 2.1.11
 description: An API for Easy Access to Resources
 commands:
   wolfapi:

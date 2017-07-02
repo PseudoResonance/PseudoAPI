@@ -178,11 +178,21 @@ public class DataController {
 	}
 	
 	public static String getName(String uuid) {
-		return uuids.get(uuid);
+		for (String u : uuids.keySet()) {
+			if (u.equalsIgnoreCase(uuid)) {
+				return uuids.get(u);
+			}
+		}
+		return null;
 	}
 	
 	public static String getUUID(String name) {
-		return uuids.getKey(name);
+		for (String n : uuids.values()) {
+			if (n.equalsIgnoreCase(name)) {
+				return uuids.getKey(n);
+			}
+		}
+		return null;
 	}
 	
 	public static DualHashBidiMap<String, String> getUUIDS(Backend b) {
