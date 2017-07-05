@@ -1,8 +1,14 @@
 package io.github.wolfleader116.wolfapi.bukkit;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import io.github.wolfleader116.wolfapi.bukkit.data.Data;
 import net.md_5.bungee.api.ChatColor;
@@ -29,9 +35,18 @@ public class ConfigOptions implements ConfigOption {
 	public static boolean bungeeEnabled = false;
 	
 	public static boolean updateConfig() {
-		if (WolfAPI.plugin.getConfig().getInt("Version") == 5) {
-			Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date!");
-		} else {
+		boolean error = false;
+		InputStream configin = WolfAPI.plugin.getClass().getResourceAsStream("/config.yml"); 
+		BufferedReader configreader = new BufferedReader(new InputStreamReader(configin));
+		YamlConfiguration configc = YamlConfiguration.loadConfiguration(configreader);
+		int configcj = configc.getInt("Version");
+		try {
+			configreader.close();
+			configin.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		if (WolfAPI.plugin.getConfig().getInt("Version") != configcj) {
 			try {
 				String oldFile = "";
 				File conf = new File(WolfAPI.plugin.getDataFolder(), "config.yml");
@@ -53,8 +68,13 @@ public class ConfigOptions implements ConfigOption {
 				Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date! Old config file renamed to " + oldFile + ".");
 			} catch (Exception e) {
 				Message.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
-				return false;
+				error = true;
 			}
+		}
+		if (!error) {
+			Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date!");
+		} else {
+			return false;
 		}
 		return true;
 	}
