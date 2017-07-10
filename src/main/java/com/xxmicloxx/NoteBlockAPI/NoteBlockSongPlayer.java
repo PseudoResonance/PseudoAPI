@@ -15,6 +15,10 @@ public class NoteBlockSongPlayer extends SongPlayer {
 		super(song);
 	}
 
+	public NoteBlockSongPlayer(Song song, boolean resourcePack) {
+		super(song, resourcePack);
+	}
+
 	public Block getNoteBlock() {
 		return noteBlock;
 	}
@@ -43,13 +47,17 @@ public class NoteBlockSongPlayer extends SongPlayer {
 
 			if (Instrument.isCustomInstrument(note.getInstrument())) {
 				if (song.getCustomInstruments()[note.getInstrument() - Instrument.getCustomInstrumentFirstIndex()].getSound() != null) {
-					p.playSound(noteBlock.getLocation(), song.getCustomInstruments()[note.getInstrument() - Instrument.getCustomInstrumentFirstIndex()].getSound(), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey() - 33));
+					p.playSound(noteBlock.getLocation(), song.getCustomInstruments()[note.getInstrument() - Instrument.getCustomInstrumentFirstIndex()].getSound(), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
 				} else {
-					p.playSound(noteBlock.getLocation(), song.getCustomInstruments()[note.getInstrument() - Instrument.getCustomInstrumentFirstIndex()].getSoundfile(), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey() - 33));
+					p.playSound(noteBlock.getLocation(), song.getCustomInstruments()[note.getInstrument() - Instrument.getCustomInstrumentFirstIndex()].getSoundfile(), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
 				}
 
 			} else {
-				p.playSound(noteBlock.getLocation(), Instrument.getInstrument(note.getInstrument()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey() - 33));
+				if (resourcePack) {
+					p.playSound(noteBlock.getLocation(), "gb" + NotePitch.getFile(note.getKey()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
+				} else {
+					p.playSound(noteBlock.getLocation(), Instrument.getInstrument(note.getInstrument()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
+				}
 			}
 
 			if (isPlayerInRange(p)) {
