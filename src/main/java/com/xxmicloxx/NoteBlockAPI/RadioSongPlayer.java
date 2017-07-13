@@ -11,10 +11,6 @@ public class RadioSongPlayer extends SongPlayer {
 		super(song);
 	}
 
-	public RadioSongPlayer(Song song, boolean resourcePack) {
-		super(song, resourcePack);
-	}
-
 	@Override
 	public void playTick(Player p, int tick) {
 		byte playerVolume = WolfAPI.getPlayerVolume(p);
@@ -32,11 +28,7 @@ public class RadioSongPlayer extends SongPlayer {
 				}
 
 			} else {
-				if (resourcePack) {
-					p.playSound(getLocation(p.getEyeLocation()), "gb" + NotePitch.getFile(note.getKey()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, NotePitch.getPitch(note.getKey()));
-				} else {
-					p.playSound(getLocation(p.getEyeLocation()), Instrument.getInstrument(note.getInstrument()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, NotePitch.getPitch(note.getKey()));
-				}
+				p.playSound(getLocation(p.getEyeLocation()), Instrument.getInstrument(note.getInstrument()), (l.getVolume() * (int) volume * (int) playerVolume) / 1000000f, NotePitch.getPitch(note.getKey()));
 			}
 		}
 	}

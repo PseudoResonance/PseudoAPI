@@ -15,10 +15,6 @@ public class NoteBlockSongPlayer extends SongPlayer {
 		super(song);
 	}
 
-	public NoteBlockSongPlayer(Song song, boolean resourcePack) {
-		super(song, resourcePack);
-	}
-
 	public Block getNoteBlock() {
 		return noteBlock;
 	}
@@ -53,11 +49,7 @@ public class NoteBlockSongPlayer extends SongPlayer {
 				}
 
 			} else {
-				if (resourcePack) {
-					p.playSound(noteBlock.getLocation(), "gb" + NotePitch.getFile(note.getKey()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
-				} else {
-					p.playSound(noteBlock.getLocation(), Instrument.getInstrument(note.getInstrument()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
-				}
+				p.playSound(noteBlock.getLocation(), Instrument.getInstrument(note.getInstrument()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
 			}
 
 			if (isPlayerInRange(p)) {

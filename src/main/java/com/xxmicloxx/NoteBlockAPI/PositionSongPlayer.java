@@ -2,7 +2,6 @@ package com.xxmicloxx.NoteBlockAPI;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import io.github.wolfleader116.wolfapi.bukkit.WolfAPI;
@@ -14,10 +13,6 @@ public class PositionSongPlayer extends SongPlayer {
 
 	public PositionSongPlayer(Song song) {
 		super(song);
-	}
-
-	public PositionSongPlayer(Song song, boolean resourcePack) {
-		super(song, resourcePack);
 	}
 
 	public Location getTargetLocation() {
@@ -50,13 +45,7 @@ public class PositionSongPlayer extends SongPlayer {
 				}
 
 			} else {
-				if (resourcePack) {
-					if (Instrument.getInstrument(note.getInstrument()) == Sound.BLOCK_NOTE_HARP) {
-						p.playSound(targetLocation, "gb" + NotePitch.getFile(note.getKey()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
-					}
-				} else {
-					p.playSound(targetLocation, Instrument.getInstrument(note.getInstrument()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
-				}
+				p.playSound(targetLocation, Instrument.getInstrument(note.getInstrument()), ((l.getVolume() * (int) volume * (int) playerVolume) / 1000000f) * ((1f / 16f) * distance), NotePitch.getPitch(note.getKey()));
 			}
 
 			if (isPlayerInRange(p)) {

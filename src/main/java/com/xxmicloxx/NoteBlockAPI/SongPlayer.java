@@ -30,18 +30,10 @@ public abstract class SongPlayer {
 	protected FadeType fadeType = FadeType.FADE_LINEAR;
 	private final Lock lock = new ReentrantLock();
 	protected WolfAPI plugin;
-	protected boolean resourcePack = false;
 
 	public SongPlayer(Song song) {
 		this.song = song;
 		plugin = WolfAPI.plugin;
-		start();
-	}
-	
-	public SongPlayer(Song song, boolean resourcePack) {
-		this.song = song;
-		plugin = WolfAPI.plugin;
-		this.resourcePack = resourcePack;
 		start();
 	}
 
