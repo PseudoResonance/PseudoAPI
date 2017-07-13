@@ -19,5 +19,12 @@ public class PlayerJoinEH implements Listener {
 		String name = p.getName();
 		DataController.addUUID(uuid, name);
 	}
+	
+	public static void playerJoin(Player p) {
+		UUID u = p.getUniqueId();
+		String uuid = u.toString();
+		String name = p.getName();
+		DataController.addUUID(uuid, name);
+	}
 
 }

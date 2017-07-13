@@ -61,6 +61,9 @@ public class WolfAPI extends WolfPlugin implements Listener {
 		configOptions.reloadConfig();
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		PluginMessenger.enable();
+		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+			PlayerJoinEH.playerJoin(p);
+		}
 	}
 
 	@Override
