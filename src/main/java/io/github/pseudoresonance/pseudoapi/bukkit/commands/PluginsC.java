@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.ConfigOptions;
-import io.github.pseudoresonance.pseudoapi.bukkit.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message;
+import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.PluginController;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;

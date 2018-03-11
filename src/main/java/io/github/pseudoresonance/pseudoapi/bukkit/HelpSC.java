@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import net.md_5.bungee.api.ChatColor;
 
 public class HelpSC implements SubCommandExecutor {

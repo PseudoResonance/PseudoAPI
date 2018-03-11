@@ -281,5 +281,15 @@ public class Message {
 			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + p.getName() + " " + end);
 		}
 	}
+	
+	public enum Errors {
+		NO_PERMISSION,
+		NOT_A_NUMBER,
+		NOT_ONLINE,
+		NEVER_JOINED,
+		NOT_LOADED,
+		CUSTOM,
+		GENERIC;
+	}
 
 }

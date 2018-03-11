@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+
 public class PluginChannelListener implements PluginMessageListener {
 
 	private static HashMap<Player, Object> obj = new HashMap<Player, Object>();

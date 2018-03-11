@@ -8,6 +8,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+
 public class MainCommand implements CommandExecutor {
 	
 	protected PseudoPlugin plugin;
