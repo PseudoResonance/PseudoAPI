@@ -1,41 +1,41 @@
-name: WolfAPI
-author: WolfLeader116
-main: io.github.wolfleader116.wolfapi.bukkit.WolfAPI
-version: 2.1.16
+name: PseudoAPI
+author: PseudoResonance
+main: io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI
+version: 3.0
 description: An API for Easy Access to Resources
 commands:
-  wolfapi:
-    description: WolfAPI Menu
+  pseudoapi:
+    description: PseudoAPI Menu
   plugins:
     description: Plugins
-    permission: wolfapi.plugins
+    permission: pseudoapi.plugins
   pl:
     description: Plugins
-    permission: wolfapi.plugins
+    permission: pseudoapi.plugins
   allplugins:
     description: All plugins
-    permission: wolfapi.allplugins
+    permission: pseudoapi.allplugins
     aliases: [allpl]
 permissions:
-  wolfapi.plugins:
-    description: Allows the player to see WolfAPI plugins
+  pseudoapi.plugins:
+    description: Allows the player to see PseudoAPI plugins
     default: true
-  wolfapi.allplugins:
+  pseudoapi.allplugins:
     description: Allows the player to see all plugins
     default: op
     children:
-      wolfapi.plugins: true
-  wolfapi.reload:
+      pseudoapi.plugins: true
+  pseudoapi.reload:
     description: Allows the player to reload the plugin
     default: op
-  wolfapi.reset:
+  pseudoapi.reset:
     description: Allows the player to reset the plugin
     default: op
-  wolfapi.*:
-    description: Gives the user all WolfAPI permissions
+  pseudoapi.*:
+    description: Gives the user all PseudoAPI permissions
     default: op
     children:
-      wolfapi.plugins: true
-      wolfapi.allplugins: true
-      wolfapi.reload: true
-      wolfapi.reset: true
+      pseudoapi.plugins: true
+      pseudoapi.allplugins: true
+      pseudoapi.reload: true
+      pseudoapi.reset: true

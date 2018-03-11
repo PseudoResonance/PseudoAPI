@@ -1,6 +1,6 @@
-#######################
-#WolfAPI Bukkit Config#
-#######################
+#########################
+#PseudoAPI Bukkit Config#
+#########################
 
 #DO NOT CHANGE THIS LINE! YOUR CONFIG WILL BE RESET UPON LOADING IF THIS LINE IS EDITED!
 Version: 5
@@ -12,8 +12,8 @@ Version: 5
 #Hide plugins from players?
 HidePlugins: true
 
-#Allow players to see WolfAPI plugins?
-AllowWolfAPI: true
+#Allow players to see PseudoAPI plugins?
+AllowPseudoAPI: true
 
 
 ##############
@@ -27,21 +27,22 @@ Backend: file
 Backends:
   file:
     type: file
-    file: data.yml
+    #Relative to plugin directory if not absolute
+    directory: Data
   mysql:
     type: mysql
     host: 127.0.0.1
     port: 3306
     username: username
     password: password
-    database: WolfPlugins
-    prefix: "Wolf_"
+    database: PseudoPlugins
+    prefix: "Pseudo_"
   sqlite:
     type: sqlite
-    database: plugins/WolfAPI/data
+    database: plugins/PseudoAPI/data
     username: username
     password: password
-    prefix: "Wolf_"
+    prefix: "Pseudo_"
 
 
 ##########################
