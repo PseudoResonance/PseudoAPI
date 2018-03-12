@@ -30,8 +30,6 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 
 	private static List<ConfigOption> config = new ArrayList<ConfigOption>();
 
-	private boolean disabling = false;
-
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -59,37 +57,8 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 
 	@Override
 	public void onDisable() {
-		disabling = true;
 		Bukkit.getScheduler().cancelTasks(this);
 		super.onDisable();
-	}
-
-	public static int getCompatibility() {
-		if (Bukkit.getVersion().contains("1.8") || Bukkit.getVersion().contains("1.7")) {
-			return NoteBlockCompatibility.pre1_9;
-		} else if (Bukkit.getVersion().contains("1.9") || Bukkit.getVersion().contains("1.10") || Bukkit.getVersion().contains("1.11")) {
-			return NoteBlockCompatibility.pre1_12;
-		} else {
-			return NoteBlockCompatibility.post1_12;
-		}
-	}
-
-	public void doSync(Runnable r) {
-		getServer().getScheduler().runTask(this, r);
-	}
-
-	public void doAsync(Runnable r) {
-		getServer().getScheduler().runTaskAsynchronously(this, r);
-	}
-
-	public boolean isDisabling() {
-		return disabling;
-	}
-
-	public class NoteBlockCompatibility {
-		public static final int pre1_9 = 0;
-		public static final int pre1_12 = 1;
-		public static final int post1_12 = 2;
 	}
 
 	public static String getPlayerName(String uuid) {
