@@ -34,6 +34,11 @@ public class ConfigOptions implements ConfigOption {
 	
 	public static boolean bungeeEnabled = false;
 	
+	public static String timeFormat = "HH:mm:ss";
+	public static String dateFormat = "yyyy-MM-dd";
+	
+	public static int tpsUpdateFrequency = 20;
+	
 	public static boolean updateConfig() {
 		boolean error = false;
 		InputStream configin = PseudoAPI.plugin.getClass().getResourceAsStream("/config.yml"); 
@@ -286,8 +291,27 @@ public class ConfigOptions implements ConfigOption {
 		} else if (PseudoAPI.plugin.getConfig().getString("ClickEvent").equalsIgnoreCase("suggest")) {
 			clickEvent = ComponentType.SUGGEST_COMMAND;
 		}
+		if (PseudoAPI.plugin.getConfig().getString("TimeFormat") != "") {
+			timeFormat = PseudoAPI.plugin.getConfig().getString("TimeFormat");
+		} else {
+			timeFormat = "HH:mm:ss";
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for TimeFormat!");
+		}
+		if (PseudoAPI.plugin.getConfig().getString("DateFormat") != "") {
+			dateFormat = PseudoAPI.plugin.getConfig().getString("DateFormat");
+		} else {
+			dateFormat = "yyyy-MM-dd";
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for DateFormat!");
+		}
+		String tpsUpdate = PseudoAPI.plugin.getConfig().getString("TPSUpdateFrequency");
+		if (isInteger(tpsUpdate)) {
+			tpsUpdateFrequency = Integer.valueOf(tpsUpdate);
+		} else {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for TPSUpdateFrequency!");
+		}
 		Data.loadBackends();
-		DataController.updateBackend();
+		Utils.stopTps();
+		Utils.startTps();
 	}
 	
 	public static String arrayToString(ChatColor[] cc) {
@@ -296,6 +320,17 @@ public class ConfigOptions implements ConfigOption {
 			s.append(c);
 		}
 		return s.toString();
+	}
+	
+	private static boolean isInteger(String s) {
+	    try { 
+	        Integer.parseInt(s); 
+	    } catch(NumberFormatException e) { 
+	        return false; 
+	    } catch(NullPointerException e) {
+	        return false;
+	    }
+	    return true;
 	}
 
 }

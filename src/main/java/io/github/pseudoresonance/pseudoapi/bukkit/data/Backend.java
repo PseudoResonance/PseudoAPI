@@ -1,22 +1,15 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.data;
 
-public abstract class Backend {
+public interface Backend {
 	
-	private String name = "";
+	public void setup();
 	
-	public Backend(String name) {
-		this.name = name;
-	}
+	public void stop();
 	
-	public String getName() {
-		return this.name;
-	}
+	public boolean isEnabled();
 	
-	public boolean equals(Backend obj) {
-		if (obj.getName().equals(this.name)) {
-			return true;
-		}
-		return false;
-	}
+	public String getName();
+	
+	public boolean equals(Backend obj);
 
 }

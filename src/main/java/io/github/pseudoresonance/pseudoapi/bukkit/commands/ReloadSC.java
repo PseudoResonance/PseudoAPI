@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.SubCommandExecutor;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
+import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 
 public class ReloadSC implements SubCommandExecutor {
@@ -21,6 +23,8 @@ public class ReloadSC implements SubCommandExecutor {
 					return false;
 				}
 				PseudoAPI.getConfigOptions().reloadConfig();
+				Data.loadBackends();
+				PlayerDataController.update();
 				PseudoAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
 				return true;
 			} else {
@@ -35,6 +39,8 @@ public class ReloadSC implements SubCommandExecutor {
 				return false;
 			}
 			PseudoAPI.getConfigOptions().reloadConfig();
+			Data.loadBackends();
+			PlayerDataController.update();
 			PseudoAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
 			return true;
 		}

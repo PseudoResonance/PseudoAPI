@@ -1,7 +1,7 @@
 name: PseudoAPI
 author: PseudoResonance
 main: io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI
-version: 3.0.1
+version: 3.0.4
 description: An API for Easy Access to Resources
 commands:
   pseudoapi:
@@ -16,7 +16,34 @@ commands:
     description: All plugins
     permission: pseudoapi.allplugins
     aliases: [allpl]
+  metrics:
+    description: System metrics
+    permission: pseudoapi.metrics
+    aliases: [lag,tps]
+  brand:
+    description: Player client brand
+    permission: pseudoapi.brand
 permissions:
+  pseudoapi.brand:
+    description: Allows the player to see user's client brands
+    default: op
+  pseudoapi.metrics:
+    description: Allows the player to see detailed system metrics
+    default: op
+    children:
+      pseudoapi.metrics.tps: true
+  pseudoapi.metrics.tps:
+    description: Allows the player to see tps details in system metrics
+    default: op
+  pseudoapi.metrics.java:
+    description: Allows the player to see java details in system metrics
+    default: op
+  pseudoapi.metrics.cpu:
+    description: Allows the player to see cpu details in system metrics
+    default: op
+  pseudoapi.metrics.memory:
+    description: Allows the player to see memory details in system metrics
+    default: op
   pseudoapi.plugins:
     description: Allows the player to see PseudoAPI plugins
     default: true
@@ -37,5 +64,10 @@ permissions:
     children:
       pseudoapi.plugins: true
       pseudoapi.allplugins: true
+      pseudoapi.brand: true
+      pseudoapi.metrics: true
+      pseudoapi.metrics.java: true
+      pseudoapi.metrics.cpu: true
+      pseudoapi.metrics.memory: true
       pseudoapi.reload: true
       pseudoapi.reset: true

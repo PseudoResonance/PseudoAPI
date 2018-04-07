@@ -2,13 +2,32 @@ package io.github.pseudoresonance.pseudoapi.bukkit.data;
 
 import java.io.File;
 
-public class FileBackend extends Backend {
+public class FileBackend implements Backend {
 	
-	private File folder;
+	private boolean enabled = false;
+	
+	private final String name;
+	private final File folder;
 
 	public FileBackend(String name, File folder) {
-		super(name);
+		this.name = name;
 		this.folder = folder;
+	}
+
+	public void setup() {
+		enabled = true;
+	}
+
+	public void stop() {
+		enabled = false;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public String getName() {
+		return this.name;
 	}
 	
 	public File getFolder() {

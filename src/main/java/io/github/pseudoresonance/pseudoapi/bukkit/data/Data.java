@@ -27,6 +27,9 @@ public class Data {
 	}
 	
 	public static void loadBackends() {
+		if (backend != null)
+			if (backend instanceof SQLBackend)
+				((SQLBackend) backend).stop();
 		Set<String> keys = PseudoAPI.plugin.getConfig().getConfigurationSection("Backends").getKeys(false);
 		for (String key : keys) {
 			try {
@@ -49,22 +52,12 @@ public class Data {
 					String username = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".username");
 					String password = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".password");
 					String database = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".database");
+					boolean ssl = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".useSSL");
 					String prefix = "";
 					if (PseudoAPI.plugin.getConfig().contains("Backends." + key + ".prefix")) {
 						prefix = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".prefix");
 					}
-					backend = new MysqlBackend(key, host, port, username, password, database, prefix);
-					backends.put(key, backend);
-				} else if (type.equalsIgnoreCase("sqlite")) {
-					String location = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".database");
-					File file = new File(location);
-					String username = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".username");
-					String password = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".password");
-					String prefix = "";
-					if (PseudoAPI.plugin.getConfig().contains("Backends." + key + ".prefix")) {
-						prefix = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".prefix");
-					}
-					backend = new SqliteBackend(key, file, username, password, prefix);
+					backend = new MySQLBackend(key, host, port, username, password, database, prefix, ssl);
 					backends.put(key, backend);
 				} else {
 					Message.sendConsoleMessage(ChatColor.RED + "Invalid backend type for backend: " + key + "!");
@@ -81,7 +74,10 @@ public class Data {
 		String backend = PseudoAPI.plugin.getConfig().getString("Backend");
 		for (String b : backends.keySet()) {
 			if (b.equals(backend)) {
-				Data.backend = backends.get(b);
+				Backend back = backends.get(b);
+				Data.backend = back;
+				if (back instanceof SQLBackend)
+					((SQLBackend) back).setup();
 			}
 		}
 		if (Data.backend == null) {

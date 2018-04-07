@@ -20,6 +20,9 @@ public class PseudoAPITC implements TabCompleter {
 			if (sender.hasPermission("pseudoapi.reset")) {
 				possible.add("reset");
 			}
+			if (sender.hasPermission("pseudoapi.metrics")) {
+				possible.add("metrics");
+			}
 			if (args[0].equalsIgnoreCase("")) {
 				return possible;
 			} else {
