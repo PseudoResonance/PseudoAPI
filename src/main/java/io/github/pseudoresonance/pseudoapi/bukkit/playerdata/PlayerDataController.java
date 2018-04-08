@@ -559,12 +559,11 @@ public class PlayerDataController {
 			SQLBackend sb = (SQLBackend) b;
 			BasicDataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
-				try (PreparedStatement ps = c.prepareStatement("SELECT ? FROM `" + sb.getPrefix() + "Players` WHERE UUID=? LIMIT 1;")) {
-					ps.setString(1, key);
-					ps.setString(2, uuid);
+				try (PreparedStatement ps = c.prepareStatement("SELECT " + key + " FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
+					ps.setString(1, uuid);
 					try (ResultSet rs = ps.executeQuery()) {
 						if (rs.next()) {
-							Object o = rs.getObject(key);
+							Object o = rs.getObject(1);
 							return o;
 						}
 					} catch (SQLException e) {
@@ -605,7 +604,7 @@ public class PlayerDataController {
 			SQLBackend sb = (SQLBackend) b;
 			BasicDataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
-				try (PreparedStatement ps = c.prepareStatement("SELECT * FROM `" + sb.getPrefix() + "Players` WHERE UUID=? LIMIT 1;")) {
+				try (PreparedStatement ps = c.prepareStatement("SELECT * FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
 					ps.setString(1, uuid);
 					try (ResultSet rs = ps.executeQuery()) {
 						ResultSetMetaData md = rs.getMetaData();
