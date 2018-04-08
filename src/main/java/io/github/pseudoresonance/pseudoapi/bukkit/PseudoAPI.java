@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.AllPluginsC;
+import io.github.pseudoresonance.pseudoapi.bukkit.commands.BackendSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.BrandSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.MetricsSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.PluginsC;
@@ -100,6 +101,7 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		subCommands.put("reset", new ResetSC());
 		subCommands.put("metrics", metricsSubCommand);
 		subCommands.put("brand", brandSubCommand);
+		subCommands.put("backend", new BackendSC());
 	}
 
 	private void initializeTabcompleters() {
@@ -123,6 +125,8 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		this.commandDescriptions.add(new CommandDescription("pseudoapi reset", "Resets PseudoAPI config", "pseudoapi.reset"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi metrics", "Shows server metrics", "pseudoapi.metrics"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi brand <player>", "Shows user client brand", "pseudoapi.brand", false));
+		this.commandDescriptions.add(new CommandDescription("pseudoapi backend list", "Lists all backends", "pseudoapi.backend"));
+		this.commandDescriptions.add(new CommandDescription("pseudoapi backend migrate <from> <to>", "Migrates from one backend to another", "pseudoapi.backend", false));
 		this.commandDescriptions.add(new CommandDescription("plugins", "Shows plugins", "pseudoapi.plugins"));
 		this.commandDescriptions.add(new CommandDescription("allplugins", "Shows all plugins", "pseudoapi.allplugins"));
 	}

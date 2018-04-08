@@ -23,12 +23,36 @@ public class PseudoAPITC implements TabCompleter {
 			if (sender.hasPermission("pseudoapi.metrics")) {
 				possible.add("metrics");
 			}
+			if (sender.hasPermission("pseudoapi.brand")) {
+				possible.add("brand");
+			}
+			if (sender.hasPermission("pseudoapi.backend")) {
+				possible.add("backend");
+			}
 			if (args[0].equalsIgnoreCase("")) {
 				return possible;
 			} else {
 				List<String> checked = new ArrayList<String>();
 				for (String check : possible) {
 					if (check.toLowerCase().startsWith(args[0].toLowerCase())) {
+						checked.add(check);
+					}
+				}
+				return checked;
+			}
+		} else if (args.length == 2) {
+			if (args[0].equalsIgnoreCase("backend")) {
+				if (sender.hasPermission("pseudoapi.backend")) {
+					possible.add("list");
+					possible.add("migrate");
+				}
+			}
+			if (args[1].equalsIgnoreCase("")) {
+				return possible;
+			} else {
+				List<String> checked = new ArrayList<String>();
+				for (String check : possible) {
+					if (check.toLowerCase().startsWith(args[1].toLowerCase())) {
 						checked.add(check);
 					}
 				}

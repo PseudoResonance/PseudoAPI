@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -15,14 +14,14 @@ import net.md_5.bungee.api.ChatColor;
 
 public class Data {
 	
-	private static Map<String, Backend> backends = new HashMap<String, Backend>();
+	private static HashMap<String, Backend> backends = new HashMap<String, Backend>();
 	private static Backend backend;
 	
 	public static Backend getBackend() {
 		return backend;
 	}
 	
-	public static Map<String, Backend> getBackends() {
+	public static HashMap<String, Backend> getBackends() {
 		return Data.backends;
 	}
 	

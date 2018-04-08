@@ -104,6 +104,10 @@ public class MySQLBackend implements SQLBackend {
 		return this.ssl;
 	}
 
+	public String getURL() {
+		return this.url;
+	}
+
 	public boolean equals(Backend obj) {
 		if (obj instanceof MySQLBackend) {
 			MySQLBackend b = (MySQLBackend) obj;

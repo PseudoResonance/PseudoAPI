@@ -2,6 +2,7 @@ package io.github.pseudoresonance.pseudoapi.bukkit.playerdata;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -57,27 +58,21 @@ public class PlayerDataController {
 			try (Connection c = data.getConnection()) {
 				for (Column column : serverDataTypes) {
 					if (column.getName().equalsIgnoreCase(col.getName())) {
-						try (PreparedStatement ps = c.prepareStatement("ALTER TABLE `" + sb.getPrefix() + "Players` MODIFY ? ? DEFAULT ?;")) {
+						try (Statement st = c.createStatement()) {
 							String key = col.getName();
 							String value = col.getType();
 							String defaultValue = col.getDefaultValue();
 							try {
-								ps.setString(1, key);
-								ps.setString(2, value);
-								ps.setString(3, defaultValue);
-								ps.execute();
+								st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` MODIFY " + key + " " + value + " DEFAULT " + defaultValue + ";");
 								return true;
 							} catch (SQLException e) {
 								int error = e.getErrorCode();
 								if (b instanceof MySQLBackend) {
 									if (error == 1406 || error == 1264 || error == 1265 || error == 1366 || error == 1292) {
-										try (PreparedStatement ps2 = c.prepareStatement("ALTER TABLE `" + sb.getPrefix() + "Players` CHANGE ? ? ?;")) {
+										try (Statement st2 = c.createStatement()) {
 											String suffix = "_OLD";
 											try {
-												ps2.setString(1, key);
-												ps2.setString(2, key + suffix);
-												ps2.setString(3, value);
-												ps2.execute();
+												st2.execute("ALTER TABLE `" + sb.getPrefix() + "Players` CHANGE " + key + " " + key + suffix + " " + value + ";");
 												return true;
 											} catch (SQLException ex) {
 												PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when renaming column: " + key + " to: " + key + suffix + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
@@ -85,7 +80,7 @@ public class PlayerDataController {
 												break;
 											}
 										} catch (SQLException ex) {
-											PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+											PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 											PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + ex.getErrorCode() + ": (State: " + ex.getSQLState() + ") - " + ex.getMessage());
 										}
 									}
@@ -94,27 +89,24 @@ public class PlayerDataController {
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					}
 				}
-				try (PreparedStatement ps = c.prepareStatement("ALTER TABLE `" + sb.getPrefix() + "Players` ADD ? ? DEFAULT ?;")) {
+				try (Statement st = c.createStatement()) {
 					String key = col.getName();
 					String value = col.getType();
 					String defaultValue = col.getDefaultValue();
 					try {
-						ps.setString(1, key);
-						ps.setString(2, value);
-						ps.setString(3, defaultValue);
-						ps.execute();
+						st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` ADD " + key + " " + value + " DEFAULT " + defaultValue + ";");
 						return true;
 					} catch (SQLException e) {
 						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
 			} catch (SQLException e) {
@@ -163,11 +155,12 @@ public class PlayerDataController {
 							String field = rs.getString("Field");
 							String type = rs.getString("Type");
 							String defaultValue = String.valueOf(rs.getObject("Default"));
-							columns.add(new Column(field, type, defaultValue));
 							if (field.equalsIgnoreCase("uuid"))
 								uuidCol = true;
 							else if (field.equalsIgnoreCase("username"))
 								usernameCol = true;
+							else
+								columns.add(new Column(field, type, defaultValue));
 						}
 					} catch (SQLException e) {
 						if (e.getErrorCode() == 1146) {
@@ -190,47 +183,46 @@ public class PlayerDataController {
 							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
-						try (PreparedStatement ps = c.prepareStatement("ALTER TABLE `" + sb.getPrefix() + "Players` ADD ? ? DEFAULT ?;")) {
+						try (Statement st = c.createStatement()) {
 							for (Column col : dataTypes) {
 								String key = col.getName();
 								String value = col.getType();
 								String defaultValue = col.getDefaultValue();
 								try {
-									ps.setString(1, key);
-									ps.setString(2, value);
-									ps.setString(3, defaultValue);
-									ps.execute();
+									st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` ADD " + key + " " + value + " DEFAULT " + defaultValue + ";");
 								} catch (SQLException e) {
 									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 								}
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					} else {
 						if (uuidCol && usernameCol) {
 							for (Column col : dataTypes) {
+								boolean found = false;
 								for (Column testCol : columns) {
 									if (testCol.equals(col)) {
+										found = true;
 										break;
 									} else if (testCol.getName().equalsIgnoreCase(col.getName())) {
 										editColumns.add(col);
+										found = true;
+										break;
 									}
 								}
-								newColumns.add(col);
+								if (!found)
+									newColumns.add(col);
 							}
-							try (PreparedStatement ps = c.prepareStatement("ALTER TABLE `" + sb.getPrefix() + "Players` MODIFY ? ? DEFAULT ?;")) {
+							try (Statement st = c.createStatement()) {
 								for (Column col : editColumns) {
 									String key = col.getName();
 									String value = col.getType();
 									String defaultValue = col.getDefaultValue();
 									try {
-										ps.setString(1, key);
-										ps.setString(2, value);
-										ps.setString(3, defaultValue);
-										ps.execute();
+										st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` MODIFY " + key + " " + value + " DEFAULT " + defaultValue + ";");
 									} catch (SQLException e) {
 										int error = e.getErrorCode();
 										if (b instanceof MySQLBackend) {
@@ -244,45 +236,39 @@ public class PlayerDataController {
 									}
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
-							try (PreparedStatement ps = c.prepareStatement("ALTER TABLE `" + sb.getPrefix() + "Players` CHANGE ? ? ?;")) {
+							try (Statement st = c.createStatement()) {
 								for (Column col : oldColumns) {
 									String key = col.getName();
 									String value = col.getType();
 									String suffix = "_OLD";
 									try {
-										ps.setString(1, key);
-										ps.setString(2, key + suffix);
-										ps.setString(3, value);
-										ps.execute();
+										st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` CHANGE " + key + " " + key + suffix + " " + value + ";");
 									} catch (SQLException e) {
 										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when renaming column: " + key + " to: " + key + suffix + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 									}
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
-							try (PreparedStatement ps = c.prepareStatement("ALTER TABLE `" + sb.getPrefix() + "Players` ADD ? ? DEFAULT ?;")) {
+							try (Statement st = c.createStatement()) {
 								for (Column col : newColumns) {
 									String key = col.getName();
 									String value = col.getType();
 									String defaultValue = col.getDefaultValue();
 									try {
-										ps.setString(1, key);
-										ps.setString(2, value);
-										ps.setString(3, defaultValue);
-										ps.execute();
+										st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` ADD " + key + " " + value + " DEFAULT " + defaultValue + ";");
 									} catch (SQLException e) {
 										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 									}
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						} else {
@@ -334,6 +320,7 @@ public class PlayerDataController {
 
 	public static void playerLeave(String uuid, String username) {
 		playerJoin(uuid, username);
+		setPlayerSettings(uuid, playerData.get(uuid));
 		playerData.remove(uuid);
 	}
 
@@ -420,6 +407,8 @@ public class PlayerDataController {
 			changed.put(key, o);
 			original.put(key, o);
 		}
+		if (playerData.containsKey(uuid))
+			playerData.put(uuid, original);
 		if (b instanceof FileBackend) {
 			FileBackend fb = (FileBackend) b;
 			File folder = new File(fb.getFolder(), "Players");
@@ -462,8 +451,6 @@ public class PlayerDataController {
 				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 			}
 		}
-		if (playerData.containsKey(uuid))
-			playerData.put(uuid, original);
 	}
 
 	public static void setPlayerSetting(String uuid, String key, Object value) {
@@ -483,6 +470,8 @@ public class PlayerDataController {
 			if (original.get(key).equals(value))
 				return;
 		original.put(key, value);
+		if (playerData.containsKey(uuid))
+			playerData.put(uuid, original);
 		if (b instanceof FileBackend) {
 			FileBackend fb = (FileBackend) b;
 			File folder = new File(fb.getFolder(), "Players");
@@ -501,11 +490,9 @@ public class PlayerDataController {
 			BasicDataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
-					ps.setString(1, key);
-					ps.setString(2, uuid);
+					ps.setString(1, uuid);
+					ps.setObject(2, value);
 					ps.setObject(3, value);
-					ps.setString(4, key);
-					ps.setObject(5, value);
 					try {
 						ps.execute();
 					} catch (SQLException e) {
@@ -521,8 +508,6 @@ public class PlayerDataController {
 				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 			}
 		}
-		if (playerData.containsKey(uuid))
-			playerData.put(uuid, original);
 	}
 
 	public static Object getPlayerSetting(String uuid, String key) {
@@ -628,6 +613,127 @@ public class PlayerDataController {
 			} catch (SQLException e) {
 				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
 				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+			}
+		}
+		return null;
+	}
+	
+	public static void migrateBackends(Backend origin, Backend destination) {
+		HashMap<String, HashMap<String, Object>> values = getBackend(origin);
+		setBackend(destination, values);
+	}
+
+	private static void setBackend(Backend b, HashMap<String, HashMap<String, Object>> values) {
+		if (b instanceof FileBackend) {
+			FileBackend fb = (FileBackend) b;
+			fb.getFolder().mkdir();
+			File folder = new File(fb.getFolder(), "Players");
+			folder.mkdir();
+			try {
+				for (String uuid : values.keySet()) {
+					if (!new File(folder, uuid + ".yml").isDirectory()) {
+						HashMap<String, Object> playerData = values.get(uuid);
+						Config c = new Config(folder, uuid + ".yml", PseudoAPI.plugin);
+						FileConfiguration fc = c.getConfig();
+						for (String key : playerData.keySet()) {
+							Object value = playerData.get(key);
+							fc.set(key, value);
+						}
+						c.save();
+					}
+				}
+			} catch (SecurityException e) {
+				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+			}
+		} else if (b instanceof SQLBackend) {
+			SQLBackend sb = (SQLBackend) b;
+			if (sb instanceof MySQLBackend) {
+				MySQLBackend mb = (MySQLBackend) sb;
+				try (Connection c = DriverManager.getConnection(mb.getURL(),mb.getUsername(),mb.getPassword())) {
+					for (String uuid : values.keySet()) {
+						HashMap<String, Object> playerData = values.get(uuid);
+						for (String key : playerData.keySet()) {
+							try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
+								Object value = playerData.get(key);
+								ps.setString(1, uuid);
+								ps.setObject(2, value);
+								ps.setObject(3, value);
+								try {
+									ps.execute();
+								} catch (SQLException e) {
+									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in key: " + key + " with value: " + String.valueOf(value) + " in database: " + sb.getName());
+									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								}
+							} catch (SQLException e) {
+								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							}
+						}
+					}
+				} catch (SQLException e) {
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				}
+			}
+		}
+	}
+
+	private static HashMap<String, HashMap<String, Object>> getBackend(Backend b) {
+		HashMap<String, HashMap<String, Object>> allData = new HashMap<String, HashMap<String, Object>>();
+		if (b instanceof FileBackend) {
+			FileBackend fb = (FileBackend) b;
+			fb.getFolder().mkdir();
+			File folder = new File(fb.getFolder(), "Players");
+			folder.mkdir();
+			try {
+				File[] files = folder.listFiles();
+				for (File f : files) {
+					if (f.getName().endsWith(".yml")) {
+						Config c = new Config(folder, f.getName(), PseudoAPI.plugin);
+						FileConfiguration fc = c.getConfig();
+						Set<String> keys = fc.getKeys(false);
+						HashMap<String, Object> result = new HashMap<String, Object>(keys.size());
+						for (String s : keys) {
+							result.put(s, fc.get(s));
+						}
+						allData.put(f.getName().substring(0, f.getName().length() - 4), result);
+					}
+				}
+			} catch (SecurityException e) {
+				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+			}
+		} else if (b instanceof SQLBackend) {
+			SQLBackend sb = (SQLBackend) b;
+			if (sb instanceof MySQLBackend) {
+				MySQLBackend mb = (MySQLBackend) sb;
+				try (Connection c = DriverManager.getConnection(mb.getURL(),mb.getUsername(),mb.getPassword())) {
+					try (Statement st = c.createStatement()) {
+						try (ResultSet rs = st.executeQuery("SELECT * FROM `" + sb.getPrefix() + "Players`;")) {
+							ResultSetMetaData md = rs.getMetaData();
+							int columns = md.getColumnCount();
+							while (rs.next()) {
+								HashMap<String, Object> result = new HashMap<String, Object>(columns);
+								String uuid = "";
+								for (int i = 1; i <= columns; i++) {
+									if (md.getColumnName(i).equalsIgnoreCase("uuid"))
+										uuid = rs.getString(i);
+									else
+										result.put(md.getColumnName(i), rs.getObject(i));
+								}
+								allData.put(uuid, result);
+							}
+						} catch (SQLException e) {
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when getting player data from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						}
+					} catch (SQLException e) {
+						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					}
+				} catch (SQLException e) {
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				}
 			}
 		}
 		return null;

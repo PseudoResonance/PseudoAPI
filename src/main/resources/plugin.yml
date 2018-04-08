@@ -1,7 +1,7 @@
 name: PseudoAPI
 author: PseudoResonance
 main: io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI
-version: 3.0.4
+version: 3.1
 description: An API for Easy Access to Resources
 commands:
   pseudoapi:
@@ -24,6 +24,9 @@ commands:
     description: Player client brand
     permission: pseudoapi.brand
 permissions:
+  pseudoapi.backend:
+    description: Allows the player to configure backends
+    default: op
   pseudoapi.brand:
     description: Allows the player to see user's client brands
     default: op
@@ -64,6 +67,7 @@ permissions:
     children:
       pseudoapi.plugins: true
       pseudoapi.allplugins: true
+      pseudoapi.backend: true
       pseudoapi.brand: true
       pseudoapi.metrics: true
       pseudoapi.metrics.java: true

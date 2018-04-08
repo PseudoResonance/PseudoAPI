@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Utils;
@@ -14,7 +14,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataControlle
 public class PlayerJoinLeaveL implements Listener {
 
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent e) {
+	public void onPlayerLogin(PlayerLoginEvent e) {
 		Player p = e.getPlayer();
 		UUID u = p.getUniqueId();
 		String uuid = u.toString();
