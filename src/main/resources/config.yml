@@ -93,17 +93,3 @@ ClickEvent: Run
 #Is newest console message at top or bottom?
 #Usually top for Multicraft and bottom for self-hosted servers
 ConsoleFormat: bottom
-
-#Time Format
-#Use following codes:
-#https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
-TimeFormat: "HH:mm:ss"
-
-#Date Format
-#Use following codes:
-#https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
-DateFormat: "yyyy-MM-dd"
-
-#How frequently TPS is checked for
-#In ticks, how often the plugin will calculate the current TPS
-TPSUpdateFrequency: 40

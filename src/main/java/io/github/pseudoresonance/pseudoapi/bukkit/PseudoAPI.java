@@ -8,12 +8,9 @@ import org.bukkit.event.Listener;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.AllPluginsC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.BackendSC;
-import io.github.pseudoresonance.pseudoapi.bukkit.commands.BrandSC;
-import io.github.pseudoresonance.pseudoapi.bukkit.commands.MetricsSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.PluginsC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ReloadSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ResetSC;
-import io.github.pseudoresonance.pseudoapi.bukkit.listeners.ClientBrandL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandPreprocessL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
@@ -30,8 +27,6 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 	private static HelpSC helpSubCommand;
 	private static PluginsC pluginsCommand;
 	private static AllPluginsC allPluginsCommand;
-	private static MetricsSC metricsSubCommand;
-	private static BrandSC brandSubCommand;
 
 	private static ConfigOptions configOptions;
 
@@ -42,7 +37,6 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		super.onEnable();
 		this.saveDefaultConfig();
 		plugin = this;
-		Utils.startTps();
 		configOptions = new ConfigOptions();
 		ConfigOptions.updateConfig();
 		message = new Message(this);
@@ -50,8 +44,6 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		helpSubCommand = new HelpSC(plugin);
 		pluginsCommand = new PluginsC();
 		allPluginsCommand = new AllPluginsC();
-		metricsSubCommand = new MetricsSC();
-		brandSubCommand = new BrandSC();
 		initializeCommands();
 		initializeTabcompleters();
 		initializeSubCommands();
@@ -91,16 +83,12 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		this.getCommand("plugins").setExecutor(pluginsCommand);
 		this.getCommand("pl").setExecutor(pluginsCommand);
 		this.getCommand("allplugins").setExecutor(allPluginsCommand);
-		this.getCommand("metrics").setExecutor(metricsSubCommand);
-		this.getCommand("brand").setExecutor(brandSubCommand);
 	}
 
 	private void initializeSubCommands() {
 		subCommands.put("help", helpSubCommand);
 		subCommands.put("reload", new ReloadSC());
 		subCommands.put("reset", new ResetSC());
-		subCommands.put("metrics", metricsSubCommand);
-		subCommands.put("brand", brandSubCommand);
 		subCommands.put("backend", new BackendSC());
 	}
 
@@ -115,7 +103,6 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		}
 		getServer().getPluginManager().registerEvents(new CommandPreprocessL(), this);
 		getServer().getPluginManager().registerEvents(new PlayerJoinLeaveL(), this);
-		this.getServer().getMessenger().registerIncomingPluginChannel(PseudoAPI.plugin, "MC|Brand", new ClientBrandL());
 	}
 
 	private void setCommandDescriptions() {
@@ -123,8 +110,6 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		this.commandDescriptions.add(new CommandDescription("pseudoapi help", "Shows PseudoAPI commands", ""));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi reload", "Reloads PseudoAPI config", "pseudoapi.reload"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi reset", "Resets PseudoAPI config", "pseudoapi.reset"));
-		this.commandDescriptions.add(new CommandDescription("pseudoapi metrics", "Shows server metrics", "pseudoapi.metrics"));
-		this.commandDescriptions.add(new CommandDescription("pseudoapi brand <player>", "Shows user client brand", "pseudoapi.brand", false));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi backend list", "Lists all backends", "pseudoapi.backend"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi backend migrate <from> <to>", "Migrates from one backend to another", "pseudoapi.backend", false));
 		this.commandDescriptions.add(new CommandDescription("plugins", "Shows plugins", "pseudoapi.plugins"));
