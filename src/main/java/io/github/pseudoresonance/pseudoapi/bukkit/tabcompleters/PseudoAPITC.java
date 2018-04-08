@@ -7,6 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
+
 public class PseudoAPITC implements TabCompleter {
 
 	@Override
@@ -53,6 +55,40 @@ public class PseudoAPITC implements TabCompleter {
 				List<String> checked = new ArrayList<String>();
 				for (String check : possible) {
 					if (check.toLowerCase().startsWith(args[1].toLowerCase())) {
+						checked.add(check);
+					}
+				}
+				return checked;
+			}
+		} else if (args.length == 3) {
+			if (args[0].equalsIgnoreCase("backend") && args[1].equalsIgnoreCase("migrate")) {
+				if (sender.hasPermission("pseudoapi.backend")) {
+					possible.addAll(Data.getBackends().keySet());
+				}
+			}
+			if (args[2].equalsIgnoreCase("")) {
+				return possible;
+			} else {
+				List<String> checked = new ArrayList<String>();
+				for (String check : possible) {
+					if (check.toLowerCase().startsWith(args[2].toLowerCase())) {
+						checked.add(check);
+					}
+				}
+				return checked;
+			}
+		} else if (args.length == 4) {
+			if (args[0].equalsIgnoreCase("backend") && args[1].equalsIgnoreCase("migrate")) {
+				if (sender.hasPermission("pseudoapi.backend")) {
+					possible.addAll(Data.getBackends().keySet());
+				}
+			}
+			if (args[3].equalsIgnoreCase("")) {
+				return possible;
+			} else {
+				List<String> checked = new ArrayList<String>();
+				for (String check : possible) {
+					if (check.toLowerCase().startsWith(args[3].toLowerCase())) {
 						checked.add(check);
 					}
 				}
