@@ -321,6 +321,7 @@ public class PlayerDataController {
 	public static void playerLeave(String uuid, String username) {
 		playerJoin(uuid, username);
 		setPlayerSettings(uuid, playerData.get(uuid));
+		playerData.get(uuid).clear();
 		playerData.remove(uuid);
 	}
 	
@@ -526,7 +527,7 @@ public class PlayerDataController {
 
 	public static Object getPlayerSetting(String uuid, String key) {
 		HashMap<String, Object> data = playerData.get(uuid);
-		if (data != null)
+		if (data != null && !(data.isEmpty()))
 			return data.get(key);
 		else
 			return getPlayerSingle(uuid, key);
@@ -534,7 +535,7 @@ public class PlayerDataController {
 
 	public static HashMap<String, Object> getPlayerSettings(String uuid) {
 		HashMap<String, Object> data = playerData.get(uuid);
-		if (data != null)
+		if (data != null && !(data.isEmpty()))
 			return data;
 		else
 			return getPlayer(uuid);
