@@ -323,6 +323,14 @@ public class PlayerDataController {
 		setPlayerSettings(uuid, playerData.get(uuid));
 		playerData.remove(uuid);
 	}
+	
+	public static Set<String> getNames() {
+		return uuids.values();
+	}
+	
+	public static Set<String> getUUIDs() {
+		return uuids.keySet();
+	}
 
 	public static String getName(String uuid) {
 		for (String u : uuids.keySet()) {

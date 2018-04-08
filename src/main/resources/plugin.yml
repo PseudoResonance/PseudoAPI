@@ -1,7 +1,7 @@
 name: PseudoAPI
 author: PseudoResonance
 main: io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI
-version: 3.1.1
+version: 3.1.2
 description: An API for Easy Access to Resources
 commands:
   pseudoapi:
