@@ -409,9 +409,12 @@ public class PlayerDataController {
 		}
 		for (String key : values.keySet()) {
 			Object o = values.get(key);
-			if (original.containsKey(key))
-				if (original.get(key).equals(o))
-					continue;
+			if (original.containsKey(key)) {
+				Object test = original.get(key);
+				if (test != null)
+					if (test.equals(o))
+						continue;
+			}
 			changed.put(key, o);
 			original.put(key, o);
 		}
@@ -474,9 +477,12 @@ public class PlayerDataController {
 		if (original == null) {
 			original = new HashMap<String, Object>();
 		}
-		if (original.containsKey(key))
-			if (original.get(key).equals(value))
-				return;
+		if (original.containsKey(key)) {
+			Object test = original.get(key);
+			if (test != null)
+				if (test.equals(value))
+					return;
+		}
 		original.put(key, value);
 		if (playerData.containsKey(uuid))
 			playerData.put(uuid, original);
