@@ -1,6 +1,7 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.playerdata;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -17,8 +18,10 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Config;
+import io.github.pseudoresonance.pseudoapi.bukkit.ConfigOptions;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
@@ -27,6 +30,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.FileBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.SQLBackend;
+import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import net.md_5.bungee.api.ChatColor;
 
 public class PlayerDataController {
@@ -45,6 +49,10 @@ public class PlayerDataController {
 	public static void update() {
 		b = Data.getBackend();
 		setup();
+		playerData.clear();
+		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+			PlayerJoinLeaveL.playerJoin(p);
+		}
 	}
 
 	public static boolean addColumn(Column col) {
@@ -174,7 +182,7 @@ public class PlayerDataController {
 					if (create) {
 						try (Statement st = c.createStatement()) {
 							try {
-								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16), `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP);");
+								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16), `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0);");
 							} catch (SQLException e) {
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
@@ -319,8 +327,27 @@ public class PlayerDataController {
 	}
 
 	public static void playerLeave(String uuid, String username) {
+		Object o = getPlayerSetting(uuid, "lastjoinleave");
+		if (o instanceof Timestamp) {
+			long joinLeave = ((Timestamp) o).getTime();
+			long diff = System.currentTimeMillis() - joinLeave;
+			Object ob = getPlayerSetting(uuid, "playtime");
+			if (ob instanceof BigInteger || ob instanceof Long) {
+				long playTime = 0;
+				if (ob instanceof BigInteger)
+					playTime = ((BigInteger) ob).longValueExact();
+				else
+					playTime = (Long) ob;
+				playTime = diff >= 0 ? playTime + diff : playTime - diff;
+				setPlayerSetting(uuid, "playtime", playTime);
+			}
+		}
 		playerJoin(uuid, username);
 		setPlayerSettings(uuid, playerData.get(uuid));
+		if (ConfigOptions.bungeeEnabled) {
+			playerData.get(uuid).clear();
+			playerData.remove(uuid);
+		}
 	}
 	
 	public static Set<String> getNames() {
