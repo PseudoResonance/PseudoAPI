@@ -36,7 +36,7 @@ public class ConfigOptions implements ConfigOption {
 
 	public static boolean startupUpdate = true;
 	public static int startupDelay = 60;
-	public static int updateFrequency = 360;
+	public static int updateFrequency = 60;
 	public static boolean downloadUpdates = true;
 	public static boolean updateRestart = true;
 	public static boolean restartEmpty = true;
@@ -318,7 +318,7 @@ public class ConfigOptions implements ConfigOption {
 		if (isInteger(updateF)) {
 			updateFrequency = Integer.valueOf(updateF);
 		} else {
-			updateFrequency = 360;
+			updateFrequency = 60;
 			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for UpdateFrequency!");
 		}
 		try {

@@ -314,11 +314,13 @@ public class PseudoUpdater {
 				if (updateTaskID != -1) {
 					Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
 				}
-				updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
-					public void run() {
-						checkUpdates(false);
-					}
-				}, ConfigOptions.updateFrequency * 60 * 20);
+				if (ConfigOptions.updateFrequency > 0) {
+					updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
+						public void run() {
+							checkUpdates(false);
+						}
+					}, ConfigOptions.updateFrequency * 60 * 20);
+				}
 			}
 		}
 
@@ -415,11 +417,13 @@ public class PseudoUpdater {
 				if (updateTaskID != -1) {
 					Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
 				}
-				updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
-					public void run() {
-						checkUpdates(false);
-					}
-				}, ConfigOptions.updateFrequency * 60 * 20);
+				if (ConfigOptions.updateFrequency > 0) {
+					updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
+						public void run() {
+							checkUpdates(false);
+						}
+					}, ConfigOptions.updateFrequency * 60 * 20);
+				}
 			}
 		}
 
