@@ -39,6 +39,7 @@ public class PseudoUpdater {
 		Method getFileM = null;
 		try {
 			getFileM = javaPluginC.getDeclaredMethod("getFile");
+			getFileM.setAccessible(true);
 		} catch (NoSuchMethodException | SecurityException e1) {
 			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
 			e1.printStackTrace();
@@ -72,6 +73,7 @@ public class PseudoUpdater {
 						if (getFileM != null) {
 							Object file = getFileM.invoke(p);
 							if (file instanceof File) {
+								Bukkit.getUpdateFolderFile().mkdir();
 								updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
 							}
 						}
@@ -86,7 +88,8 @@ public class PseudoUpdater {
 		if (updates > 0) {
 			PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Completed update check! " + updates + " updates found!");
 			if (updates > updateUrls.size()) {
-				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), updateUrls.size() + " plugins could not be updated due to erros! Please check the console!");
+				int failedUpdates = updates - updateUrls.size();
+				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), failedUpdates + " plugins could not be updated due to erros! Please check the console!");
 			}
 			if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
 				downloadFiles(updateUrls);
@@ -172,6 +175,7 @@ public class PseudoUpdater {
 
 		@Override
 		public void run() {
+			int successfulUpdates = 0;
 			for (UpdateData d : files) {
 				try {
 					Files.copy(new URL(d.getURL()).openStream(), d.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -179,12 +183,16 @@ public class PseudoUpdater {
 						oldFiles.add(d.getOldFile());
 						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Please delete " + d.getOldFile().getName() + " before starting the server again to prevent duplicate plugins!");
 					}
+					successfulUpdates++;
 				} catch (IOException e) {
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
+					e.printStackTrace();
+				} catch (Exception e) {
 					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
 					e.printStackTrace();
 				}
 			}
-			if (ConfigOptions.updateRestart) {
+			if (ConfigOptions.updateRestart && successfulUpdates > 0) {
 				shouldRestart = true;
 				restartCheck();
 			}

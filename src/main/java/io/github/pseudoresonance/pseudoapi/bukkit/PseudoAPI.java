@@ -37,6 +37,7 @@ public class PseudoAPI extends PseudoPlugin {
 		PseudoUpdater.registerPlugin(this);
 	}
 
+	@Override
 	public void onEnable() {
 		super.onEnable();
 		this.saveDefaultConfig();

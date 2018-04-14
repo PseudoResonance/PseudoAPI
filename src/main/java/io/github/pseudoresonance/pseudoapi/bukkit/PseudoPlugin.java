@@ -25,11 +25,10 @@ public class PseudoPlugin extends JavaPlugin {
 	protected List<CommandDescription> commandDescriptions = new ArrayList<CommandDescription>();
 	public Message message;
 	
-	public void onLoad() {
-		PluginController.pluginLoaded(this);
-	}
-
+	@Override
 	public void onEnable() {
+		super.onEnable();
+		PluginController.pluginLoaded(this);
 		name = this.getDescription().getName();
 		prefix = this.getDescription().getPrefix();
 		description = this.getDescription().getDescription();
