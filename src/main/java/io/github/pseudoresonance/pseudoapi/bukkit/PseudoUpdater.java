@@ -46,6 +46,13 @@ public class PseudoUpdater {
 		new Update(startup).runTaskAsynchronously(PseudoAPI.plugin);
 	}
 
+	private static void downloadFiles(ArrayList<UpdateData> files, CommandSender sender) {
+		if (asyncUpdater == null) {
+			asyncUpdater = new Download(files, sender);
+			asyncUpdater.runTaskAsynchronously(PseudoAPI.plugin);
+		}
+	}
+
 	private static void downloadFiles(ArrayList<UpdateData> files) {
 		if (asyncUpdater == null) {
 			asyncUpdater = new Download(files);
@@ -200,7 +207,7 @@ public class PseudoUpdater {
 									updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
 									if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
 										alreadyUpdated.add(p);
-										downloadFiles(updateUrls);
+										downloadFiles(updateUrls, sender);
 									}
 								}
 							}
@@ -280,7 +287,7 @@ public class PseudoUpdater {
 					PseudoAPI.message.sendPluginMessage(sender, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 				}
 				if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
-					downloadFiles(updateUrls);
+					downloadFiles(updateUrls, sender);
 				}
 			} else {
 				PseudoAPI.message.sendPluginMessage(sender, "Completed update check! No updates found!");
@@ -381,9 +388,15 @@ public class PseudoUpdater {
 	private static class Download extends BukkitRunnable {
 
 		private ArrayList<UpdateData> files;
+		private CommandSender sender = null;
 
 		private Download(ArrayList<UpdateData> files) {
 			this.files = files;
+		}
+
+		private Download(ArrayList<UpdateData> files, CommandSender sender) {
+			this.files = files;
+			this.sender = sender;
 		}
 
 		@Override
@@ -408,8 +421,12 @@ public class PseudoUpdater {
 			if (ConfigOptions.updateRestart && successfulUpdates > 0) {
 				shouldRestart = true;
 				restartCheck();
-				if (!(!ConfigOptions.restartEmpty || Bukkit.getOnlinePlayers().size() == 0))
+				if (!(!ConfigOptions.restartEmpty || Bukkit.getOnlinePlayers().size() == 0)) {
 					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Waiting for server to empty before restarting!");
+					if (sender != null) {
+						PseudoAPI.message.sendPluginMessage(sender, "Waiting for server to empty before restarting!");
+					}
+				}
 			}
 		}
 
