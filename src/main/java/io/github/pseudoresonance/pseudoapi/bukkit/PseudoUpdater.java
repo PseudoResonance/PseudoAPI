@@ -199,6 +199,11 @@ public class PseudoUpdater {
 					}
 					if (isNewer(version, p.getVersion())) {
 						PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+						for (Player pl : Bukkit.getOnlinePlayers()) {
+							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+								PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+							}
+						}
 						try {
 							if (getFileM != null) {
 								Object file = getFileM.invoke(p);
@@ -216,8 +221,14 @@ public class PseudoUpdater {
 							e.printStackTrace();
 							return;
 						}
-					} else
+					} else {
 						PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+						for (Player pl : Bukkit.getOnlinePlayers()) {
+							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+								PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+							}
+						}
+					}
 				}
 			}
 			if (!pluginFound) {
@@ -230,7 +241,7 @@ public class PseudoUpdater {
 			int updates = 0;
 			PseudoAPI.message.sendPluginMessage(sender, "Beginning update check!");
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
+				if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
 					PseudoAPI.message.sendPluginMessage(p, "Beginning update check!");
 				}
 			}
@@ -270,6 +281,11 @@ public class PseudoUpdater {
 				if (isNewer(version, p.getVersion())) {
 					updates++;
 					PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+					for (Player pl : Bukkit.getOnlinePlayers()) {
+						if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+						}
+					}
 					try {
 						if (getFileM != null) {
 							Object file = getFileM.invoke(p);
@@ -283,12 +299,19 @@ public class PseudoUpdater {
 						PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file! Failed to update!");
 						e.printStackTrace();
 					}
+				} else {
+					PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+					for (Player pl : Bukkit.getOnlinePlayers()) {
+						if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+						}
+					}
 				}
 			}
 			if (updates > 0) {
 				PseudoAPI.message.sendPluginMessage(sender, "Completed update check! " + updates + " updates found!");
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
+					if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
 						PseudoAPI.message.sendPluginMessage(p, "Completed update check! " + updates + " updates found!");
 					}
 				}
@@ -296,7 +319,7 @@ public class PseudoUpdater {
 					int failedUpdates = updates - updateUrls.size();
 					PseudoAPI.message.sendPluginMessage(sender, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 					for (Player p : Bukkit.getOnlinePlayers()) {
-						if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
+						if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
 							PseudoAPI.message.sendPluginMessage(p, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 						}
 					}
@@ -307,7 +330,7 @@ public class PseudoUpdater {
 			} else {
 				PseudoAPI.message.sendPluginMessage(sender, "Completed update check! No updates found!");
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
+					if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
 						PseudoAPI.message.sendPluginMessage(p, "Completed update check! No updates found!");
 					}
 				}
@@ -332,7 +355,7 @@ public class PseudoUpdater {
 			int updates = 0;
 			PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Beginning update check!");
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				if (p.hasPermission("wolfapi.update.notify")) {
+				if (p.hasPermission("pseudoapi.update.notify")) {
 					PseudoAPI.message.sendPluginMessage(p, "Beginning update check!");
 				}
 			}
@@ -372,6 +395,11 @@ public class PseudoUpdater {
 				if (isNewer(version, p.getVersion())) {
 					updates++;
 					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+					for (Player pl : Bukkit.getOnlinePlayers()) {
+						if (pl.hasPermission("pseudoapi.update.notify")) {
+							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+						}
+					}
 					try {
 						if (getFileM != null) {
 							Object file = getFileM.invoke(p);
@@ -385,13 +413,19 @@ public class PseudoUpdater {
 						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
 						e.printStackTrace();
 					}
-				} else
+				} else {
 					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+					for (Player pl : Bukkit.getOnlinePlayers()) {
+						if (pl.hasPermission("pseudoapi.update.notify")) {
+							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+						}
+					}
+				}
 			}
 			if (updates > 0) {
 				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Completed update check! " + updates + " updates found!");
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					if (p.hasPermission("wolfapi.update.notify")) {
+					if (p.hasPermission("pseudoapi.update.notify")) {
 						PseudoAPI.message.sendPluginMessage(p, "Completed update check! " + updates + " updates found!");
 					}
 				}
@@ -399,7 +433,7 @@ public class PseudoUpdater {
 					int failedUpdates = updates - updateUrls.size();
 					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 					for (Player p : Bukkit.getOnlinePlayers()) {
-						if (p.hasPermission("wolfapi.update.notify")) {
+						if (p.hasPermission("pseudoapi.update.notify")) {
 							PseudoAPI.message.sendPluginMessage(p, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 						}
 					}
@@ -410,7 +444,7 @@ public class PseudoUpdater {
 			} else {
 				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Completed update check! No updates found!");
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					if (p.hasPermission("wolfapi.update.notify")) {
+					if (p.hasPermission("pseudoapi.update.notify")) {
 						PseudoAPI.message.sendPluginMessage(p, "Completed update check! No updates found!");
 					}
 				}
@@ -469,7 +503,7 @@ public class PseudoUpdater {
 					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Waiting for server to empty before restarting!");
 					if (sender != null) {
 						for (Player p : Bukkit.getOnlinePlayers()) {
-							if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
+							if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
 								PseudoAPI.message.sendPluginMessage(p, "Waiting for server to empty before restarting!");
 							}
 						}
@@ -478,7 +512,7 @@ public class PseudoUpdater {
 						}
 					} else {
 						for (Player p : Bukkit.getOnlinePlayers()) {
-							if (p.hasPermission("wolfapi.update.notify")) {
+							if (p.hasPermission("pseudoapi.update.notify")) {
 								PseudoAPI.message.sendPluginMessage(p, "Waiting for server to empty before restarting!");
 							}
 						}
