@@ -230,7 +230,7 @@ public class PseudoUpdater {
 			int updates = 0;
 			PseudoAPI.message.sendPluginMessage(sender, "Beginning update check!");
 			for (Player p : Bukkit.getOnlinePlayers()) {
-				if (p.hasPermission("wolfapi.update.notify")) {
+				if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
 					PseudoAPI.message.sendPluginMessage(p, "Beginning update check!");
 				}
 			}
@@ -288,7 +288,7 @@ public class PseudoUpdater {
 			if (updates > 0) {
 				PseudoAPI.message.sendPluginMessage(sender, "Completed update check! " + updates + " updates found!");
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					if (p.hasPermission("wolfapi.update.notify")) {
+					if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
 						PseudoAPI.message.sendPluginMessage(p, "Completed update check! " + updates + " updates found!");
 					}
 				}
@@ -296,7 +296,7 @@ public class PseudoUpdater {
 					int failedUpdates = updates - updateUrls.size();
 					PseudoAPI.message.sendPluginMessage(sender, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 					for (Player p : Bukkit.getOnlinePlayers()) {
-						if (p.hasPermission("wolfapi.update.notify")) {
+						if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
 							PseudoAPI.message.sendPluginMessage(p, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 						}
 					}
@@ -307,7 +307,7 @@ public class PseudoUpdater {
 			} else {
 				PseudoAPI.message.sendPluginMessage(sender, "Completed update check! No updates found!");
 				for (Player p : Bukkit.getOnlinePlayers()) {
-					if (p.hasPermission("wolfapi.update.notify")) {
+					if (!p.getName().equals(sender.getName()) && p.hasPermission("wolfapi.update.notify")) {
 						PseudoAPI.message.sendPluginMessage(p, "Completed update check! No updates found!");
 					}
 				}
@@ -470,6 +470,12 @@ public class PseudoUpdater {
 							}
 						}
 						PseudoAPI.message.sendPluginMessage(sender, "Waiting for server to empty before restarting!");
+					} else {
+						for (Player p : Bukkit.getOnlinePlayers()) {
+							if (p.hasPermission("wolfapi.update.notify")) {
+								PseudoAPI.message.sendPluginMessage(p, "Waiting for server to empty before restarting!");
+							}
+						}
 					}
 				}
 			}
