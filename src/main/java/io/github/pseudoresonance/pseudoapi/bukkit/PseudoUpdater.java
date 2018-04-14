@@ -473,7 +473,9 @@ public class PseudoUpdater {
 								PseudoAPI.message.sendPluginMessage(p, "Waiting for server to empty before restarting!");
 							}
 						}
-						PseudoAPI.message.sendPluginMessage(sender, "Waiting for server to empty before restarting!");
+						if (sender instanceof Player) {
+							PseudoAPI.message.sendPluginMessage(sender, "Waiting for server to empty before restarting!");
+						}
 					} else {
 						for (Player p : Bukkit.getOnlinePlayers()) {
 							if (p.hasPermission("wolfapi.update.notify")) {
