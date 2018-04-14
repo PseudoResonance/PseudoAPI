@@ -24,10 +24,12 @@ public class PseudoPlugin extends JavaPlugin {
 	protected Map<String, SubCommandExecutor> subCommands = new HashMap<String, SubCommandExecutor>();
 	protected List<CommandDescription> commandDescriptions = new ArrayList<CommandDescription>();
 	public Message message;
+	
+	public void onLoad() {
+		PluginController.pluginLoaded(this);
+	}
 
-	@Override
 	public void onEnable() {
-		super.onEnable();
 		name = this.getDescription().getName();
 		prefix = this.getDescription().getPrefix();
 		description = this.getDescription().getDescription();
@@ -74,12 +76,6 @@ public class PseudoPlugin extends JavaPlugin {
 			output = prefix;
 		}
 		message = new Message(this);
-		PluginController.pluginLoaded(this);
-	}
-
-	@Override
-	public void onDisable() {
-		super.onDisable();
 	}
 
 	public String getPluginName() {

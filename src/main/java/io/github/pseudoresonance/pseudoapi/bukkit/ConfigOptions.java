@@ -33,6 +33,14 @@ public class ConfigOptions implements ConfigOption {
 	public static boolean allowPseudoAPI = true;
 	
 	public static boolean bungeeEnabled = false;
+
+	public static boolean startupUpdate = true;
+	public static int startupDelay = 60;
+	public static int updateFrequency = 360;
+	public static boolean downloadUpdates = true;
+	public static boolean updateRestart = true;
+	public static boolean restartEmpty = true;
+	public static int restartWarning = 60;
 	
 	public static boolean updateConfig() {
 		boolean error = false;
@@ -286,6 +294,79 @@ public class ConfigOptions implements ConfigOption {
 		} else if (PseudoAPI.plugin.getConfig().getString("ClickEvent").equalsIgnoreCase("suggest")) {
 			clickEvent = ComponentType.SUGGEST_COMMAND;
 		}
+		try {
+			String s = PseudoAPI.plugin.getConfig().getString("StartupUpdate");
+			if (s.equalsIgnoreCase("true")) {
+				startupUpdate = true;
+			} else if (s.equalsIgnoreCase("false")) {
+				startupUpdate = false;
+			} else {
+				startupUpdate = false;
+				Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for StartupUpdate!");
+			}
+		} catch (Exception e) {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for StartupUpdate!");
+		}
+		String startupD = PseudoAPI.plugin.getConfig().getString("StartupDelay");
+		if (isInteger(startupD)) {
+			startupDelay = Integer.valueOf(startupD);
+		} else {
+			startupDelay = 60;
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for StartupDelay!");
+		}
+		String updateF = PseudoAPI.plugin.getConfig().getString("UpdateFrequency");
+		if (isInteger(updateF)) {
+			updateFrequency = Integer.valueOf(updateF);
+		} else {
+			updateFrequency = 360;
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for UpdateFrequency!");
+		}
+		try {
+			String s = PseudoAPI.plugin.getConfig().getString("DownloadUpdates");
+			if (s.equalsIgnoreCase("true")) {
+				downloadUpdates = true;
+			} else if (s.equalsIgnoreCase("false")) {
+				downloadUpdates = false;
+			} else {
+				downloadUpdates = false;
+				Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for DownloadUpdates!");
+			}
+		} catch (Exception e) {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for DownloadUpdates!");
+		}
+		try {
+			String s = PseudoAPI.plugin.getConfig().getString("UpdateRestart");
+			if (s.equalsIgnoreCase("true")) {
+				updateRestart = true;
+			} else if (s.equalsIgnoreCase("false")) {
+				updateRestart = false;
+			} else {
+				updateRestart = false;
+				Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for UpdateRestart!");
+			}
+		} catch (Exception e) {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for UpdateRestart!");
+		}
+		try {
+			String s = PseudoAPI.plugin.getConfig().getString("RestartEmpty");
+			if (s.equalsIgnoreCase("true")) {
+				restartEmpty = true;
+			} else if (s.equalsIgnoreCase("false")) {
+				restartEmpty = false;
+			} else {
+				restartEmpty = false;
+				Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for RestartEmpty!");
+			}
+		} catch (Exception e) {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for RestartEmpty!");
+		}
+		String restartWarn = PseudoAPI.plugin.getConfig().getString("RestartWarning");
+		if (isInteger(restartWarn)) {
+			restartWarning = Integer.valueOf(restartWarn);
+		} else {
+			restartWarning = 60;
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for RestartWarning!");
+		}
 		Data.loadBackends();
 	}
 	
@@ -295,6 +376,17 @@ public class ConfigOptions implements ConfigOption {
 			s.append(c);
 		}
 		return s.toString();
+	}
+	
+	private static boolean isInteger(String s) {
+	    try { 
+	        Integer.parseInt(s); 
+	    } catch(NumberFormatException e) { 
+	        return false; 
+	    } catch(NullPointerException e) {
+	        return false;
+	    }
+	    return true;
 	}
 
 }

@@ -1,7 +1,7 @@
 name: PseudoAPI
 author: PseudoResonance
 main: io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI
-version: 3.1.6
+version: 3.1.7
 description: An API for Easy Access to Resources
 commands:
   pseudoapi:
@@ -17,6 +17,9 @@ commands:
     permission: pseudoapi.allplugins
     aliases: [allpl]
 permissions:
+  pseudoapi.update:
+    description: Allows the player to update plugins
+    default: op
   pseudoapi.backend:
     description: Allows the player to configure backends
     default: op
@@ -43,3 +46,4 @@ permissions:
       pseudoapi.backend: true
       pseudoapi.reload: true
       pseudoapi.reset: true
+      pseudoapi.update: true

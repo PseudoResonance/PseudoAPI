@@ -1,11 +1,12 @@
 package io.github.pseudoresonance.pseudoapi.bukkit;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.AllPluginsC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.BackendSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.PluginsC;
@@ -17,7 +18,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.tabcompleters.PseudoAPITC;
 
-public class PseudoAPI extends PseudoPlugin implements Listener {
+public class PseudoAPI extends PseudoPlugin {
 
 	public static PseudoAPI plugin;
 	public static Message message;
@@ -31,8 +32,11 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 	private static ConfigOptions configOptions;
 
 	private static List<ConfigOption> config = new ArrayList<ConfigOption>();
+	
+	public void onLoad() {
+		PseudoUpdater.registerPlugin(this);
+	}
 
-	@Override
 	public void onEnable() {
 		super.onEnable();
 		this.saveDefaultConfig();
@@ -50,18 +54,24 @@ public class PseudoAPI extends PseudoPlugin implements Listener {
 		initializeListeners();
 		setCommandDescriptions();
 		configOptions.reloadConfig();
-		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		PluginMessenger.enable();
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerJoinLeaveL.playerJoin(p);
 		}
 		PlayerDataController.update();
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			public void run() {
+				PseudoUpdater.checkUpdates(true);
+			}
+			
+		}, ConfigOptions.startupDelay * 20);
 	}
 
-	@Override
 	public void onDisable() {
+		for (File f : PseudoUpdater.getOldFiles()) {
+			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Please delete " + f.getName() + " before starting the server again to prevent duplicate plugins!");
+		}
 		Bukkit.getScheduler().cancelTasks(this);
-		super.onDisable();
 	}
 
 	public static void registerConfig(ConfigOption r) {

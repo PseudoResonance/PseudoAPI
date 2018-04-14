@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.PseudoUpdater;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
 
 public class PlayerJoinLeaveL implements Listener {
@@ -28,6 +29,7 @@ public class PlayerJoinLeaveL implements Listener {
 		String uuid = u.toString();
 		String name = p.getName();
 		PlayerDataController.playerLeave(uuid, name);
+		PseudoUpdater.restartCheck();
 	}
 	
 	public static void playerJoin(Player p) {
