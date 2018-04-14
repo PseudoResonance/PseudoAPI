@@ -70,6 +70,25 @@ public class Message {
 		}
 	}
 	
+	public void broadcastPluginMessageWithPerission(String message, String permission) {
+		String format = ConfigOptions.messageFormat;
+		format = format.replace("{message}", ConfigOptions.text + message);
+		format = format.replace("{name}", ConfigOptions.prefix + plugin.getPluginName());
+		format = format.replace("{nickname}", ConfigOptions.prefix + plugin.getOutputName());
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			if (p.hasPermission(permission)) {
+				String send = format.replace("{player}", p.getName());
+				send = send.replace("{playernick}", p.getDisplayName());
+				send = ChatColor.translateAlternateColorCodes('&', send);
+				p.sendMessage(send);
+			}
+		}
+		String consoleF = format.replace("{player}", "Console");
+		consoleF = consoleF.replace("{playernick}", "Console");
+		consoleF = ChatColor.translateAlternateColorCodes('&', consoleF);
+		console.sendMessage(consoleF);
+	}
+	
 	public void broadcastPluginMessage(String message) {
 		String format = ConfigOptions.messageFormat;
 		format = format.replace("{message}", ConfigOptions.text + message);
