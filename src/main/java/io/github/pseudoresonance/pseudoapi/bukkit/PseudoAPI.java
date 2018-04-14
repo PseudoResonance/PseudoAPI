@@ -12,6 +12,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.commands.BackendSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.PluginsC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ReloadSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ResetSC;
+import io.github.pseudoresonance.pseudoapi.bukkit.commands.UpdateSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandPreprocessL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
@@ -101,6 +102,7 @@ public class PseudoAPI extends PseudoPlugin {
 		subCommands.put("reload", new ReloadSC());
 		subCommands.put("reset", new ResetSC());
 		subCommands.put("backend", new BackendSC());
+		subCommands.put("update", new UpdateSC());
 	}
 
 	private void initializeTabcompleters() {
@@ -123,6 +125,8 @@ public class PseudoAPI extends PseudoPlugin {
 		this.commandDescriptions.add(new CommandDescription("pseudoapi reset", "Resets PseudoAPI config", "pseudoapi.reset"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi backend list", "Lists all backends", "pseudoapi.backend"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi backend migrate <from> <to>", "Migrates from one backend to another", "pseudoapi.backend", false));
+		this.commandDescriptions.add(new CommandDescription("pseudoapi update", "Updates all PseudoAPI plugins", "pseudoapi.update"));
+		this.commandDescriptions.add(new CommandDescription("pseudoapi update <plugin>", "Updates specified PseudoAPI plugin", "pseudoapi.update", false));
 		this.commandDescriptions.add(new CommandDescription("plugins", "Shows plugins", "pseudoapi.plugins"));
 		this.commandDescriptions.add(new CommandDescription("allplugins", "Shows all plugins", "pseudoapi.allplugins"));
 	}

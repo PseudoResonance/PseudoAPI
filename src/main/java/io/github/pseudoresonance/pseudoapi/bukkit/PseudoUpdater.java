@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -24,28 +25,34 @@ public class PseudoUpdater {
 	private static ArrayList<File> oldFiles = new ArrayList<File>();
 
 	private static ArrayList<PseudoPlugin> plugins = new ArrayList<PseudoPlugin>();
+	private static ArrayList<PseudoPlugin> alreadyUpdated = new ArrayList<PseudoPlugin>();
 
 	private static Update asyncUpdater = null;
+	private static int updateTaskID = -1;
 
 	public static void registerPlugin(PseudoPlugin plugin) {
 		plugins.add(plugin);
 	}
 
-	protected static void checkUpdates(boolean startup) {
+	public static void checkUpdates(CommandSender sender, String pluginName) {
 		ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
-		int updates = 0;
-		PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Beginning update check!");
 		Class<JavaPlugin> javaPluginC = JavaPlugin.class;
 		Method getFileM = null;
 		try {
 			getFileM = javaPluginC.getDeclaredMethod("getFile");
 			getFileM.setAccessible(true);
 		} catch (NoSuchMethodException | SecurityException e1) {
-			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
+			PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file! Failed to update!");
 			e1.printStackTrace();
 		}
-		if (ConfigOptions.startupUpdate || !startup) {
-			for (PseudoPlugin p : plugins) {
+		boolean pluginFound = false;
+		for (PseudoPlugin p : plugins) {
+			if (p.getName().equalsIgnoreCase(pluginName)) {
+				pluginFound = true;
+				if (alreadyUpdated.contains(p)) {
+					PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is already waiting to be updated upon server restart!");
+					return;
+				}
 				String urlPart = "https://circleci.com/api/v1.1/project/github/" + p.getAuthors().get(0) + "/" + p.getName();
 				String buildCheck = urlPart + "?limit=1&filter=completed";
 				JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
@@ -67,36 +74,184 @@ public class PseudoUpdater {
 					}
 				}
 				if (isNewer(version, p.getVersion())) {
-					updates++;
-					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+					PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
 					try {
 						if (getFileM != null) {
 							Object file = getFileM.invoke(p);
 							if (file instanceof File) {
 								Bukkit.getUpdateFolderFile().mkdir();
 								updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
+								if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
+									alreadyUpdated.add(p);
+									downloadFiles(updateUrls);
+								}
 							}
 						}
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
+						PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file! Failed to update!");
 						e.printStackTrace();
+						return;
 					}
 				} else
-					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+					PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
 			}
+		}
+		if (!pluginFound) {
+			PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Invalid plugin name: " + pluginName);
+		}
+	}
+
+	public static void checkUpdates(CommandSender sender) {
+		ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
+		int updates = 0;
+		PseudoAPI.message.sendPluginMessage(sender, "Beginning update check!");
+		Class<JavaPlugin> javaPluginC = JavaPlugin.class;
+		Method getFileM = null;
+		try {
+			getFileM = javaPluginC.getDeclaredMethod("getFile");
+			getFileM.setAccessible(true);
+		} catch (NoSuchMethodException | SecurityException e1) {
+			PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file!");
+			e1.printStackTrace();
+		}
+		for (PseudoPlugin p : plugins) {
+			if (alreadyUpdated.contains(p)) {
+				continue;
+			}
+			String urlPart = "https://circleci.com/api/v1.1/project/github/" + p.getAuthors().get(0) + "/" + p.getName();
+			String buildCheck = urlPart + "?limit=1&filter=completed";
+			JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
+			int build = buildJson.getJSONObject(0).getInt("build_num");
+			String artifactCheck = urlPart + "/" + build + "/artifacts";
+			JSONArray artifactJson = JsonReader.readJsonFromUrl(artifactCheck);
+			String url = "";
+			String version = "";
+			for (int i = 0; i < artifactJson.length(); i++) {
+				String aUrl = artifactJson.getJSONObject(i).getString("url");
+				if (aUrl.endsWith(".jar")) {
+					if (!aUrl.endsWith("-SNAPSHOT.jar")) {
+						url = aUrl;
+					} else {
+						String test = aUrl.replaceFirst(".*\\/artifacts\\/" + p.getName() + "-", "");
+						test = test.substring(0, test.length() - 13);
+						version = test;
+					}
+				}
+			}
+			if (isNewer(version, p.getVersion())) {
+				updates++;
+				PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+				try {
+					if (getFileM != null) {
+						Object file = getFileM.invoke(p);
+						if (file instanceof File) {
+							Bukkit.getUpdateFolderFile().mkdir();
+							updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
+							alreadyUpdated.add(p);
+						}
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file! Failed to update!");
+					e.printStackTrace();
+				}
+			}
+		}
+		if (updates > 0) {
+			PseudoAPI.message.sendPluginMessage(sender, "Completed update check! " + updates + " updates found!");
+			if (updates > updateUrls.size()) {
+				int failedUpdates = updates - updateUrls.size();
+				PseudoAPI.message.sendPluginMessage(sender, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
+			}
+			if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
+				downloadFiles(updateUrls);
+			}
+		} else {
+			PseudoAPI.message.sendPluginMessage(sender, "Completed update check! No updates found!");
+			if (updateTaskID != -1) {
+				Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
+			}
+			updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
+				public void run() {
+					checkUpdates(false);
+				}
+			}, ConfigOptions.updateFrequency * 60 * 20);
+		}
+	}
+
+	protected static void checkUpdates(boolean startup) {
+		if (!(ConfigOptions.startupUpdate || !startup)) {
+			return;
+		}
+		ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
+		int updates = 0;
+		PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Beginning update check!");
+		Class<JavaPlugin> javaPluginC = JavaPlugin.class;
+		Method getFileM = null;
+		try {
+			getFileM = javaPluginC.getDeclaredMethod("getFile");
+			getFileM.setAccessible(true);
+		} catch (NoSuchMethodException | SecurityException e1) {
+			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
+			e1.printStackTrace();
+		}
+		for (PseudoPlugin p : plugins) {
+			if (alreadyUpdated.contains(p)) {
+				continue;
+			}
+			String urlPart = "https://circleci.com/api/v1.1/project/github/" + p.getAuthors().get(0) + "/" + p.getName();
+			String buildCheck = urlPart + "?limit=1&filter=completed";
+			JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
+			int build = buildJson.getJSONObject(0).getInt("build_num");
+			String artifactCheck = urlPart + "/" + build + "/artifacts";
+			JSONArray artifactJson = JsonReader.readJsonFromUrl(artifactCheck);
+			String url = "";
+			String version = "";
+			for (int i = 0; i < artifactJson.length(); i++) {
+				String aUrl = artifactJson.getJSONObject(i).getString("url");
+				if (aUrl.endsWith(".jar")) {
+					if (!aUrl.endsWith("-SNAPSHOT.jar")) {
+						url = aUrl;
+					} else {
+						String test = aUrl.replaceFirst(".*\\/artifacts\\/" + p.getName() + "-", "");
+						test = test.substring(0, test.length() - 13);
+						version = test;
+					}
+				}
+			}
+			if (isNewer(version, p.getVersion())) {
+				updates++;
+				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+				try {
+					if (getFileM != null) {
+						Object file = getFileM.invoke(p);
+						if (file instanceof File) {
+							Bukkit.getUpdateFolderFile().mkdir();
+							updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
+							alreadyUpdated.add(p);
+						}
+					}
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
+					e.printStackTrace();
+				}
+			} else
+				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
 		}
 		if (updates > 0) {
 			PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Completed update check! " + updates + " updates found!");
 			if (updates > updateUrls.size()) {
 				int failedUpdates = updates - updateUrls.size();
-				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), failedUpdates + " plugins could not be updated due to erros! Please check the console!");
+				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), failedUpdates + " plugins could not be updated due to errors! Please check the console!");
 			}
 			if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
 				downloadFiles(updateUrls);
 			}
 		} else {
 			PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Completed update check! No updates found!");
-			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
+			if (updateTaskID != -1) {
+				Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
+			}
+			updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 				public void run() {
 					checkUpdates(false);
 				}
@@ -123,7 +278,7 @@ public class PseudoUpdater {
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 				public void run() {
 					for (Player p : Bukkit.getOnlinePlayers()) {
-						p.kickPlayer("§cServer is restarting for updates!\n&cPlease come back in a few minutes!");
+						p.kickPlayer("§cServer is restarting for updates!\nPlease come back in a few minutes!");
 					}
 					if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot")) {
 						Bukkit.getServer().spigot().restart();
@@ -195,6 +350,8 @@ public class PseudoUpdater {
 			if (ConfigOptions.updateRestart && successfulUpdates > 0) {
 				shouldRestart = true;
 				restartCheck();
+				if (!(!ConfigOptions.restartEmpty || Bukkit.getOnlinePlayers().size() == 0))
+					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Waiting for server to empty before restarting!");
 			}
 		}
 

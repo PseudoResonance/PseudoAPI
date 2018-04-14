@@ -7,6 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.PluginController;
+import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
 
 public class PseudoAPITC implements TabCompleter {
@@ -31,6 +33,9 @@ public class PseudoAPITC implements TabCompleter {
 			if (sender.hasPermission("pseudoapi.backend")) {
 				possible.add("backend");
 			}
+			if (sender.hasPermission("pseudoapi.update")) {
+				possible.add("update");
+			}
 			if (args[0].equalsIgnoreCase("")) {
 				return possible;
 			} else {
@@ -47,6 +52,12 @@ public class PseudoAPITC implements TabCompleter {
 				if (sender.hasPermission("pseudoapi.backend")) {
 					possible.add("list");
 					possible.add("migrate");
+				}
+			} else if (args[0].equalsIgnoreCase("update")) {
+				if (sender.hasPermission("pseudoapi.update")) {
+					for (PseudoPlugin p : PluginController.getPlugins()) {
+						possible.add(p.getName());
+					}
 				}
 			}
 			if (args[1].equalsIgnoreCase("")) {
