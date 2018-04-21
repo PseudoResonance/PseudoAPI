@@ -209,7 +209,7 @@ public class PseudoUpdater {
 								Object file = getFileM.invoke(p);
 								if (file instanceof File) {
 									Bukkit.getUpdateFolderFile().mkdir();
-									updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
+									updateUrls.add(new UpdateData((File) file, url));
 									if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
 										alreadyUpdated.add(p);
 										downloadFiles(updateUrls, sender);
@@ -291,7 +291,7 @@ public class PseudoUpdater {
 							Object file = getFileM.invoke(p);
 							if (file instanceof File) {
 								Bukkit.getUpdateFolderFile().mkdir();
-								updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
+								updateUrls.add(new UpdateData((File) file, url));
 								alreadyUpdated.add(p);
 							}
 						}
@@ -405,7 +405,7 @@ public class PseudoUpdater {
 							Object file = getFileM.invoke(p);
 							if (file instanceof File) {
 								Bukkit.getUpdateFolderFile().mkdir();
-								updateUrls.add(new UpdateData((File) file, url, new File(Bukkit.getUpdateFolderFile(), p.getName() + ".jar")));
+								updateUrls.add(new UpdateData((File) file, url));
 								alreadyUpdated.add(p);
 							}
 						}
@@ -482,17 +482,13 @@ public class PseudoUpdater {
 			int successfulUpdates = 0;
 			for (UpdateData d : files) {
 				try {
-					Files.copy(new URL(d.getURL()).openStream(), d.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
-					if (!d.getOldFile().getName().equals(d.getNewFile().getName())) {
-						oldFiles.add(d.getOldFile());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Please delete " + d.getOldFile().getName() + " before starting the server again to prevent duplicate plugins!");
-					}
+					Files.copy(new URL(d.getURL()).openStream(), d.getFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
 					successfulUpdates++;
 				} catch (IOException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getFile().getAbsolutePath());
 					e.printStackTrace();
 				} catch (Exception e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getFile().getAbsolutePath());
 					e.printStackTrace();
 				}
 			}
@@ -525,26 +521,20 @@ public class PseudoUpdater {
 
 	private static class UpdateData {
 
-		private final File oldFile;
+		private final File file;
 		private final String url;
-		private final File newFile;
 
-		private UpdateData(File oldFile, String url, File newFile) {
-			this.oldFile = oldFile;
+		private UpdateData(File file, String url) {
+			this.file = file;
 			this.url = url;
-			this.newFile = newFile;
 		}
 
-		public File getOldFile() {
-			return this.oldFile;
+		public File getFile() {
+			return this.file;
 		}
 
 		public String getURL() {
 			return this.url;
-		}
-
-		public File getNewFile() {
-			return this.newFile;
 		}
 
 	}
