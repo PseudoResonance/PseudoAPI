@@ -209,7 +209,7 @@ public class PseudoUpdater {
 								Object file = getFileM.invoke(p);
 								if (file instanceof File) {
 									Bukkit.getUpdateFolderFile().mkdir();
-									updateUrls.add(new UpdateData((File) file, url));
+									updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), url));
 									if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
 										alreadyUpdated.add(p);
 										downloadFiles(updateUrls, sender);
@@ -291,7 +291,7 @@ public class PseudoUpdater {
 							Object file = getFileM.invoke(p);
 							if (file instanceof File) {
 								Bukkit.getUpdateFolderFile().mkdir();
-								updateUrls.add(new UpdateData((File) file, url));
+								updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), url));
 								alreadyUpdated.add(p);
 							}
 						}
@@ -405,7 +405,7 @@ public class PseudoUpdater {
 							Object file = getFileM.invoke(p);
 							if (file instanceof File) {
 								Bukkit.getUpdateFolderFile().mkdir();
-								updateUrls.add(new UpdateData((File) file, url));
+								updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), url));
 								alreadyUpdated.add(p);
 							}
 						}
@@ -482,13 +482,13 @@ public class PseudoUpdater {
 			int successfulUpdates = 0;
 			for (UpdateData d : files) {
 				try {
-					Files.copy(new URL(d.getURL()).openStream(), d.getFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(new URL(d.getURL()).openStream(), d.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
 					successfulUpdates++;
 				} catch (IOException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getFile().getAbsolutePath());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
 					e.printStackTrace();
 				} catch (Exception e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getFile().getAbsolutePath());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
 					e.printStackTrace();
 				}
 			}
@@ -521,16 +521,16 @@ public class PseudoUpdater {
 
 	private static class UpdateData {
 
-		private final File file;
+		private final File newFile;
 		private final String url;
 
-		private UpdateData(File file, String url) {
-			this.file = file;
+		private UpdateData(File newFile, String url) {
+			this.newFile = newFile;
 			this.url = url;
 		}
 
-		public File getFile() {
-			return this.file;
+		public File getNewFile() {
+			return this.newFile;
 		}
 
 		public String getURL() {
