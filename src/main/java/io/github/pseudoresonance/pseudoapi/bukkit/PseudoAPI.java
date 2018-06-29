@@ -13,7 +13,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.commands.PluginsC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ReloadSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ResetSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.UpdateSC;
-import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandPreprocessL;
+import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
@@ -94,6 +94,8 @@ public class PseudoAPI extends PseudoPlugin {
 		this.getCommand("pseudoapi").setExecutor(mainCommand);
 		this.getCommand("plugins").setExecutor(pluginsCommand);
 		this.getCommand("pl").setExecutor(pluginsCommand);
+		this.registerDynamicCommand("plugins", pluginsCommand);
+		this.registerDynamicCommand("pl", pluginsCommand);
 		this.getCommand("allplugins").setExecutor(allPluginsCommand);
 	}
 
@@ -114,7 +116,7 @@ public class PseudoAPI extends PseudoPlugin {
 			this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 			this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeSpigot", pcl = new PluginChannelListener());
 		}
-		getServer().getPluginManager().registerEvents(new CommandPreprocessL(), this);
+		getServer().getPluginManager().registerEvents(new CommandL(), this);
 		getServer().getPluginManager().registerEvents(new PlayerJoinLeaveL(), this);
 	}
 

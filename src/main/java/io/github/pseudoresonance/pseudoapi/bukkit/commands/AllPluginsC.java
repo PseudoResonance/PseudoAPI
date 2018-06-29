@@ -15,8 +15,32 @@ import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 public class AllPluginsC implements CommandExecutor {
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (cmd.getName().equalsIgnoreCase("allplugins")) {
-			if (!(sender instanceof Player)) {
+		if (!(sender instanceof Player)) {
+			String pluginlist = "";
+			Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
+			int pluginsfound = plugins.length;
+			for(int i = 0; i < plugins.length; i++) {
+				if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
+					String add = "";
+					if (pluginlist == "") {
+						add = ChatColor.GREEN + "[E] " + plugins[i].getName();
+					} else {
+						add = ChatColor.RESET + ", " + ChatColor.GREEN + "[E] " + plugins[i].getName();
+					}
+					pluginlist = pluginlist + add;
+				} else {
+					String add = "";
+					if (pluginlist == "") {
+						add = ChatColor.RED + "[D] " + plugins[i].getName();
+					} else {
+						add = ChatColor.RESET + ", " + ChatColor.RED + "[D] " + plugins[i].getName();
+					}
+					pluginlist = pluginlist + add;
+				}
+			}
+			Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
+		} else {
+			if (sender.hasPermission("pseudoapi.allplugins")) {
 				String pluginlist = "";
 				Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
 				int pluginsfound = plugins.length;
@@ -24,51 +48,25 @@ public class AllPluginsC implements CommandExecutor {
 					if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
 						String add = "";
 						if (pluginlist == "") {
-							add = ChatColor.GREEN + "[E] " + plugins[i].getName();
+							add = ChatColor.GREEN + plugins[i].getName();
 						} else {
-							add = ChatColor.RESET + ", " + ChatColor.GREEN + "[E] " + plugins[i].getName();
+							add = ChatColor.RESET + ", " + ChatColor.GREEN + plugins[i].getName();
 						}
 						pluginlist = pluginlist + add;
 					} else {
 						String add = "";
 						if (pluginlist == "") {
-							add = ChatColor.RED + "[D] " + plugins[i].getName();
+							add = ChatColor.RED + plugins[i].getName();
 						} else {
-							add = ChatColor.RESET + ", " + ChatColor.RED + "[D] " + plugins[i].getName();
+							add = ChatColor.RESET + ", " + ChatColor.RED + plugins[i].getName();
 						}
 						pluginlist = pluginlist + add;
 					}
 				}
 				Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
 			} else {
-				if (sender.hasPermission("pseudoapi.allplugins")) {
-					String pluginlist = "";
-					Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
-					int pluginsfound = plugins.length;
-					for(int i = 0; i < plugins.length; i++) {
-						if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
-							String add = "";
-							if (pluginlist == "") {
-								add = ChatColor.GREEN + plugins[i].getName();
-							} else {
-								add = ChatColor.RESET + ", " + ChatColor.GREEN + plugins[i].getName();
-							}
-							pluginlist = pluginlist + add;
-						} else {
-							String add = "";
-							if (pluginlist == "") {
-								add = ChatColor.RED + plugins[i].getName();
-							} else {
-								add = ChatColor.RESET + ", " + ChatColor.RED + plugins[i].getName();
-							}
-							pluginlist = pluginlist + add;
-						}
-					}
-					Message.sendMessage(sender, "Plugins (" + pluginsfound + "): " + pluginlist);
-				} else {
-					PseudoAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
-					return false;
-				}
+				PseudoAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
+				return false;
 			}
 		}
 		return false;
