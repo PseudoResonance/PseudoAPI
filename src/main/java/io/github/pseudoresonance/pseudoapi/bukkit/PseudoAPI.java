@@ -94,8 +94,8 @@ public class PseudoAPI extends PseudoPlugin {
 		this.getCommand("pseudoapi").setExecutor(mainCommand);
 		this.getCommand("plugins").setExecutor(pluginsCommand);
 		this.getCommand("pl").setExecutor(pluginsCommand);
-		this.registerDynamicCommand("plugins", pluginsCommand, new PseudoAPITC());
-		this.registerDynamicCommand("pl", pluginsCommand, new PseudoAPITC());
+		this.registerDynamicCommand("plugins", pluginsCommand);
+		this.registerDynamicCommand("pl", pluginsCommand);
 		this.getCommand("allplugins").setExecutor(allPluginsCommand);
 	}
 
