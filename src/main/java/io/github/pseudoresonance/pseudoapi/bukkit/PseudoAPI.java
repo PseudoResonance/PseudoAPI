@@ -70,6 +70,7 @@ public class PseudoAPI extends PseudoPlugin {
 	}
 
 	public void onDisable() {
+		super.onDisable();
 		for (File f : PseudoUpdater.getOldFiles()) {
 			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Please delete " + f.getName() + " before starting the server again to prevent duplicate plugins!");
 		}
