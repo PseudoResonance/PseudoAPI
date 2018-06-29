@@ -9,10 +9,28 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.RemoteServerCommandEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.event.server.TabCompleteEvent;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.CommandHandler;
 
 public class CommandL implements Listener {
+
+	@EventHandler
+	public void tabComplete(TabCompleteEvent e) {
+		String[] split = e.getBuffer().split("\\s+");
+		List<String> argsList = new ArrayList<String>();
+		for (int i = 1; i < split.length; i++) {
+			argsList.add(split[i]);
+		}
+		argsList.add("");
+		String[] newArgs = argsList.toArray(new String[argsList.size()]);
+		String cmdName = split[0];
+		if (cmdName.startsWith("/"))
+			cmdName = cmdName.substring(1);
+		List<String> results = CommandHandler.runCompleter(e.getSender(), cmdName, newArgs);
+		if (results != null)
+			e.setCompletions(results);
+	}
 
 	@EventHandler
 	public void commandPreprocess(PlayerCommandPreprocessEvent e) {
@@ -27,7 +45,7 @@ public class CommandL implements Listener {
 	}
 
 	@EventHandler
-	public void commandPreprocess(ServerCommandEvent e) {
+	public void serverCommand(ServerCommandEvent e) {
 		String[] split = e.getCommand().split("\\s+");
 		List<String> argsList = new ArrayList<String>();
 		for (int i = 1; i < split.length; i++) {
@@ -39,7 +57,7 @@ public class CommandL implements Listener {
 	}
 
 	@EventHandler
-	public void commandPreprocess(RemoteServerCommandEvent e) {
+	public void remoteServerCommand(RemoteServerCommandEvent e) {
 		String[] split = e.getCommand().split("\\s+");
 		List<String> argsList = new ArrayList<String>();
 		for (int i = 1; i < split.length; i++) {

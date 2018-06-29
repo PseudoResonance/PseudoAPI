@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -129,6 +130,10 @@ public class PseudoPlugin extends JavaPlugin {
 	
 	public void registerDynamicCommand(String cmd, CommandExecutor executor) {
 		CommandHandler.registerCommand(this, cmd, executor);
+	}
+	
+	public void registerDynamicCommand(String cmd, CommandExecutor executor, TabCompleter completer) {
+		CommandHandler.registerCommand(this, cmd, executor, completer);
 	}
 	
 	public void unregisterDynamicCommand(String cmd) {
