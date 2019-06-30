@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -328,8 +329,15 @@ public class PlayerDataController {
 
 	public static void playerLeave(String uuid, String username) {
 		Object o = getPlayerSetting(uuid, "lastjoinleave");
+		Timestamp joinLeaveTS = null;
 		if (o instanceof Timestamp) {
-			long joinLeave = ((Timestamp) o).getTime();
+			joinLeaveTS = (Timestamp) o;
+		}
+		if (o instanceof Date) {
+			joinLeaveTS = new Timestamp(((Date) o).getTime());
+		}
+		if (joinLeaveTS != null) {
+			long joinLeave = joinLeaveTS.getTime();
 			long diff = System.currentTimeMillis() - joinLeave;
 			Object ob = getPlayerSetting(uuid, "playtime");
 			if (ob instanceof BigInteger || ob instanceof Long) {
@@ -340,6 +348,8 @@ public class PlayerDataController {
 					playTime = (Long) ob;
 				playTime = diff >= 0 ? playTime + diff : playTime - diff;
 				setPlayerSetting(uuid, "playtime", playTime);
+			} else if (ob == null) {
+				setPlayerSetting(uuid, "playtime", diff);
 			}
 		}
 		playerJoin(uuid, username);

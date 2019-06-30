@@ -56,7 +56,7 @@ public class PseudoAPI extends PseudoPlugin {
 		initializeListeners();
 		setCommandDescriptions();
 		configOptions.reloadConfig();
-		PluginMessenger.enable();
+		//PluginMessenger.enable();
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerJoinLeaveL.playerJoin(p);
 		}

@@ -100,8 +100,10 @@ public class PseudoUpdater {
 		String[] current = currentVer.split("\\.");
 		int length = Math.max(test.length, current.length);
 		for (int i = 0; i < length; i++) {
-			int testPart = i < test.length ? Integer.parseInt(test[i]) : 0;
-			int currentPart = i < current.length ? Integer.parseInt(current[i]) : 0;
+			String testStr = test[i].isEmpty() ? "0" : test[i];
+			String currentStr = current[i].isEmpty() ? "0" : current[i];
+			int testPart = i < test.length ? Integer.parseInt(testStr) : 0;
+			int currentPart = i < current.length ? Integer.parseInt(currentStr) : 0;
 			if (testPart < currentPart)
 				return false;
 			if (testPart > currentPart)
