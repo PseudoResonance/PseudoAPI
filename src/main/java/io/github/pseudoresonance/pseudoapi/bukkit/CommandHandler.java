@@ -62,15 +62,17 @@ public class CommandHandler {
 	protected static void unregisterCommand(PseudoPlugin plugin, String cmd) {
 		String lower = cmd.toLowerCase();
 		ArrayList<String> cmds = plugins.get(plugin);
-		if (cmds.contains(lower)) {
-			executors.remove(lower);
-			owners.remove(lower);
-			completers.remove(lower);
-			cmds.remove(lower);
-			if (cmds.size() > 0) {
-				plugins.put(plugin, cmds);
-			} else
-				plugins.remove(plugin);
+		if (cmds != null) {
+			if (cmds.contains(lower)) {
+				executors.remove(lower);
+				owners.remove(lower);
+				completers.remove(lower);
+				cmds.remove(lower);
+				if (cmds.size() > 0) {
+					plugins.put(plugin, cmds);
+				} else
+					plugins.remove(plugin);
+			}
 		}
 	}
 	
