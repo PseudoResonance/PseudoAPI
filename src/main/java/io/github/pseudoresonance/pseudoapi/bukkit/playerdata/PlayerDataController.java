@@ -51,6 +51,7 @@ public class PlayerDataController {
 		b = Data.getBackend();
 		setup();
 		playerData.clear();
+		getUUIDS();
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerJoinLeaveL.playerJoin(p);
 		}

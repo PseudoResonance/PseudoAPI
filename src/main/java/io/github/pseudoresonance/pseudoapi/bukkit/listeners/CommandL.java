@@ -22,7 +22,9 @@ public class CommandL implements Listener {
 		for (int i = 1; i < split.length; i++) {
 			argsList.add(split[i]);
 		}
-		argsList.add("");
+		if (e.getBuffer().endsWith(" ")) {
+			argsList.add("");
+		}
 		String[] newArgs = argsList.toArray(new String[argsList.size()]);
 		String cmdName = split[0];
 		if (cmdName.startsWith("/"))
