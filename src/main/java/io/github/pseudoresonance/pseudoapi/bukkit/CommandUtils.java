@@ -226,20 +226,24 @@ public class CommandUtils {
 	 *            entity to get the relative int from.
 	 * @return the int
 	 */
-	public static int getIntRelative(String arg, String rel, Entity e) {
-		int relInt = 0;
+	public static double getIntRelative(String arg, String rel, Entity e) {
+		double relInt = 0;
 		switch (rel.toLowerCase()) {
 		case "x":
-			relInt = e.getLocation().getBlockX();
+			relInt = e.getLocation().getX();
 			break;
 		case "y":
-			relInt = e.getLocation().getBlockY();
+			relInt = e.getLocation().getY();
 			break;
 		case "z":
-			relInt = e.getLocation().getBlockZ();
+			relInt = e.getLocation().getZ();
 			break;
 		}
-		return mathIt(arg, relInt);
+		try {
+			return mathIt(arg, relInt);
+		} catch (Exception ex) {
+			throw ex;
+		}
 	}
 
 	private static boolean canBeAccepted(String arg, Entity e, Location loc) {
@@ -287,8 +291,8 @@ public class CommandUtils {
 		return tags.split(",");
 	}
 
-	private static int mathIt(String args, int relInt) {
-		int total = 0;
+	private static double mathIt(String args, double relInt) {
+		double total = 0;
 		short mode = 0;
 		String arg = args.replace("~", String.valueOf(relInt));
 		String intString = "";
@@ -298,16 +302,16 @@ public class CommandUtils {
 				try {
 					switch (mode) {
 					case 0:
-						total = total + Integer.parseInt(intString);
+						total = total + Double.parseDouble(intString);
 						break;
 					case 1:
-						total = total - Integer.parseInt(intString);
+						total = total - Double.parseDouble(intString);
 						break;
 					case 2:
-						total = total * Integer.parseInt(intString);
+						total = total * Double.parseDouble(intString);
 						break;
 					case 3:
-						total = total / Integer.parseInt(intString);
+						total = total / Double.parseDouble(intString);
 						break;
 					}
 					mode = (short) ((arg.charAt(i) == '+') ? 0 : ((arg
@@ -315,8 +319,7 @@ public class CommandUtils {
 							: ((arg.charAt(i) == '*') ? 2
 									: ((arg.charAt(i) == '/') ? 3 : -1))));
 				} catch (Exception e) {
-					Bukkit.getLogger()
-							.severe("There has been an issue with a plugin using the CommandUtils class!");
+					throw e;
 				}
 
 			} else if (args.length() == i || arg.charAt(i) == ' '
@@ -324,21 +327,20 @@ public class CommandUtils {
 				try {
 					switch (mode) {
 					case 0:
-						total = total + Integer.parseInt(intString);
+						total = total + Double.parseDouble(intString);
 						break;
 					case 1:
-						total = total - Integer.parseInt(intString);
+						total = total - Double.parseDouble(intString);
 						break;
 					case 2:
-						total = total * Integer.parseInt(intString);
+						total = total * Double.parseDouble(intString);
 						break;
 					case 3:
-						total = total / Integer.parseInt(intString);
+						total = total / Double.parseDouble(intString);
 						break;
 					}
 				} catch (Exception e) {
-					Bukkit.getLogger()
-							.severe("There has been an issue with a plugin using the CommandUtils class!");
+					throw e;
 				}
 				break;
 			} else {
