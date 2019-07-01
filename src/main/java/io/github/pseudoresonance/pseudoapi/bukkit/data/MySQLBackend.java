@@ -16,10 +16,12 @@ public class MySQLBackend implements SQLBackend {
 	private final String password;
 	private final String database;
 	private final String prefix;
-	private final boolean ssl;
+	private final boolean useSSL;
+	private final boolean verifyServerCertificate;
+	private final boolean requireSSL;
 	private final String url;
 
-	public MySQLBackend(String name, String host, int port, String username, String password, String database, String prefix, boolean ssl) {
+	public MySQLBackend(String name, String host, int port, String username, String password, String database, String prefix, boolean useSSL, boolean verifyServerCertificate, boolean requireSSL) {
 		this.name = name;
 		this.host = host;
 		this.port = port;
@@ -27,11 +29,23 @@ public class MySQLBackend implements SQLBackend {
 		this.password = password;
 		this.database = database;
 		this.prefix = prefix;
-		this.ssl = ssl;
-		if (ssl)
-			this.url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=true";
+		this.useSSL = useSSL;
+		this.verifyServerCertificate = verifyServerCertificate;
+		this.requireSSL = requireSSL;
+		String suffix = "?";
+		if (useSSL)
+			suffix += "useSSL=true";
 		else
-			this.url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=false";
+			suffix += "useSSL=false";
+		if (verifyServerCertificate)
+			suffix += "&verifyServerCertificate=true";
+		else
+			suffix += "&verifyServerCertificate=false";
+		if (requireSSL)
+			suffix += "&requireSSL=true";
+		else
+			suffix += "&requireSSL=false";
+		this.url = "jdbc:mysql://" + host + ":" + port + "/" + database + suffix;
 	}
 
 	public BasicDataSource getDataSource() {
@@ -100,8 +114,16 @@ public class MySQLBackend implements SQLBackend {
 		return this.prefix;
 	}
 
-	public boolean getSSL() {
-		return this.ssl;
+	public boolean getUseSSL() {
+		return this.useSSL;
+	}
+
+	public boolean getVerifyServerCertificate() {
+		return this.verifyServerCertificate;
+	}
+
+	public boolean getRequireSSL() {
+		return this.requireSSL;
 	}
 
 	public String getURL() {

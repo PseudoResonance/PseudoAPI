@@ -51,12 +51,14 @@ public class Data {
 					String username = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".username");
 					String password = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".password");
 					String database = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".database");
-					boolean ssl = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".useSSL");
+					boolean useSSL = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".useSSL");
+					boolean verifyServerCertificate = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".verifyServerCertificate");
+					boolean requireSSL = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".requireSSL");
 					String prefix = "";
 					if (PseudoAPI.plugin.getConfig().contains("Backends." + key + ".prefix")) {
 						prefix = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".prefix");
 					}
-					backend = new MySQLBackend(key, host, port, username, password, database, prefix, ssl);
+					backend = new MySQLBackend(key, host, port, username, password, database, prefix, useSSL, verifyServerCertificate, requireSSL);
 					backends.put(key, backend);
 				} else {
 					Message.sendConsoleMessage(ChatColor.RED + "Invalid backend type for backend: " + key + "!");

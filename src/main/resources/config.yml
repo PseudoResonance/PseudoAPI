@@ -38,6 +38,8 @@ Backends:
     database: PseudoPlugins
     prefix: "Pseudo_"
     useSSL: true
+    verifyServerCertificate: false
+    requireSSL: false
 
 
 ##########################
