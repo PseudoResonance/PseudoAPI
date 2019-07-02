@@ -1,6 +1,7 @@
 package io.github.pseudoresonance.pseudoapi.bukkit;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.minecart.CommandMinecart;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.util.Vector;
 
 /**
  * https://github.com/ZombieStriker/CommandUtils/blob/master/src/CommandUtils.java
@@ -63,6 +65,8 @@ public class CommandUtils {
 			loc = ((BlockCommandSender) sender).getBlock().getLocation();
 		} else if (sender instanceof CommandMinecart) {
 			loc = ((CommandMinecart) sender).getLocation();
+		} else {
+			loc = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
 		}
 		if (arg.startsWith("@a")) {
 			if (loc != null) {
@@ -210,38 +214,121 @@ public class CommandUtils {
 	}
 
 	/**
-	 * Returns an integer. Use this to support "~" by providing what it will
+	 * Returns an double array. Use this to support "~" and "^" by providing what it will
 	 * mean.
-	 * 
-	 * E.g. rel="x" when ~ should be turn into the entity's X coord.
 	 * 
 	 * Currently supports "x", "y" and "z".
 	 * 
 	 * 
-	 * @param The
-	 *            argument
-	 * @param What
-	 *            the int should represent
-	 * @param The
-	 *            entity to get the relative int from.
-	 * @return the int
+	 * @param X argument
+	 * @param Y argument
+	 * @param Z argument
+	 * @param The entities to get the relative int from.
+	 * @return XYZ coordinates
 	 */
-	public static double getIntRelative(String arg, String rel, Entity e) {
-		double relInt = 0;
-		switch (rel.toLowerCase()) {
-		case "x":
-			relInt = e.getLocation().getX();
-			break;
-		case "y":
-			relInt = e.getLocation().getY();
-			break;
-		case "z":
-			relInt = e.getLocation().getZ();
-			break;
+	public static HashMap<Entity, double[]> getRelativeCoords(String x, String y, String z, Entity[] e) throws NumberFormatException {
+		boolean carrot = false;
+		boolean xRel = false;
+		boolean yRel = false;
+		boolean zRel = false;
+		if (x.charAt(0) == '^' || y.charAt(0) == '^' ||  z.charAt(0) == '^') {
+			if (x.charAt(0) == '^' && y.charAt(0) == '^' &&  z.charAt(0) == '^') {
+				carrot = true;
+			} else {
+				throw new NumberFormatException("Invalid coordinates");
+			}
+		} else {
+			if (x.charAt(0) == '~')
+				xRel = true;
+			if (y.charAt(0) == '~')
+				yRel = true;
+			if (z.charAt(0) == '~')
+				zRel = true;
 		}
 		try {
-			return mathIt(arg, relInt);
-		} catch (Exception ex) {
+			double xIn = 0;
+			double yIn = 0;
+			double zIn = 0;
+			if (carrot || xRel) {
+				if (x.length() > 1)
+					xIn = Double.valueOf(x.substring(1));
+				else
+					xIn = 0;
+			} else
+				xIn = Double.valueOf(x);
+			if (carrot || yRel) {
+				if (y.length() > 1)
+					yIn = Double.valueOf(y.substring(1));
+				else
+					yIn = 0;
+			} else
+				yIn = Double.valueOf(y);
+			if (carrot || zRel) {
+				if (z.length() > 1)
+					zIn = Double.valueOf(z.substring(1));
+				else
+					zIn = 0;
+			} else
+				zIn = Double.valueOf(z);
+			HashMap<Entity, double[]> ret = new HashMap<Entity, double[]>();
+			if (!carrot) {
+				if (!xRel && !yRel && !zRel) {
+					double[] arr = new double[] {xIn, yIn, zIn};
+					for (Entity ent : e) {
+						ret.put(ent, arr);
+					}
+					return ret;
+				} else {
+					for (Entity ent : e) {
+						double[] arr = new double[3];
+						Location l = ent.getLocation();
+						if (xRel)
+							arr[0] = l.getX() + xIn;
+						else
+							arr[0] = xIn;
+						if (yRel)
+							arr[1] = l.getY() + yIn;
+						else
+							arr[1] = yIn;
+						if (zRel)
+							arr[2] = l.getZ() + zIn;
+						else
+							arr[2] = zIn;
+						ret.put(ent, arr);
+					}
+					return ret;
+				}
+			} else {
+				for (Entity ent : e) {
+					Location l = ent.getLocation();
+					l.add(l.getDirection().multiply(new Vector(xIn, yIn, zIn)));
+					double[] arr = new double[] {l.getX(), l.getY(), l.getZ()};
+					ret.put(ent, arr);
+				}
+				return ret;
+			}
+		} catch (NumberFormatException ex) {
+			throw ex;
+		}
+	}
+
+	/**
+	 * Returns an double array. Use this to support "~" and "^" by providing what it will
+	 * mean.
+	 * 
+	 * Currently supports "x", "y" and "z".
+	 * 
+	 * 
+	 * @param X argument
+	 * @param Y argument
+	 * @param Z argument
+	 * @param The entity to get the relative int from.
+	 * @return XYZ coordinates
+	 */
+	public static double[] getRelativeCoords(String x, String y, String z, Entity e) throws NumberFormatException {
+		try {
+			return getRelativeCoords(x, y, z, new Entity[] {e}).get(e);
+		} catch (NumberFormatException ex) {
 			throw ex;
 		}
 	}
@@ -289,65 +376,6 @@ public class CommandUtils {
 			return new String[0];
 		String tags = arg.split("\\[")[1].split("\\]")[0];
 		return tags.split(",");
-	}
-
-	private static double mathIt(String args, double relInt) {
-		double total = 0;
-		short mode = 0;
-		String arg = args.replace("~", String.valueOf(relInt));
-		String intString = "";
-		for (int i = 0; i < arg.length(); i++) {
-			if (arg.charAt(i) == '+' || arg.charAt(i) == '-'
-					|| arg.charAt(i) == '*' || arg.charAt(i) == '/') {
-				try {
-					switch (mode) {
-					case 0:
-						total = total + Double.parseDouble(intString);
-						break;
-					case 1:
-						total = total - Double.parseDouble(intString);
-						break;
-					case 2:
-						total = total * Double.parseDouble(intString);
-						break;
-					case 3:
-						total = total / Double.parseDouble(intString);
-						break;
-					}
-					mode = (short) ((arg.charAt(i) == '+') ? 0 : ((arg
-							.charAt(i) == '-') ? 1
-							: ((arg.charAt(i) == '*') ? 2
-									: ((arg.charAt(i) == '/') ? 3 : -1))));
-				} catch (Exception e) {
-					throw e;
-				}
-
-			} else if (args.length() == i || arg.charAt(i) == ' '
-					|| arg.charAt(i) == ',' || arg.charAt(i) == ']') {
-				try {
-					switch (mode) {
-					case 0:
-						total = total + Double.parseDouble(intString);
-						break;
-					case 1:
-						total = total - Double.parseDouble(intString);
-						break;
-					case 2:
-						total = total * Double.parseDouble(intString);
-						break;
-					case 3:
-						total = total / Double.parseDouble(intString);
-						break;
-					}
-				} catch (Exception e) {
-					throw e;
-				}
-				break;
-			} else {
-				intString += arg.charAt(i);
-			}
-		}
-		return total;
 	}
 
 	private static String getType(String arg) {
