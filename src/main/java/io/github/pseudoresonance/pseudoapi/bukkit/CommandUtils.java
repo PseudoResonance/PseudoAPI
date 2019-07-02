@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Damageable;
@@ -58,28 +59,33 @@ public class CommandUtils {
 	public static Entity[] getTargets(CommandSender sender, String arg) {
 		Entity[] ents = null;
 		Location loc = null;
-		if (sender instanceof Player) {
-			loc = ((Player) sender).getLocation();
+		if (sender instanceof Entity) {
+			loc = ((Entity) sender).getLocation();
 		} else if (sender instanceof BlockCommandSender) {
 			loc = ((BlockCommandSender) sender).getBlock().getLocation();
 		} else if (sender instanceof CommandMinecart) {
 			loc = ((CommandMinecart) sender).getLocation();
 		} else {
-			loc = new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
+			for (World w : Bukkit.getWorlds()) {
+				if (w.getEnvironment() == Environment.NORMAL) {
+					loc = new Location(w, 0, 0, 0);
+					break;
+				}
+			}
 		}
 		if (arg.startsWith("@a")) {
 			if (loc != null) {
 				int maxEnts = 0;
 				for (World w : getAcceptedWorlds(loc, arg))
-					maxEnts += w.getEntities().size();
+					maxEnts += w.getPlayers().size();
 				ents = new Entity[maxEnts];
 				int id = 0;
 				int C = getC(arg);
 				World world3 = null;
 
 				for (World w : getAcceptedWorlds(loc, arg)) {
-					List<Entity> ea = w.getEntities();
-					for (int i = 0; i < w.getEntities().size(); i++) {
+					List<Player> ea = w.getPlayers();
+					for (int i = 0; i < w.getPlayers().size(); i++) {
 						if (world3 == null || !world3.equals(w)) {
 							world3 = w;
 						}
@@ -160,8 +166,8 @@ public class CommandUtils {
 				if (hasType(arg)) {
 					Entity e = loc
 							.getWorld()
-							.getEntities()
-							.get(r.nextInt(loc.getWorld().getEntities().size()));
+							.getPlayers()
+							.get(r.nextInt(loc.getWorld().getPlayers().size()));
 					boolean good = true;
 					for (int b = 0; b < getTags(arg).length; b++) {
 						if (!canBeAccepted(arg, e, loc)) {
@@ -225,7 +231,22 @@ public class CommandUtils {
 	 * @param The entity to get the relative int from.
 	 * @return XYZ coordinates
 	 */
-	public static double[] getRelativeCoords(String x, String y, String z, Entity e) throws NumberFormatException {
+	public static double[] getRelativeCoords(String x, String y, String z, CommandSender sender) throws NumberFormatException {
+		Location l = null;
+		if (sender instanceof Entity) {
+			l = ((Entity) sender).getLocation();
+		} else if (sender instanceof BlockCommandSender) {
+			l = ((BlockCommandSender) sender).getBlock().getLocation();
+		} else if (sender instanceof CommandMinecart) {
+			l = ((CommandMinecart) sender).getLocation();
+		} else {
+			for (World w : Bukkit.getWorlds()) {
+				if (w.getEnvironment() == Environment.NORMAL) {
+					l = new Location(w, 0, 0, 0);
+					break;
+				}
+			}
+		}
 		boolean carrot = false;
 		boolean xRel = false;
 		boolean yRel = false;
@@ -273,7 +294,6 @@ public class CommandUtils {
 				xIn += 0.5;
 			if (zIn - Math.floor(zIn) == 0)
 				zIn += 0.5;
-			Location l = e.getLocation();
 			if (!carrot) {
 				double[] arr = new double[3];
 				if (xRel)
