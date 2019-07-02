@@ -1,7 +1,6 @@
 package io.github.pseudoresonance.pseudoapi.bukkit;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -223,10 +222,10 @@ public class CommandUtils {
 	 * @param X argument
 	 * @param Y argument
 	 * @param Z argument
-	 * @param The entities to get the relative int from.
+	 * @param The entity to get the relative int from.
 	 * @return XYZ coordinates
 	 */
-	public static HashMap<Entity, double[]> getRelativeCoords(String x, String y, String z, Entity[] e) throws NumberFormatException {
+	public static double[] getRelativeCoords(String x, String y, String z, Entity e) throws NumberFormatException {
 		boolean carrot = false;
 		boolean xRel = false;
 		boolean yRel = false;
@@ -270,64 +269,31 @@ public class CommandUtils {
 					zIn = 0;
 			} else
 				zIn = Double.valueOf(z);
-			HashMap<Entity, double[]> ret = new HashMap<Entity, double[]>();
+			if (xIn - Math.floor(xIn) == 0)
+				xIn += 0.5;
+			if (zIn - Math.floor(zIn) == 0)
+				zIn += 0.5;
+			Location l = e.getLocation();
 			if (!carrot) {
-				if (!xRel && !yRel && !zRel) {
-					double[] arr = new double[] {xIn, yIn, zIn};
-					for (Entity ent : e) {
-						ret.put(ent, arr);
-					}
-					return ret;
-				} else {
-					for (Entity ent : e) {
-						double[] arr = new double[3];
-						Location l = ent.getLocation();
-						if (xRel)
-							arr[0] = l.getX() + xIn;
-						else
-							arr[0] = xIn;
-						if (yRel)
-							arr[1] = l.getY() + yIn;
-						else
-							arr[1] = yIn;
-						if (zRel)
-							arr[2] = l.getZ() + zIn;
-						else
-							arr[2] = zIn;
-						ret.put(ent, arr);
-					}
-					return ret;
-				}
+				double[] arr = new double[3];
+				if (xRel)
+					arr[0] = l.getX() + xIn;
+				else
+					arr[0] = xIn;
+				if (yRel)
+					arr[1] = l.getY() + yIn;
+				else
+					arr[1] = yIn;
+				if (zRel)
+					arr[2] = l.getZ() + zIn;
+				else
+					arr[2] = zIn;
+				return arr;
 			} else {
-				for (Entity ent : e) {
-					Location l = ent.getLocation();
-					l.add(l.getDirection().multiply(new Vector(xIn, yIn, zIn)));
-					double[] arr = new double[] {l.getX(), l.getY(), l.getZ()};
-					ret.put(ent, arr);
-				}
-				return ret;
+				l.add(l.getDirection().multiply(new Vector(xIn, yIn, zIn)));
+				double[] arr = new double[] {l.getX(), l.getY(), l.getZ()};
+				return arr;
 			}
-		} catch (NumberFormatException ex) {
-			throw ex;
-		}
-	}
-
-	/**
-	 * Returns an double array. Use this to support "~" and "^" by providing what it will
-	 * mean.
-	 * 
-	 * Currently supports "x", "y" and "z".
-	 * 
-	 * 
-	 * @param X argument
-	 * @param Y argument
-	 * @param Z argument
-	 * @param The entity to get the relative int from.
-	 * @return XYZ coordinates
-	 */
-	public static double[] getRelativeCoords(String x, String y, String z, Entity e) throws NumberFormatException {
-		try {
-			return getRelativeCoords(x, y, z, new Entity[] {e}).get(e);
 		} catch (NumberFormatException ex) {
 			throw ex;
 		}
