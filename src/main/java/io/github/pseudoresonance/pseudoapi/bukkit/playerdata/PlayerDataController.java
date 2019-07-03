@@ -11,8 +11,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -21,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
@@ -324,10 +327,12 @@ public class PlayerDataController {
 		settings.put("lastjoinleave", timestamp);
 		if (name == null)
 			settings.put("firstjoin", timestamp);
+		settings.put("lastserver", Config.serverName);
 		setPlayerSettings(uuid, settings);
 	}
 
 	public static void playerLeave(String uuid, String username) {
+		HashMap<String, Object> settings = new HashMap<String, Object>();
 		Object o = getPlayerSetting(uuid, "lastjoinleave");
 		Timestamp joinLeaveTS = null;
 		if (o instanceof Timestamp) {
@@ -347,13 +352,14 @@ public class PlayerDataController {
 				else
 					playTime = (Long) ob;
 				playTime = diff >= 0 ? playTime + diff : playTime - diff;
-				setPlayerSetting(uuid, "playtime", playTime);
+				settings.put("playtime", playTime);
 			} else if (ob == null) {
-				setPlayerSetting(uuid, "playtime", diff);
+				settings.put("playtime", diff);
 			}
 		}
-		playerJoin(uuid, username);
-		setPlayerSettings(uuid, playerData.get(uuid));
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		settings.put("lastjoinleave", timestamp);
+		setPlayerSettings(uuid, settings);
 		playerData.get(uuid).clear();
 		playerData.remove(uuid);
 	}
@@ -429,7 +435,7 @@ public class PlayerDataController {
 
 	public static void setPlayerSettings(String uuid, HashMap<String, Object> values) {
 		HashMap<String, Object> original;
-		HashMap<String, Object> changed = new HashMap<String, Object>();
+		LinkedHashMap<String, Object> changed = new LinkedHashMap<String, Object>();
 		if (playerData.containsKey(uuid)) {
 			original = playerData.get(uuid);
 			if (original == null) {
@@ -474,22 +480,34 @@ public class PlayerDataController {
 			SQLBackend sb = (SQLBackend) b;
 			BasicDataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
+				String columnList = "";
+				String valueList = "";
+				String keyList = "";
 				for (String key : changed.keySet()) {
-					try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
-						Object value = changed.get(key);
-						ps.setString(1, uuid);
-						ps.setObject(2, value);
-						ps.setObject(3, value);
-						try {
-							ps.execute();
-						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in key: " + key + " with value: " + String.valueOf(value) + " in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
-						}
+					columnList += ",`" + key + "`";
+					valueList += ",?";
+					keyList += ", `" + key + "`=?";
+				}
+				keyList = keyList.substring(2);
+				String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
+				try (PreparedStatement ps = c.prepareStatement(statement)) {
+					ps.setString(1, uuid);
+					int i = 1;
+					Collection<Object> valueCol = changed.values();
+					for (Object value : valueCol) {
+						i++;
+						ps.setObject(i, value);
+						ps.setObject(i + valueCol.size(), value);
+					}
+					try {
+						ps.execute();
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
+				} catch (SQLException e) {
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
 			} catch (SQLException e) {
 				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
@@ -669,11 +687,11 @@ public class PlayerDataController {
 	}
 	
 	public static void migrateBackends(Backend origin, Backend destination) {
-		HashMap<String, HashMap<String, Object>> values = getBackend(origin);
+		HashMap<String, LinkedHashMap<String, Object>> values = getBackend(origin);
 		setBackend(destination, values);
 	}
 
-	private static void setBackend(Backend b, HashMap<String, HashMap<String, Object>> values) {
+	private static void setBackend(Backend b, HashMap<String, LinkedHashMap<String, Object>> values) {
 		if (b instanceof FileBackend) {
 			FileBackend fb = (FileBackend) b;
 			fb.getFolder().mkdir();
@@ -682,7 +700,7 @@ public class PlayerDataController {
 			try {
 				for (String uuid : values.keySet()) {
 					if (!new File(folder, uuid + ".yml").isDirectory()) {
-						HashMap<String, Object> playerData = values.get(uuid);
+						LinkedHashMap<String, Object> playerData = values.get(uuid);
 						ConfigFile c = new ConfigFile(folder, uuid + ".yml", PseudoAPI.plugin);
 						FileConfiguration fc = c.getConfig();
 						for (String key : playerData.keySet()) {
@@ -701,23 +719,35 @@ public class PlayerDataController {
 				MySQLBackend mb = (MySQLBackend) sb;
 				try (Connection c = DriverManager.getConnection(mb.getURL(),mb.getUsername(),mb.getPassword())) {
 					for (String uuid : values.keySet()) {
-						HashMap<String, Object> playerData = values.get(uuid);
+						LinkedHashMap<String, Object> playerData = values.get(uuid);
+						String columnList = "";
+						String valueList = "";
+						String keyList = "";
 						for (String key : playerData.keySet()) {
-							try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
-								Object value = playerData.get(key);
-								ps.setString(1, uuid);
-								ps.setObject(2, value);
-								ps.setObject(3, value);
-								try {
-									ps.execute();
-								} catch (SQLException e) {
-									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in key: " + key + " with value: " + String.valueOf(value) + " in database: " + sb.getName());
-									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
-								}
+							columnList += ",`" + key + "`";
+							valueList += ",?";
+							keyList += ", `" + key + "`=?";
+						}
+						keyList = keyList.substring(2);
+						String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
+						try (PreparedStatement ps = c.prepareStatement(statement)) {
+							ps.setString(1, uuid);
+							int i = 1;
+							Collection<Object> valueCol = playerData.values();
+							for (Object value : valueCol) {
+								i++;
+								ps.setObject(i, value);
+								ps.setObject(i + valueCol.size(), value);
+							}
+							try {
+								ps.execute();
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
+						} catch (SQLException e) {
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					}
 				} catch (SQLException e) {
@@ -728,8 +758,8 @@ public class PlayerDataController {
 		}
 	}
 
-	private static HashMap<String, HashMap<String, Object>> getBackend(Backend b) {
-		HashMap<String, HashMap<String, Object>> allData = new HashMap<String, HashMap<String, Object>>();
+	private static HashMap<String, LinkedHashMap<String, Object>> getBackend(Backend b) {
+		HashMap<String, LinkedHashMap<String, Object>> allData = new HashMap<String, LinkedHashMap<String, Object>>();
 		if (b instanceof FileBackend) {
 			FileBackend fb = (FileBackend) b;
 			fb.getFolder().mkdir();
@@ -742,7 +772,7 @@ public class PlayerDataController {
 						ConfigFile c = new ConfigFile(folder, f.getName(), PseudoAPI.plugin);
 						FileConfiguration fc = c.getConfig();
 						Set<String> keys = fc.getKeys(false);
-						HashMap<String, Object> result = new HashMap<String, Object>(keys.size());
+						LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(keys.size());
 						for (String s : keys) {
 							result.put(s, fc.get(s));
 						}
@@ -762,7 +792,7 @@ public class PlayerDataController {
 							ResultSetMetaData md = rs.getMetaData();
 							int columns = md.getColumnCount();
 							while (rs.next()) {
-								HashMap<String, Object> result = new HashMap<String, Object>(columns);
+								LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(columns);
 								String uuid = "";
 								for (int i = 1; i <= columns; i++) {
 									if (md.getColumnName(i).equalsIgnoreCase("uuid"))

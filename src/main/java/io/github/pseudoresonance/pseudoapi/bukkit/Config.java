@@ -27,6 +27,7 @@ public class Config extends PluginConfig {
 	private static HashMap<String, Backend> backends = new HashMap<String, Backend>();
 
 	public static boolean bungeeEnabled = false;
+	public static String serverName = "server";
 
 	public static String borderColor = "&3";
 	public static String titleColor = "&6";
@@ -100,6 +101,7 @@ public class Config extends PluginConfig {
 		}
 
 		bungeeEnabled = PluginConfig.getBoolean(fc, "BungeeEnabled", bungeeEnabled);
+		serverName = PluginConfig.getString(fc, "ServerName", serverName);
 
 		borderColor = PluginConfig.getColorCodes(fc, "BorderColor", borderColor);
 		titleColor = PluginConfig.getColorCodes(fc, "TitleColor", titleColor);

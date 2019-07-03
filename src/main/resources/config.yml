@@ -55,6 +55,9 @@ Backends:
 # Is server on BungeeCord network?
 BungeeEnabled: false
 
+# Unique server name
+ServerName: Server
+
 
 ########
 # Chat #

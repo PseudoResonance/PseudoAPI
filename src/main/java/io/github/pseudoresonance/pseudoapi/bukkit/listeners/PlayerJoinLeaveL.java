@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoUpdater;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
+import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.ServerPlayerDataController;
 
 public class PlayerJoinLeaveL implements Listener {
 
@@ -22,6 +23,7 @@ public class PlayerJoinLeaveL implements Listener {
 		String uuid = u.toString();
 		String name = p.getName();
 		PlayerDataController.playerJoin(uuid, name);
+		ServerPlayerDataController.playerJoin(uuid, name);
 	}
 
 	@EventHandler
@@ -31,6 +33,7 @@ public class PlayerJoinLeaveL implements Listener {
 		String uuid = u.toString();
 		String name = p.getName();
 		PlayerDataController.playerLeave(uuid, name);
+		ServerPlayerDataController.playerLeave(uuid, name);
 		try {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 				@Override
@@ -46,6 +49,7 @@ public class PlayerJoinLeaveL implements Listener {
 		String uuid = u.toString();
 		String name = p.getName();
 		PlayerDataController.playerJoin(uuid, name);
+		ServerPlayerDataController.playerJoin(uuid, name);
 	}
 
 }

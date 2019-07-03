@@ -17,6 +17,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
+import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.ServerPlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.tabcompleters.PseudoAPITC;
 
 public class PseudoAPI extends PseudoPlugin {
@@ -57,11 +58,11 @@ public class PseudoAPI extends PseudoPlugin {
 		initializeListeners();
 		setCommandDescriptions();
 		pluginConfig.reloadConfig();
-		// PluginMessenger.enable();
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerJoinLeaveL.playerJoin(p);
 		}
 		PlayerDataController.update();
+		ServerPlayerDataController.update();
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			public void run() {
 				PseudoUpdater.checkUpdates(true);
