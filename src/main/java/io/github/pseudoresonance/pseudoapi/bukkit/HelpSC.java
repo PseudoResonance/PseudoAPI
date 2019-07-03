@@ -8,6 +8,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent;
+import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatElement;
+import io.github.pseudoresonance.pseudoapi.bukkit.utils.ElementBuilder;
+import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent.ComponentType;
 import net.md_5.bungee.api.ChatColor;
 
 public class HelpSC implements SubCommandExecutor {
@@ -35,30 +39,30 @@ public class HelpSC implements SubCommandExecutor {
 			}
 		}
 		List<Object> messages = new ArrayList<Object>();
-		messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + plugin.getPluginName() + " Help" + ConfigOptions.border + "---===");
+		messages.add(Config.borderColor + "===---" + Config.titleColor + plugin.getPluginName() + " Help" + Config.borderColor + "---===");
 		if (args.length == 0) {
 			for (int i = 0; i <= 9; i++) {
 				if (i < commands.size()) {
 					CommandDescription cd = commands.get(i);
 					if (cd.getRunnable()) {
-						messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+						messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(Config.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + "Click to run the command!")), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(cd.getDescription()))).build());
 					} else {
-						messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+						messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + "Click to run the command!")), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(cd.getDescription()))).build());
 					}
 				}
 			}
 			if (commands.size() > 10) {
-				int total = (int) Math.ceil((double)commands.size() / 10);
-				messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of " + total + ConfigOptions.border + "---===");
+				int total = (int) Math.ceil((double) commands.size() / 10);
+				messages.add(Config.borderColor + "===---" + Config.titleColor + "Page 1 of " + total + Config.borderColor + "---===");
 			} else {
-				messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of 1" + ConfigOptions.border + "---===");
+				messages.add(Config.borderColor + "===---" + Config.titleColor + "Page 1 of 1" + Config.borderColor + "---===");
 			}
 			Message.sendMessage(sender, messages);
 			return true;
 		} else {
 			if (isInteger(args[0])) {
 				int page = Integer.parseInt(args[0]);
-				int total = (int) Math.ceil((double)commands.size() / 10);
+				int total = (int) Math.ceil((double) commands.size() / 10);
 				if (page > total) {
 					message.sendPluginError(sender, Errors.CUSTOM, "Only " + total + " pages available!");
 					return false;
@@ -70,16 +74,16 @@ public class HelpSC implements SubCommandExecutor {
 						if (i < commands.size()) {
 							CommandDescription cd = commands.get(i);
 							if (cd.getRunnable()) {
-								messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ConfigOptions.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+								messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(Config.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + "Click to run the command!")), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(cd.getDescription()))).build());
 							} else {
-								messages.add(new ElementBuilder(new ChatElement(ConfigOptions.command + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, ConfigOptions.description + "Click to run the command!")), new ChatElement(" " + ConfigOptions.description + ChatColor.stripColor(cd.getDescription()))).build());
+								messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + "Click to run the command!")), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(cd.getDescription()))).build());
 							}
 						}
 					}
 					if (commands.size() > 10) {
-						messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of " + total + ConfigOptions.border + "---===");
+						messages.add(Config.borderColor + "===---" + Config.titleColor + "Page 1 of " + total + Config.borderColor + "---===");
 					} else {
-						messages.add(ConfigOptions.border + "===---" + ConfigOptions.title + "Page 1 of 1" + ConfigOptions.border + "---===");
+						messages.add(Config.borderColor + "===---" + Config.titleColor + "Page 1 of 1" + Config.borderColor + "---===");
 					}
 					Message.sendMessage(sender, messages);
 					return true;
@@ -90,16 +94,16 @@ public class HelpSC implements SubCommandExecutor {
 			}
 		}
 	}
-	
+
 	private static boolean isInteger(String s) {
-	    try { 
-	        Integer.parseInt(s); 
-	    } catch(NumberFormatException e) { 
-	        return false; 
-	    } catch(NullPointerException e) {
-	        return false;
-	    }
-	    return true;
+		try {
+			Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			return false;
+		} catch (NullPointerException e) {
+			return false;
+		}
+		return true;
 	}
 
 }

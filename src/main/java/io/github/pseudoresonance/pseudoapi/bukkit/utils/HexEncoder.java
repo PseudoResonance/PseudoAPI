@@ -1,4 +1,4 @@
-package io.github.pseudoresonance.pseudoapi.bukkit;
+package io.github.pseudoresonance.pseudoapi.bukkit.utils;
 
 import java.nio.charset.Charset;
 

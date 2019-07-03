@@ -128,7 +128,7 @@ public class PseudoPlugin extends JavaPlugin {
 		return permissions;
 	}
 	
-	public void registerDynamicCommand(String cmd, CommandExecutor executor) {
+	public void registerCommandOverride(String cmd, CommandExecutor executor) {
 		CommandHandler.registerCommand(this, cmd, executor);
 	}
 	

@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONArray;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.utils.JsonReader;
 
 public class PseudoUpdater {
 
@@ -62,13 +63,13 @@ public class PseudoUpdater {
 
 	public static void restartCheck() {
 		if (shouldRestart)
-			if (!ConfigOptions.restartEmpty || Bukkit.getOnlinePlayers().size() == 0)
+			if (!Config.restartEmpty || Bukkit.getOnlinePlayers().size() == 0)
 				restart();
 	}
 
 	private static void restart() {
 		if (Bukkit.getOnlinePlayers().size() != 0) {
-			PseudoAPI.message.broadcastPluginMessage("&cServer will restart in " + ConfigOptions.restartWarning + " seconds to perform updates!");
+			PseudoAPI.message.broadcastPluginMessage("&cServer will restart in " + Config.restartWarning + " seconds to perform updates!");
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 				public void run() {
 					for (Player p : Bukkit.getOnlinePlayers()) {
@@ -80,7 +81,7 @@ public class PseudoUpdater {
 						Bukkit.getServer().shutdown();
 					}
 				}
-			}, ConfigOptions.restartWarning * 20);
+			}, Config.restartWarning * 20);
 		} else {
 			PseudoAPI.message.broadcastPluginMessage("&cServer will restart now to perform updates!");
 			if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot")) {
@@ -212,7 +213,7 @@ public class PseudoUpdater {
 								if (file instanceof File) {
 									Bukkit.getUpdateFolderFile().mkdir();
 									updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), url));
-									if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
+									if (updateUrls.size() > 0 && Config.downloadUpdates) {
 										alreadyUpdated.add(p);
 										downloadFiles(updateUrls, sender);
 									}
@@ -326,7 +327,7 @@ public class PseudoUpdater {
 						}
 					}
 				}
-				if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
+				if (updateUrls.size() > 0 && Config.downloadUpdates) {
 					downloadFiles(updateUrls, sender);
 				}
 			} else {
@@ -339,18 +340,18 @@ public class PseudoUpdater {
 				if (updateTaskID != -1) {
 					Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
 				}
-				if (ConfigOptions.updateFrequency > 0) {
+				if (Config.updateFrequency > 0) {
 					updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 						public void run() {
 							checkUpdates(false);
 						}
-					}, ConfigOptions.updateFrequency * 60 * 20);
+					}, Config.updateFrequency * 60 * 20);
 				}
 			}
 		}
 
 		protected static void checkUpdates(boolean startup) {
-			if (!(ConfigOptions.startupUpdate || !startup)) {
+			if (!(Config.startupUpdate || !startup)) {
 				return;
 			}
 			ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
@@ -440,7 +441,7 @@ public class PseudoUpdater {
 						}
 					}
 				}
-				if (updateUrls.size() > 0 && ConfigOptions.downloadUpdates) {
+				if (updateUrls.size() > 0 && Config.downloadUpdates) {
 					downloadFiles(updateUrls);
 				}
 			} else {
@@ -453,12 +454,12 @@ public class PseudoUpdater {
 				if (updateTaskID != -1) {
 					Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
 				}
-				if (ConfigOptions.updateFrequency > 0) {
+				if (Config.updateFrequency > 0) {
 					updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 						public void run() {
 							checkUpdates(false);
 						}
-					}, ConfigOptions.updateFrequency * 60 * 20);
+					}, Config.updateFrequency * 60 * 20);
 				}
 			}
 		}
@@ -494,10 +495,10 @@ public class PseudoUpdater {
 					e.printStackTrace();
 				}
 			}
-			if (ConfigOptions.updateRestart && successfulUpdates > 0) {
+			if (Config.updateRestart && successfulUpdates > 0) {
 				shouldRestart = true;
 				restartCheck();
-				if (!(!ConfigOptions.restartEmpty || Bukkit.getOnlinePlayers().size() == 0)) {
+				if (!(!Config.restartEmpty || Bukkit.getOnlinePlayers().size() == 0)) {
 					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Waiting for server to empty before restarting!");
 					if (sender != null) {
 						for (Player p : Bukkit.getOnlinePlayers()) {

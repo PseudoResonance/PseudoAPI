@@ -31,12 +31,14 @@ public class PlayerJoinLeaveL implements Listener {
 		String uuid = u.toString();
 		String name = p.getName();
 		PlayerDataController.playerLeave(uuid, name);
-		Bukkit.getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
-			@Override
-			public void run() {
-				PseudoUpdater.restartCheck();
-			}
-		}, 5);
+		try {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
+				@Override
+				public void run() {
+					PseudoUpdater.restartCheck();
+				}
+			}, 5);
+		} catch (IllegalAccessError ex) {}
 	}
 	
 	public static void playerJoin(Player p) {

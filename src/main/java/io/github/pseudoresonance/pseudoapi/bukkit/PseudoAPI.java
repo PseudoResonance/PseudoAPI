@@ -13,9 +13,9 @@ import io.github.pseudoresonance.pseudoapi.bukkit.commands.PluginsC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ReloadSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ResetSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.UpdateSC;
+import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
-import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.tabcompleters.PseudoAPITC;
 
@@ -30,10 +30,10 @@ public class PseudoAPI extends PseudoPlugin {
 	private static PluginsC pluginsCommand;
 	private static AllPluginsC allPluginsCommand;
 
-	private static ConfigOptions configOptions;
+	private static Config pluginConfig;
 
-	private static List<ConfigOption> config = new ArrayList<ConfigOption>();
-	
+	private static List<PluginConfig> config = new ArrayList<PluginConfig>();
+
 	public void onLoad() {
 		PseudoUpdater.registerPlugin(this);
 	}
@@ -43,8 +43,9 @@ public class PseudoAPI extends PseudoPlugin {
 		super.onEnable();
 		this.saveDefaultConfig();
 		plugin = this;
-		configOptions = new ConfigOptions();
-		ConfigOptions.updateConfig();
+		pluginConfig = new Config(this);
+		pluginConfig.updateConfig();
+		pluginConfig.reloadConfig();
 		message = new Message(this);
 		mainCommand = new MainCommand(plugin);
 		helpSubCommand = new HelpSC(plugin);
@@ -55,8 +56,8 @@ public class PseudoAPI extends PseudoPlugin {
 		initializeSubCommands();
 		initializeListeners();
 		setCommandDescriptions();
-		configOptions.reloadConfig();
-		//PluginMessenger.enable();
+		pluginConfig.reloadConfig();
+		// PluginMessenger.enable();
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerJoinLeaveL.playerJoin(p);
 		}
@@ -65,8 +66,8 @@ public class PseudoAPI extends PseudoPlugin {
 			public void run() {
 				PseudoUpdater.checkUpdates(true);
 			}
-			
-		}, ConfigOptions.startupDelay * 20);
+
+		}, Config.startupDelay * 20);
 	}
 
 	public void onDisable() {
@@ -77,26 +78,26 @@ public class PseudoAPI extends PseudoPlugin {
 		Bukkit.getScheduler().cancelTasks(this);
 	}
 
-	public static void registerConfig(ConfigOption r) {
+	public static void registerConfig(PluginConfig r) {
 		config.add(r);
 	}
 
-	public static void updateAll() {
-		for (ConfigOption r : config) {
+	public static void reloadAll() {
+		for (PluginConfig r : config) {
 			r.reloadConfig();
 		}
 	}
 
-	public static ConfigOptions getConfigOptions() {
-		return PseudoAPI.configOptions;
+	public static Config getPluginConfig() {
+		return PseudoAPI.pluginConfig;
 	}
 
 	private void initializeCommands() {
 		this.getCommand("pseudoapi").setExecutor(mainCommand);
 		this.getCommand("plugins").setExecutor(pluginsCommand);
 		this.getCommand("pl").setExecutor(pluginsCommand);
-		this.registerDynamicCommand("plugins", pluginsCommand);
-		this.registerDynamicCommand("pl", pluginsCommand);
+		this.registerCommandOverride("plugins", pluginsCommand);
+		this.registerCommandOverride("pl", pluginsCommand);
 		this.getCommand("allplugins").setExecutor(allPluginsCommand);
 	}
 

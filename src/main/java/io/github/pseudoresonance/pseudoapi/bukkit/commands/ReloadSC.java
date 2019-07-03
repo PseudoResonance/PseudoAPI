@@ -22,7 +22,7 @@ public class ReloadSC implements SubCommandExecutor {
 					PseudoAPI.message.sendPluginError(sender, Errors.GENERIC);
 					return false;
 				}
-				PseudoAPI.getConfigOptions().reloadConfig();
+				PseudoAPI.getPluginConfig().reloadConfig();
 				Data.loadBackends();
 				PlayerDataController.update();
 				PseudoAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");
@@ -38,7 +38,7 @@ public class ReloadSC implements SubCommandExecutor {
 				PseudoAPI.message.sendPluginError(sender, Errors.GENERIC);
 				return false;
 			}
-			PseudoAPI.getConfigOptions().reloadConfig();
+			PseudoAPI.getPluginConfig().reloadConfig();
 			Data.loadBackends();
 			PlayerDataController.update();
 			PseudoAPI.message.sendPluginMessage(sender, "Plugin config reloaded!");

@@ -18,7 +18,7 @@ public class CommandHandler {
 	private static HashMap<String, TabCompleter> completers = new HashMap<String, TabCompleter>();
 	private static HashMap<String, PseudoPlugin> owners = new HashMap<String, PseudoPlugin>();
 	private static HashMap<PseudoPlugin, ArrayList<String>> plugins = new HashMap<PseudoPlugin, ArrayList<String>>();
-	
+
 	protected static boolean registerCommand(PseudoPlugin plugin, String cmd, CommandExecutor executor) {
 		String lower = cmd.toLowerCase();
 		if (executors.containsKey(lower))
@@ -32,7 +32,7 @@ public class CommandHandler {
 		owners.put(cmd, plugin);
 		return true;
 	}
-	
+
 	protected static boolean registerCommand(PseudoPlugin plugin, String cmd, CommandExecutor executor, TabCompleter completer) {
 		String lower = cmd.toLowerCase();
 		if (executors.containsKey(lower))
@@ -47,7 +47,7 @@ public class CommandHandler {
 		owners.put(cmd, plugin);
 		return true;
 	}
-	
+
 	protected static void unregisterPlugin(PseudoPlugin plugin) {
 		ArrayList<String> cmds = plugins.remove(plugin);
 		if (cmds != null) {
@@ -58,7 +58,7 @@ public class CommandHandler {
 			}
 		}
 	}
-	
+
 	protected static void unregisterCommand(PseudoPlugin plugin, String cmd) {
 		String lower = cmd.toLowerCase();
 		ArrayList<String> cmds = plugins.get(plugin);
@@ -75,7 +75,7 @@ public class CommandHandler {
 			}
 		}
 	}
-	
+
 	public static boolean runCommand(CommandSender sender, String cmd, String[] args) {
 		CommandExecutor executor = executors.get(cmd.toLowerCase());
 		if (executor != null) {
@@ -92,7 +92,7 @@ public class CommandHandler {
 		}
 		return false;
 	}
-	
+
 	public static List<String> runCompleter(CommandSender sender, String cmd, String[] args) {
 		TabCompleter completer = completers.get(cmd.toLowerCase());
 		if (completer != null) {

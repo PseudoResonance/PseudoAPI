@@ -33,7 +33,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.ConfigFile;
 import net.md_5.bungee.api.ChatColor;
 
-public class PlayerDataController {
+public class ServerPlayerDataController {
 
 	private static int uniquePlayers = 0;
 
@@ -47,7 +47,7 @@ public class PlayerDataController {
 	private static Backend b;
 
 	public static void update() {
-		b = Data.getGlobalBackend();
+		b = Data.getServerBackend();
 		setup();
 		playerData.clear();
 		getUUIDS();
@@ -183,7 +183,7 @@ public class PlayerDataController {
 					if (create) {
 						try (Statement st = c.createStatement()) {
 							try {
-								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16) NOT NULL, `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0, `lastserver` VARCHAR(36) DEFAULT NULL, `online` BIT DEFAULT 0);");
+								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY);");
 							} catch (SQLException e) {
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());

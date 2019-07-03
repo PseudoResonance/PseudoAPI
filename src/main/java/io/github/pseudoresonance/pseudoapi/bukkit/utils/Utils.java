@@ -1,8 +1,20 @@
-package io.github.pseudoresonance.pseudoapi.bukkit;
+package io.github.pseudoresonance.pseudoapi.bukkit.utils;
 
 import java.util.concurrent.TimeUnit;
 
+import org.bukkit.Bukkit;
+
 public class Utils {
+
+	private static String bukkitVersion;
+	
+	protected static void init() {
+		bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
+	}
+	
+	public static String getBukkitVersion() {
+		return bukkitVersion;
+	}
 
 	public static String millisToHumanFormat(long millis) {
 		if (millis < 0) {

@@ -11,6 +11,10 @@ public class PluginController {
 		plugins.add(plugin);
 	}
 	
+	protected static void pluginUnoaded(PseudoPlugin plugin) {
+		plugins.remove(plugin);
+	}
+	
 	public static PseudoPlugin[] getPlugins() {
 		return plugins.toArray(new PseudoPlugin[plugins.size()]);
 	}

@@ -1,121 +1,153 @@
 package io.github.pseudoresonance.pseudoapi.bukkit;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-public class Config {
+import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
+import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
+import io.github.pseudoresonance.pseudoapi.bukkit.data.FileBackend;
+import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
+import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
+import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent.ComponentType;
+import net.md_5.bungee.api.ChatColor;
 
-	private final PseudoPlugin PLUGIN;
-	private final String FILENAME;
-	private final File FOLDER;
-	private FileConfiguration config;
-	private File configFile;
+public class Config extends PluginConfig {
 
-	public Config(String filename, PseudoPlugin instance) {
-		if (!filename.endsWith(".yml")) {
-			filename += ".yml";
-		}
-		this.FILENAME = filename;
-		this.PLUGIN = instance;
-		this.FOLDER = this.PLUGIN.getDataFolder();
-		this.config = null;
-		this.configFile = null;
-		reload();
-	}
+	public static boolean hidePlugins = true;
+	public static boolean showPseudoAPI = true;
 
-	public Config(File folder, String filename, PseudoPlugin instance) {
-		if (!filename.endsWith(".yml")) {
-			filename += ".yml";
-		}
-		this.FILENAME = filename;
-		this.PLUGIN = instance;
-		this.FOLDER = folder;
-		this.config = null;
-		this.configFile = null;
-		reload();
-	}
+	public static String globalBackend = "globalfile";
+	public static String serverBackend = "file";
+	private static HashMap<String, Backend> backends = new HashMap<String, Backend>();
 
-	public FileConfiguration getConfig() {
-		if (config == null) {
-			reload();
-		}
-		return config;
-	}
+	public static boolean bungeeEnabled = false;
 
-	public void reload() {
-		if (!this.FOLDER.exists()) {
+	public static String borderColor = "&3";
+	public static String titleColor = "&6";
+	public static String commandColor = "&c";
+	public static String descriptionColor = "&b";
+	public static String textColor = "&a";
+	public static String prefixColor = "&9&l";
+	public static String errorColor = "&c";
+	public static String errorPrefixColor = "&9&1";
+	public static String messageFormat = "{nickname}> {message}";
+	public static ComponentType clickEvent = ComponentType.RUN_COMMAND;
+	public static ConsoleFormat consoleFormat = ConsoleFormat.BOTTOM;
+
+	public static boolean startupUpdate = true;
+	public static int startupDelay = 60;
+	public static int updateFrequency = 60;
+	public static boolean downloadUpdates = true;
+	public static boolean updateRestart = true;
+	public static boolean restartEmpty = true;
+	public static int restartWarning = 60;
+
+	public void reloadConfig() {
+		FileConfiguration fc = PseudoAPI.plugin.getConfig();
+		hidePlugins = PluginConfig.getBoolean(fc, "HidePlugins", hidePlugins);
+		showPseudoAPI = PluginConfig.getBoolean(fc, "ShowPseudoAPI", showPseudoAPI);
+
+		globalBackend = PluginConfig.getString(fc, "GlobalBackend", globalBackend);
+		serverBackend = PluginConfig.getString(fc, "ServerBackend", serverBackend);
+
+		Data.stopBackends();
+		Set<String> keys = PseudoAPI.plugin.getConfig().getConfigurationSection("Backends").getKeys(false);
+		for (String key : keys) {
 			try {
-				if (this.FOLDER.mkdir()) {
-					this.PLUGIN.getLogger().log(Level.INFO,
-							"Folder " + this.FOLDER.getName() + " created.");
+				String type = fc.getString("Backends." + key + ".type");
+				if (type.equalsIgnoreCase("file")) {
+					String location = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".directory");
+					Path path = Paths.get(location);
+					File dir;
+					if (path.isAbsolute()) {
+						dir = path.toFile();
+					} else {
+						dir = new File(PseudoAPI.plugin.getDataFolder(), location);
+					}
+					FileBackend backend = new FileBackend(key, dir);
+					backends.put(key, backend);
+				} else if (type.equalsIgnoreCase("mysql")) {
+					String host = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".host");
+					int port = PseudoAPI.plugin.getConfig().getInt("Backends." + key + ".port");
+					String username = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".username");
+					String password = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".password");
+					String database = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".database");
+					boolean useSSL = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".useSSL");
+					boolean verifyServerCertificate = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".verifyServerCertificate");
+					boolean requireSSL = PseudoAPI.plugin.getConfig().getBoolean("Backends." + key + ".requireSSL");
+					String prefix = "";
+					if (PseudoAPI.plugin.getConfig().contains("Backends." + key + ".prefix")) {
+						prefix = PseudoAPI.plugin.getConfig().getString("Backends." + key + ".prefix");
+					}
+					MySQLBackend backend = new MySQLBackend(key, host, port, username, password, database, prefix, useSSL, verifyServerCertificate, requireSSL);
+					backends.put(key, backend);
 				} else {
-					this.PLUGIN.getLogger().log(
-							Level.WARNING,
-							"Unable to create folder " + this.FOLDER.getName()
-									+ ".");
+					Message.sendConsoleMessage(ChatColor.RED + "Invalid backend type for backend: " + key + "!");
 				}
 			} catch (Exception e) {
-
+				Message.sendConsoleMessage(ChatColor.RED + "Invalid backend configuration for backend: " + key + "!");
 			}
 		}
-		configFile = new File(this.FOLDER, this.FILENAME);
-		if (!configFile.exists()) {
-			try {
-				configFile.createNewFile();
-			} catch (IOException e) {
-
-			}
+		if (backends.size() == 0) {
+			Message.sendConsoleMessage(ChatColor.RED + "No backends configured! Disabling PseudoAPI!");
+			Bukkit.getServer().getPluginManager().disablePlugin(PseudoAPI.plugin);
 		}
-		config = YamlConfiguration.loadConfiguration(configFile);
-	}
 
-	public void saveDefaultConfig() {
-		if (configFile == null) {
-			configFile = new File(this.FOLDER, this.FILENAME);
+		bungeeEnabled = PluginConfig.getBoolean(fc, "BungeeEnabled", bungeeEnabled);
+
+		borderColor = PluginConfig.getColorCodes(fc, "BorderColor", borderColor);
+		titleColor = PluginConfig.getColorCodes(fc, "TitleColor", titleColor);
+		commandColor = PluginConfig.getColorCodes(fc, "CommandColor", commandColor);
+		descriptionColor = PluginConfig.getColorCodes(fc, "DescriptionColor", descriptionColor);
+		textColor = PluginConfig.getColorCodes(fc, "TextColor", textColor);
+		prefixColor = PluginConfig.getColorCodes(fc, "PrefixColor", prefixColor);
+		errorColor = PluginConfig.getColorCodes(fc, "ErrorColor", errorColor);
+		errorPrefixColor = PluginConfig.getColorCodes(fc, "ErrorPrefixColor", errorPrefixColor);
+		messageFormat = PluginConfig.getString(fc, "MessageFormat", messageFormat);
+		String clickEvent = PluginConfig.getString(fc, "ClickEvent", Config.clickEvent.toString());
+		if (clickEvent.equalsIgnoreCase("suggest") || clickEvent.equalsIgnoreCase("suggest_command"))
+			Config.clickEvent = ComponentType.SUGGEST_COMMAND;
+		else if (clickEvent.equalsIgnoreCase("run") || clickEvent.equalsIgnoreCase("run_command"))
+			Config.clickEvent = ComponentType.RUN_COMMAND;
+		else {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for ClickEvent!");
 		}
-		if (!configFile.exists()) {
-			this.PLUGIN.saveResource(this.FILENAME, false);
+		String consoleFormat = PluginConfig.getString(fc, "ConsoleFormat", Config.consoleFormat.toString());
+		if (consoleFormat.equalsIgnoreCase("bottom"))
+			Config.consoleFormat = ConsoleFormat.BOTTOM;
+		else if (consoleFormat.equalsIgnoreCase("top"))
+			Config.consoleFormat = ConsoleFormat.TOP;
+		else {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for ConsoleFormat!");
 		}
+
+		startupUpdate = PluginConfig.getBoolean(fc, "StartupUpdate", startupUpdate);
+		startupDelay = PluginConfig.getInt(fc, "StartupDelay", startupDelay);
+		updateFrequency = PluginConfig.getInt(fc, "UpdateFrequency", updateFrequency);
+		downloadUpdates = PluginConfig.getBoolean(fc, "DownloadUpdates", downloadUpdates);
+		updateRestart = PluginConfig.getBoolean(fc, "UpdateRestart", updateRestart);
+		restartEmpty = PluginConfig.getBoolean(fc, "RestartEmpty", restartEmpty);
+		restartWarning = PluginConfig.getInt(fc, "RestartWarning", restartWarning);
+
+		Data.loadBackends();
 	}
 
-	public void save() {
-		if (config == null || configFile == null) {
-			return;
-		}
-		try {
-			getConfig().save(configFile);
-		} catch (IOException ex) {
-			this.PLUGIN.getLogger().log(Level.WARNING,
-					"Could not save config to " + configFile.getName(), ex);
-		}
+	public Config(PseudoPlugin plugin) {
+		super(plugin);
 	}
 
-	public void set(String path, Object o) {
-		getConfig().set(path, o);
+	public static HashMap<String, Backend> getBackends() {
+		return backends;
 	}
 
-	public void setLocation(String path, Location l) {
-		getConfig().set(path + ".w", l.getWorld().getName());
-		getConfig().set(path + ".x", l.getX());
-		getConfig().set(path + ".y", l.getY());
-		getConfig().set(path + ".z", l.getZ());
-		getConfig().set(path + ".yaw", l.getYaw());
-		getConfig().set(path + ".pitch", l.getPitch());
-		save();
+	public enum ConsoleFormat {
+		BOTTOM, TOP;
 	}
 
-	public Location getLocation(String path) {
-		Location l = new Location(Bukkit.getWorld(getConfig().getString(
-				path + ".w")), getConfig().getDouble(path + ".x"), getConfig()
-				.getDouble(path + ".y"), getConfig().getDouble(path + ".z"),
-				Float.parseFloat("" + getConfig().getDouble(path + ".yaw")),
-				Float.parseFloat("" + getConfig().getDouble(path + ".pitch")));
-		return l;
-	}
 }

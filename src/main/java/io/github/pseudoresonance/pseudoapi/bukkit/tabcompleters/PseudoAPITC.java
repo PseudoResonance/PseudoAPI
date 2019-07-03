@@ -7,9 +7,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.PluginController;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;
-import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
 
 public class PseudoAPITC implements TabCompleter {
 
@@ -74,7 +74,7 @@ public class PseudoAPITC implements TabCompleter {
 		} else if (args.length == 3) {
 			if (args[0].equalsIgnoreCase("backend") && args[1].equalsIgnoreCase("migrate")) {
 				if (sender.hasPermission("pseudoapi.backend")) {
-					possible.addAll(Data.getBackends().keySet());
+					possible.addAll(Config.getBackends().keySet());
 				}
 			}
 			if (args[2].equalsIgnoreCase("")) {
@@ -91,7 +91,7 @@ public class PseudoAPITC implements TabCompleter {
 		} else if (args.length == 4) {
 			if (args[0].equalsIgnoreCase("backend") && args[1].equalsIgnoreCase("migrate")) {
 				if (sender.hasPermission("pseudoapi.backend")) {
-					possible.addAll(Data.getBackends().keySet());
+					possible.addAll(Config.getBackends().keySet());
 				}
 			}
 			if (args[3].equalsIgnoreCase("")) {

@@ -7,9 +7,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.SubCommandExecutor;
+import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
-import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.FileBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
@@ -26,7 +26,7 @@ public class BackendSC implements SubCommandExecutor {
 			} else {
 				if (args[0].equalsIgnoreCase("list")) {
 					String backendString = "";
-					HashMap<String, Backend> backends = Data.getBackends();
+					HashMap<String, Backend> backends = Config.getBackends();
 					boolean first = true;
 					for (String name : backends.keySet()) {
 						Backend b = backends.get(name);
@@ -53,7 +53,7 @@ public class BackendSC implements SubCommandExecutor {
 						PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Please add a backend to migrate to");
 						return false;
 					} else if (args.length >= 3) {
-						HashMap<String, Backend> backends = Data.getBackends();
+						HashMap<String, Backend> backends = Config.getBackends();
 						Backend origin = null;
 						Backend destination = null;
 						for (String name : backends.keySet()) {

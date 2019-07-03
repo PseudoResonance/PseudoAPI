@@ -1,7 +1,7 @@
-name: PseudoAPI
+name: ${project.artifactId}
 author: PseudoResonance
 main: io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI
-version: 3.3.2
+version: ${version}
 description: An API for Easy Access to Resources
 api-version: 1.13
 commands:

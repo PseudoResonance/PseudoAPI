@@ -1,4 +1,4 @@
-package io.github.pseudoresonance.pseudoapi.bukkit;
+package io.github.pseudoresonance.pseudoapi.bukkit.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-/**
- * https://github.com/ZombieStriker/CommandUtils/blob/master/src/CommandUtils.java
- * 
- * @author ZombieStriker
- */
 public class CommandUtils {
 
 	/**
@@ -55,8 +50,14 @@ public class CommandUtils {
 	 * @param The
 	 *            argument to test for
 	 * @return The entities that match the criteria
+	 * @throws Exception 
 	 */
-	public static Entity[] getTargets(CommandSender sender, String arg) {
+	public static Entity[] getTargets(CommandSender sender, String arg) throws Exception {
+		try {
+			Class<?> argumentEntityClass = Class.forName("net.minecraft.server." + Utils.getBukkitVersion() + ".ArgumentEntity");
+		} catch (ClassNotFoundException e1) {
+			throw new Exception("Entity selectors do not work in this version!");
+		}
 		Entity[] ents = null;
 		Location loc = null;
 		if (sender instanceof Entity) {
@@ -213,8 +214,9 @@ public class CommandUtils {
 	 * @param The
 	 *            argument
 	 * @return The first entity retrieved.
+	 * @throws Exception 
 	 */
-	public static Entity getTarget(CommandSender sender, String arg) {
+	public static Entity getTarget(CommandSender sender, String arg) throws Exception {
 		return getTargets(sender, arg)[0];
 	}
 
@@ -274,8 +276,11 @@ public class CommandUtils {
 					xIn = Double.valueOf(x.substring(1));
 				else
 					xIn = 0;
-			} else
+			} else {
 				xIn = Double.valueOf(x);
+				if (xIn - Math.floor(xIn) == 0)
+					xIn += 0.5;
+			}
 			if (carrot || yRel) {
 				if (y.length() > 1)
 					yIn = Double.valueOf(y.substring(1));
@@ -288,12 +293,11 @@ public class CommandUtils {
 					zIn = Double.valueOf(z.substring(1));
 				else
 					zIn = 0;
-			} else
+			} else {
 				zIn = Double.valueOf(z);
-			if (xIn - Math.floor(xIn) == 0)
-				xIn += 0.5;
-			if (zIn - Math.floor(zIn) == 0)
-				zIn += 0.5;
+				if (zIn - Math.floor(zIn) == 0)
+					zIn += 0.5;
+			}
 			if (!carrot) {
 				double[] arr = new double[3];
 				if (xRel)
@@ -310,7 +314,8 @@ public class CommandUtils {
 					arr[2] = zIn;
 				return arr;
 			} else {
-				l.add(l.getDirection().multiply(new Vector(xIn, yIn, zIn)));
+				Vector v = new Vector(xIn, yIn, zIn).rotateAroundY(l.getYaw()).rotateAroundX(l.getPitch());
+				l.add(v);
 				double[] arr = new double[] {l.getX(), l.getY(), l.getZ()};
 				return arr;
 			}
