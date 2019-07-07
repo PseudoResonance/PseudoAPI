@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -270,7 +271,10 @@ public class PlayerDataController {
 		String uuid = p.getUniqueId().toString();
 		String username = p.getName();
 		if (!playerData.containsKey(uuid)) {
-			playerData.put(uuid, getPlayer(uuid));
+			if (getPlayer(uuid) != null)
+				playerData.put(uuid, getPlayer(uuid));
+			else
+				playerData.put(uuid, new HashMap<String, Object>());
 		}
 		HashMap<String, Object> settings = new HashMap<String, Object>();
 		settings.put("ip", p.getAddress().getAddress().getHostAddress());
@@ -377,47 +381,96 @@ public class PlayerDataController {
 	}
 
 	protected static void setPlayerSettings(String uuid, HashMap<String, Object> values) {
-		if (b instanceof SQLBackend) {
-			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
-			try (Connection c = data.getConnection()) {
-				String columnList = "";
-				String valueList = "";
-				String keyList = "";
-				for (String key : values.keySet()) {
-					columnList += ",`" + key + "`";
-					valueList += ",?";
-					keyList += ", `" + key + "`=?";
-				}
-				keyList = keyList.substring(2);
-				String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
-				try (PreparedStatement ps = c.prepareStatement(statement)) {
-					ps.setString(1, uuid);
-					int i = 1;
-					Collection<Object> valueCol = values.values();
-					for (Object value : valueCol) {
-						i++;
-						ps.setObject(i, value);
-						ps.setObject(i + valueCol.size(), value);
+		HashMap<String, Object> original;
+		LinkedHashMap<String, Object> changed = new LinkedHashMap<String, Object>();
+		if (playerData.containsKey(uuid)) {
+			original = playerData.get(uuid);
+			if (original == null) {
+				original = getPlayer(uuid);
+			}
+		} else {
+			original = getPlayer(uuid);
+		}
+		if (original == null) {
+			original = new HashMap<String, Object>();
+		}
+		for (String key : values.keySet()) {
+			Object o = values.get(key);
+			if (original.containsKey(key)) {
+				Object test = original.get(key);
+				if (test != null)
+					if (test.equals(o))
+						continue;
+			}
+			changed.put(key, o);
+			original.put(key, o);
+		}
+		if (changed.size() > 0) {
+			if (playerData.containsKey(uuid))
+				playerData.put(uuid, original);
+			if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				BasicDataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					String columnList = "";
+					String valueList = "";
+					String keyList = "";
+					for (String key : values.keySet()) {
+						columnList += ",`" + key + "`";
+						valueList += ",?";
+						keyList += ", `" + key + "`=?";
 					}
-					try {
-						ps.execute();
+					keyList = keyList.substring(2);
+					String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
+					try (PreparedStatement ps = c.prepareStatement(statement)) {
+						ps.setString(1, uuid);
+						int i = 1;
+						Collection<Object> valueCol = values.values();
+						for (Object value : valueCol) {
+							i++;
+							ps.setObject(i, value);
+							ps.setObject(i + valueCol.size(), value);
+						}
+						try {
+							ps.execute();
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+						}
 					} catch (SQLException e) {
-						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
+						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
 						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
+					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
 					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 				}
-			} catch (SQLException e) {
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 			}
 		}
 	}
 
 	protected static void setPlayerSetting(String uuid, String key, Object value) {
+		HashMap<String, Object> original;
+		if (playerData.containsKey(uuid)) {
+			original = playerData.get(uuid);
+			if (original == null) {
+				original = getPlayer(uuid);
+			}
+		} else {
+			original = getPlayer(uuid);
+		}
+		if (original == null) {
+			original = new HashMap<String, Object>();
+		}
+		if (original.containsKey(key)) {
+			Object test = original.get(key);
+			if (test != null)
+				if (test.equals(value))
+					return;
+		}
+		original.put(key, value);
+		if (playerData.containsKey(uuid))
+			playerData.put(uuid, original);
 		if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
 			BasicDataSource data = sb.getDataSource();

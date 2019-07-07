@@ -8,11 +8,9 @@ public class Utils {
 
 	private static String bukkitVersion;
 	
-	protected static void init() {
-		bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
-	}
-	
 	public static String getBukkitVersion() {
+		if (bukkitVersion == null)
+			bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];
 		return bukkitVersion;
 	}
 

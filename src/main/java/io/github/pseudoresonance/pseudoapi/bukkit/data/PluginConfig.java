@@ -157,7 +157,7 @@ public abstract class PluginConfig {
 
 	public static Material getMaterial(FileConfiguration fc, String key, Material def) {
 		if (fc.contains(key)) {
-			Material mat = Material.getMaterial((String) fc.get(key));
+			Material mat = Material.getMaterial(fc.getString(key).toUpperCase());
 			if (mat != null)
 				return mat;
 			else {

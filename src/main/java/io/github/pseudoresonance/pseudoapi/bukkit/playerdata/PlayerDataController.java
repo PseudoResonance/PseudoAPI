@@ -1,6 +1,7 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.playerdata;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,8 +9,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -20,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
@@ -313,20 +317,65 @@ public class PlayerDataController {
 
 	public static void playerJoin(String uuid, String username) {
 		if (!playerData.containsKey(uuid)) {
-			playerData.put(uuid, getPlayer(uuid));
+			if (getPlayer(uuid) != null)
+				playerData.put(uuid, getPlayer(uuid));
+			else
+				playerData.put(uuid, new HashMap<String, Object>());
+		}
+		if (!Config.bungeeEnabled) {
+			String name = getName(uuid);
+			HashMap<String, Object> settings = new HashMap<String, Object>();
+			settings.put("username", username);
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			settings.put("lastjoinleave", timestamp);
+			if (name == null)
+				settings.put("firstjoin", timestamp);
+			setPlayerSettings(uuid, settings);
 		}
 		uuids.put(uuid, username);
 	}
 
 	public static void playerLeave(String uuid, String username) {
-		playerData.get(uuid).clear();
-		playerData.remove(uuid);
+		if (!Config.bungeeEnabled) {
+			HashMap<String, Object> settings = new HashMap<String, Object>();
+			Object o = getPlayerSetting(uuid, "lastjoinleave");
+			Timestamp joinLeaveTS = null;
+			if (o instanceof Timestamp) {
+				joinLeaveTS = (Timestamp) o;
+			}
+			if (o instanceof Date) {
+				joinLeaveTS = new Timestamp(((Date) o).getTime());
+			}
+			if (joinLeaveTS != null) {
+				long joinLeave = joinLeaveTS.getTime();
+				long diff = System.currentTimeMillis() - joinLeave;
+				Object ob = getPlayerSetting(uuid, "playtime");
+				if (ob instanceof BigInteger || ob instanceof Long) {
+					long playTime = 0;
+					if (ob instanceof BigInteger)
+						playTime = ((BigInteger) ob).longValueExact();
+					else
+						playTime = (Long) ob;
+					playTime = diff >= 0 ? playTime + diff : playTime - diff;
+					settings.put("playtime", playTime);
+				} else if (ob == null) {
+					settings.put("playtime", diff);
+				}
+			}
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			settings.put("lastjoinleave", timestamp);
+			setPlayerSettings(uuid, settings);
+		}
+		if (playerData.containsKey(uuid)) {
+			playerData.get(uuid).clear();
+			playerData.remove(uuid);
+		}
 	}
-	
+
 	public static Set<String> getNames() {
 		return uuids.values();
 	}
-	
+
 	public static Set<String> getUUIDs() {
 		return uuids.keySet();
 	}
@@ -417,60 +466,62 @@ public class PlayerDataController {
 			changed.put(key, o);
 			original.put(key, o);
 		}
-		if (playerData.containsKey(uuid))
-			playerData.put(uuid, original);
-		if (b instanceof FileBackend) {
-			FileBackend fb = (FileBackend) b;
-			File folder = new File(fb.getFolder(), "Players");
-			try {
-				if (!new File(folder, uuid + ".yml").isDirectory()) {
-					ConfigFile c = new ConfigFile(folder, uuid + ".yml", PseudoAPI.plugin);
-					FileConfiguration fc = c.getConfig();
+		if (changed.size() > 0) {
+			if (playerData.containsKey(uuid))
+				playerData.put(uuid, original);
+			if (b instanceof FileBackend) {
+				FileBackend fb = (FileBackend) b;
+				File folder = new File(fb.getFolder(), "Players");
+				try {
+					if (!new File(folder, uuid + ".yml").isDirectory()) {
+						ConfigFile c = new ConfigFile(folder, uuid + ".yml", PseudoAPI.plugin);
+						FileConfiguration fc = c.getConfig();
+						for (String key : changed.keySet()) {
+							Object value = changed.get(key);
+							fc.set(key, value);
+						}
+						c.save();
+					}
+				} catch (SecurityException e) {
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+				}
+			} else if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				BasicDataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					String columnList = "";
+					String valueList = "";
+					String keyList = "";
 					for (String key : changed.keySet()) {
-						Object value = changed.get(key);
-						fc.set(key, value);
+						columnList += ",`" + key + "`";
+						valueList += ",?";
+						keyList += ", `" + key + "`=?";
 					}
-					c.save();
-				}
-			} catch (SecurityException e) {
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
-			}
-		} else if (b instanceof SQLBackend) {
-			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
-			try (Connection c = data.getConnection()) {
-				String columnList = "";
-				String valueList = "";
-				String keyList = "";
-				for (String key : changed.keySet()) {
-					columnList += ",`" + key + "`";
-					valueList += ",?";
-					keyList += ", `" + key + "`=?";
-				}
-				keyList = keyList.substring(2);
-				String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
-				try (PreparedStatement ps = c.prepareStatement(statement)) {
-					ps.setString(1, uuid);
-					int i = 1;
-					Collection<Object> valueCol = changed.values();
-					for (Object value : valueCol) {
-						i++;
-						ps.setObject(i, value);
-						ps.setObject(i + valueCol.size(), value);
-					}
-					try {
-						ps.execute();
+					keyList = keyList.substring(2);
+					String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
+					try (PreparedStatement ps = c.prepareStatement(statement)) {
+						ps.setString(1, uuid);
+						int i = 1;
+						Collection<Object> valueCol = changed.values();
+						for (Object value : valueCol) {
+							i++;
+							ps.setObject(i, value);
+							ps.setObject(i + valueCol.size(), value);
+						}
+						try {
+							ps.execute();
+						} catch (SQLException e) {
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						}
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
 						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
 					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
-			} catch (SQLException e) {
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 			}
 		}
 	}
@@ -644,7 +695,7 @@ public class PlayerDataController {
 		}
 		return null;
 	}
-	
+
 	public static void migrateBackends(Backend origin, Backend destination) {
 		HashMap<String, LinkedHashMap<String, Object>> values = getBackend(origin);
 		setBackend(destination, values);
@@ -676,7 +727,7 @@ public class PlayerDataController {
 			SQLBackend sb = (SQLBackend) b;
 			if (sb instanceof MySQLBackend) {
 				MySQLBackend mb = (MySQLBackend) sb;
-				try (Connection c = DriverManager.getConnection(mb.getURL(),mb.getUsername(),mb.getPassword())) {
+				try (Connection c = DriverManager.getConnection(mb.getURL(), mb.getUsername(), mb.getPassword())) {
 					for (String uuid : values.keySet()) {
 						LinkedHashMap<String, Object> playerData = values.get(uuid);
 						String columnList = "";
@@ -745,7 +796,7 @@ public class PlayerDataController {
 			SQLBackend sb = (SQLBackend) b;
 			if (sb instanceof MySQLBackend) {
 				MySQLBackend mb = (MySQLBackend) sb;
-				try (Connection c = DriverManager.getConnection(mb.getURL(),mb.getUsername(),mb.getPassword())) {
+				try (Connection c = DriverManager.getConnection(mb.getURL(), mb.getUsername(), mb.getPassword())) {
 					try (Statement st = c.createStatement()) {
 						try (ResultSet rs = st.executeQuery("SELECT * FROM `" + sb.getPrefix() + "Players`;")) {
 							ResultSetMetaData md = rs.getMetaData();
