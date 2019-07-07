@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.bukkit.Color;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -14,15 +15,15 @@ import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;
 import net.md_5.bungee.api.ChatColor;
 
 public abstract class PluginConfig {
-	
+
 	private PseudoPlugin plugin;
-	
+
 	public PluginConfig(PseudoPlugin plugin) {
 		this.plugin = plugin;
 	}
 
 	public boolean updateConfig() {
-		InputStream configin = plugin.getClass().getResourceAsStream("/config.yml"); 
+		InputStream configin = plugin.getClass().getResourceAsStream("/config.yml");
 		BufferedReader configreader = new BufferedReader(new InputStreamReader(configin));
 		YamlConfiguration configc = YamlConfiguration.loadConfiguration(configreader);
 		int configcj = configc.getInt("Version");
@@ -64,7 +65,7 @@ public abstract class PluginConfig {
 	}
 
 	public abstract void reloadConfig();
-	
+
 	public static String getString(FileConfiguration fc, String key, String def) {
 		if (fc.contains(key))
 			return fc.getString(key);
@@ -73,7 +74,7 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
 	public static boolean getBoolean(FileConfiguration fc, String key, boolean def) {
 		if (fc.contains(key))
 			return fc.getBoolean(key);
@@ -82,7 +83,7 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
 	public static int getInt(FileConfiguration fc, String key, int def) {
 		if (fc.contains(key))
 			return fc.getInt(key);
@@ -91,7 +92,7 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
 	public static double getDouble(FileConfiguration fc, String key, double def) {
 		if (fc.contains(key))
 			return fc.getDouble(key);
@@ -100,7 +101,7 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
 	public static long getLong(FileConfiguration fc, String key, long def) {
 		if (fc.contains(key))
 			return fc.getLong(key);
@@ -109,7 +110,7 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
 	public static Color getColor(FileConfiguration fc, String key, Color def) {
 		if (fc.contains(key))
 			return fc.getColor(key);
@@ -118,7 +119,7 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
 	public static float getFloat(FileConfiguration fc, String key, float def) {
 		if (fc.contains(key))
 			return (float) fc.get(key);
@@ -127,7 +128,7 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
 	public static String getColorCodes(FileConfiguration fc, String key, String def) {
 		if (fc.contains(key)) {
 			String val = fc.getString(key);
@@ -153,7 +154,22 @@ public abstract class PluginConfig {
 			return def;
 		}
 	}
-	
+
+	public static Material getMaterial(FileConfiguration fc, String key, Material def) {
+		if (fc.contains(key)) {
+			Material mat = Material.getMaterial((String) fc.get(key));
+			if (mat != null)
+				return mat;
+			else {
+				Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+				return def;
+			}
+		} else {
+			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			return def;
+		}
+	}
+
 	public static Object getObject(FileConfiguration fc, String key, Object def) {
 		if (fc.contains(key))
 			return fc.get(key);
