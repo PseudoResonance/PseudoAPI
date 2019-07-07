@@ -16,6 +16,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.commands.UpdateSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
+import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.ServerPlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.tabcompleters.PseudoAPITC;
@@ -24,7 +25,6 @@ public class PseudoAPI extends PseudoPlugin {
 
 	public static PseudoAPI plugin;
 	public static Message message;
-	public static PluginChannelListener pcl;
 
 	private static MainCommand mainCommand;
 	private static HelpSC helpSubCommand;
@@ -57,12 +57,12 @@ public class PseudoAPI extends PseudoPlugin {
 		initializeSubCommands();
 		initializeListeners();
 		setCommandDescriptions();
-		pluginConfig.reloadConfig();
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerJoinLeaveL.playerJoin(p);
 		}
 		PlayerDataController.update();
 		ServerPlayerDataController.update();
+		PluginMessenger.enable();
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			public void run() {
 				PseudoUpdater.checkUpdates(true);
@@ -115,10 +115,6 @@ public class PseudoAPI extends PseudoPlugin {
 	}
 
 	private void initializeListeners() {
-		if (this.getConfig().getBoolean("BungeeEnabled")) {
-			this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-			this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeSpigot", pcl = new PluginChannelListener());
-		}
 		getServer().getPluginManager().registerEvents(new CommandL(), this);
 		getServer().getPluginManager().registerEvents(new PlayerJoinLeaveL(), this);
 	}

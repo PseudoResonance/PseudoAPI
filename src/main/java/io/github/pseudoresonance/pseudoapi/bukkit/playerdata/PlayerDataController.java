@@ -1,7 +1,6 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.playerdata;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,10 +8,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -23,7 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message;
 import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
@@ -186,7 +182,7 @@ public class PlayerDataController {
 					if (create) {
 						try (Statement st = c.createStatement()) {
 							try {
-								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16) NOT NULL, `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0, `lastserver` VARCHAR(36) DEFAULT NULL, `online` BIT DEFAULT 0);");
+								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16) NOT NULL, `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0, `lastserver` VARCHAR(36) DEFAULT NULL, `online` BIT DEFAULT 0, `ip` VARCHAR(15) DEFAULT '0.0.0.0');");
 							} catch (SQLException e) {
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
@@ -319,47 +315,10 @@ public class PlayerDataController {
 		if (!playerData.containsKey(uuid)) {
 			playerData.put(uuid, getPlayer(uuid));
 		}
-		String name = getName(uuid);
 		uuids.put(uuid, username);
-		HashMap<String, Object> settings = new HashMap<String, Object>();
-		settings.put("username", username);
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		settings.put("lastjoinleave", timestamp);
-		if (name == null)
-			settings.put("firstjoin", timestamp);
-		settings.put("lastserver", Config.serverName);
-		setPlayerSettings(uuid, settings);
 	}
 
 	public static void playerLeave(String uuid, String username) {
-		HashMap<String, Object> settings = new HashMap<String, Object>();
-		Object o = getPlayerSetting(uuid, "lastjoinleave");
-		Timestamp joinLeaveTS = null;
-		if (o instanceof Timestamp) {
-			joinLeaveTS = (Timestamp) o;
-		}
-		if (o instanceof Date) {
-			joinLeaveTS = new Timestamp(((Date) o).getTime());
-		}
-		if (joinLeaveTS != null) {
-			long joinLeave = joinLeaveTS.getTime();
-			long diff = System.currentTimeMillis() - joinLeave;
-			Object ob = getPlayerSetting(uuid, "playtime");
-			if (ob instanceof BigInteger || ob instanceof Long) {
-				long playTime = 0;
-				if (ob instanceof BigInteger)
-					playTime = ((BigInteger) ob).longValueExact();
-				else
-					playTime = (Long) ob;
-				playTime = diff >= 0 ? playTime + diff : playTime - diff;
-				settings.put("playtime", playTime);
-			} else if (ob == null) {
-				settings.put("playtime", diff);
-			}
-		}
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		settings.put("lastjoinleave", timestamp);
-		setPlayerSettings(uuid, settings);
 		playerData.get(uuid).clear();
 		playerData.remove(uuid);
 	}

@@ -26,6 +26,9 @@ GlobalBackend: globalfile
 # Data backend configuration for this server
 ServerBackend: file
 
+# Server and global backends must be different!
+# It is recommended to use the same database, but different prefixes if only 1 database is available.
+
 # Define backends here:
 Backends:
   file:
@@ -54,9 +57,6 @@ Backends:
 
 # Is server on BungeeCord network?
 BungeeEnabled: false
-
-# Unique server name
-ServerName: Server
 
 
 ########
@@ -115,7 +115,7 @@ ConsoleFormat: bottom
 # Should the server check for updates on startup?
 StartupUpdate: true
 
-# How long should the server wait after startup to check updates?
+# How long should the server wait after startup to check updates? (in seconds)
 StartupDelay: 60
 
 # How often should update checks occur (in minutes)

@@ -1,7 +1,6 @@
 package io.github.pseudoresonance.pseudoapi.bukkit;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -339,10 +338,12 @@ public class PseudoUpdater {
 				}
 				if (updateTaskID != -1) {
 					Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
+					updateTaskID = -1;
 				}
 				if (Config.updateFrequency > 0) {
 					updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 						public void run() {
+							updateTaskID = -1;
 							checkUpdates(false);
 						}
 					}, Config.updateFrequency * 60 * 20);
@@ -453,10 +454,12 @@ public class PseudoUpdater {
 				}
 				if (updateTaskID != -1) {
 					Bukkit.getServer().getScheduler().cancelTask(updateTaskID);
+					updateTaskID = -1;
 				}
 				if (Config.updateFrequency > 0) {
 					updateTaskID = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 						public void run() {
+							updateTaskID = -1;
 							checkUpdates(false);
 						}
 					}, Config.updateFrequency * 60 * 20);
@@ -487,9 +490,6 @@ public class PseudoUpdater {
 				try {
 					Files.copy(new URL(d.getURL()).openStream(), d.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
 					successfulUpdates++;
-				} catch (IOException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
-					e.printStackTrace();
 				} catch (Exception e) {
 					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
 					e.printStackTrace();

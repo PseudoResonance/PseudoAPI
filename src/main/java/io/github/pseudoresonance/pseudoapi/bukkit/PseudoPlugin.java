@@ -10,6 +10,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
+
 public class PseudoPlugin extends JavaPlugin {
 
 	private String name = "";
@@ -82,6 +84,7 @@ public class PseudoPlugin extends JavaPlugin {
 	@Override
 	public void onDisable() {
 		CommandHandler.unregisterPlugin(this);
+		PluginMessenger.unregisterPluginListeners(this);
 	}
 
 	public String getPluginName() {

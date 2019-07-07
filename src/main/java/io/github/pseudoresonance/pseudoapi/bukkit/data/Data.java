@@ -43,7 +43,7 @@ public class Data {
 			Bukkit.getServer().getPluginManager().disablePlugin(PseudoAPI.plugin);
 		}
 		if (serverBackend == null) {
-			Message.sendConsoleMessage(ChatColor.RED + "No server backend selected! Using global backend!");
+			Message.sendConsoleMessage(ChatColor.RED + "No server backend selected! Disabling PseudoAPI!");
 			serverBackend = globalBackend;
 		}
 		PseudoAPI.reloadAll();

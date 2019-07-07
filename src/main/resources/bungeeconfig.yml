@@ -1,0 +1,63 @@
+###########################
+# PseudoAPI Bungee Config #
+###########################
+
+# DO NOT CHANGE THIS LINE! YOUR CONFIG WILL BE RESET UPON LOADING IF THIS LINE IS EDITED!
+Version: 1
+
+########################
+# Server Configuration #
+########################
+
+# List of server names and player-friendly names to display
+ServerList:
+  main: "Main"
+  skyblock: "Skyblock"
+
+################
+# Data Storage #
+################
+
+# Data backend configuration
+Backend: mysql
+
+# Define backends here:
+Backends:
+  mysql:
+    type: mysql
+    host: 127.0.0.1
+    port: 3306
+    username: username
+    password: password
+    database: PseudoPlugins
+    prefix: "Pseudo_"
+    useSSL: true
+    verifyServerCertificate: false
+    requireSSL: false
+
+
+###########
+# Updater #
+###########
+
+# Should the server check for updates on startup?
+StartupUpdate: true
+
+# How long should the server wait after startup to check updates? (in seconds)
+StartupDelay: 60
+
+# How often should update checks occur (in minutes)
+# Set to 0 to disable
+UpdateFrequency: 60
+
+# Should updates be downloaded when found?
+DownloadUpdates: true
+
+# Should the server restart upon downloading plugins?
+UpdateRestart: true
+
+# Should the server wait to restart until the server is empty?
+RestartEmpty: true
+
+# How long should the server wait to restart after warning players? (in seconds)
+RestartWarning: 60

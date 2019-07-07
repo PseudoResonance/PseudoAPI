@@ -22,7 +22,6 @@ public abstract class PluginConfig {
 	}
 
 	public boolean updateConfig() {
-		boolean error = false;
 		InputStream configin = plugin.getClass().getResourceAsStream("/config.yml"); 
 		BufferedReader configreader = new BufferedReader(new InputStreamReader(configin));
 		YamlConfiguration configc = YamlConfiguration.loadConfiguration(configreader);
@@ -31,7 +30,9 @@ public abstract class PluginConfig {
 			configreader.close();
 			configin.close();
 		} catch (IOException e1) {
+			Message.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
 			e1.printStackTrace();
+			return false;
 		}
 		if (plugin.getConfig().getInt("Version") != configcj) {
 			try {
@@ -52,16 +53,13 @@ public abstract class PluginConfig {
 				plugin.saveDefaultConfig();
 				plugin.reloadConfig();
 				Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date! Old config file renamed to " + oldFile + ".");
+				return true;
 			} catch (Exception e) {
 				Message.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
-				error = true;
+				return false;
 			}
 		}
-		if (!error) {
-			Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date!");
-		} else {
-			return false;
-		}
+		Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date!");
 		return true;
 	}
 
