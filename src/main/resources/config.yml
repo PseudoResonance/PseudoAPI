@@ -80,14 +80,8 @@ DescriptionColor: AQUA
 # Message Text Color
 TextColor: GREEN
 
-# Message Prefix Color
-PrefixColor: BLUE,BOLD
-
 # Error Text Color
-ErrorColor: RED
-
-# Error Prefix Color
-ErrorPrefixColor: BLUE,BOLD
+ErrorTextColor: RED
 
 # Plugin Message Format
 # {name} = Full Plugin Name
@@ -96,7 +90,16 @@ ErrorPrefixColor: BLUE,BOLD
 # {playernick} = Player Nickname
 # {message} = Message
 # Color Codes Enabled
-MessageFormat: "{nickname}> {message}"
+MessageFormat: "&9&l{nickname}> {message}"
+
+# Plugin Error Message Format
+# {name} = Full Plugin Name
+# {nickname} = Plugin Nickname (If present, otherwise the full name will be used)
+# {player} = Player Name
+# {playernick} = Player Nickname
+# {message} = Message
+# Color Codes Enabled
+ErrorMessageFormat: "&9&l{nickname}> {message}"
 
 # Click Command Event
 # Suggest or Run

@@ -33,10 +33,9 @@ public class Config extends PluginConfig {
 	public static String commandColor = "&c";
 	public static String descriptionColor = "&b";
 	public static String textColor = "&a";
-	public static String prefixColor = "&9&l";
-	public static String errorColor = "&c";
-	public static String errorPrefixColor = "&9&1";
-	public static String messageFormat = "{nickname}> {message}";
+	public static String errorTextColor = "&c";
+	public static String messageFormat = "&9&l{nickname}> &a{message}";
+	public static String errorMessageFormat = "&9&l{nickname}> &c{message}";
 	public static ComponentType clickEvent = ComponentType.RUN_COMMAND;
 	public static ConsoleFormat consoleFormat = ConsoleFormat.BOTTOM;
 
@@ -106,10 +105,9 @@ public class Config extends PluginConfig {
 		commandColor = PluginConfig.getColorCodes(fc, "CommandColor", commandColor);
 		descriptionColor = PluginConfig.getColorCodes(fc, "DescriptionColor", descriptionColor);
 		textColor = PluginConfig.getColorCodes(fc, "TextColor", textColor);
-		prefixColor = PluginConfig.getColorCodes(fc, "PrefixColor", prefixColor);
-		errorColor = PluginConfig.getColorCodes(fc, "ErrorColor", errorColor);
-		errorPrefixColor = PluginConfig.getColorCodes(fc, "ErrorPrefixColor", errorPrefixColor);
+		errorTextColor = PluginConfig.getColorCodes(fc, "ErrorTextColor", errorTextColor);
 		messageFormat = PluginConfig.getString(fc, "MessageFormat", messageFormat);
+		errorMessageFormat = PluginConfig.getString(fc, "ErrorMessageFormat", errorMessageFormat);
 		String clickEvent = PluginConfig.getString(fc, "ClickEvent", Config.clickEvent.toString());
 		if (clickEvent.equalsIgnoreCase("suggest") || clickEvent.equalsIgnoreCase("suggest_command"))
 			Config.clickEvent = ComponentType.SUGGEST_COMMAND;

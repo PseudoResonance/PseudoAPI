@@ -74,184 +74,131 @@ public class Message {
 
 	public void broadcastPluginMessageWithPerission(String message, String permission) {
 		String format = Config.messageFormat;
-		format = format.replace("{message}", Config.textColor + message);
-		format = format.replace("{name}", Config.prefixColor + plugin.getPluginName());
-		format = format.replace("{nickname}", Config.prefixColor + plugin.getOutputName());
+		format = format.replace("{message}", message);
+		format = format.replace("{name}", plugin.getPluginName());
+		format = format.replace("{nickname}", plugin.getOutputName());
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (p.hasPermission(permission)) {
-				String send = format.replace("{player}", p.getName());
+				String send = ChatColor.translateAlternateColorCodes('&', format);
+				send = send.replace("{player}", p.getName());
 				send = send.replace("{playernick}", p.getDisplayName());
-				send = ChatColor.translateAlternateColorCodes('&', send);
 				p.sendMessage(send);
 			}
 		}
-		String consoleF = format.replace("{player}", "Console");
-		consoleF = consoleF.replace("{playernick}", "Console");
-		consoleF = ChatColor.translateAlternateColorCodes('&', consoleF);
-		console.sendMessage(consoleF);
+		format = ChatColor.translateAlternateColorCodes('&', format);
+		format = format.replace("{player}", "Console");
+		format = format.replace("{playernick}", "Console");
+		console.sendMessage(format);
 	}
 
 	public void broadcastPluginMessage(String message) {
 		String format = Config.messageFormat;
-		format = format.replace("{message}", Config.textColor + message);
-		format = format.replace("{name}", Config.prefixColor + plugin.getPluginName());
-		format = format.replace("{nickname}", Config.prefixColor + plugin.getOutputName());
+		format = format.replace("{message}", message);
+		format = format.replace("{name}", plugin.getPluginName());
+		format = format.replace("{nickname}", plugin.getOutputName());
 		for (Player p : Bukkit.getOnlinePlayers()) {
-			String send = format.replace("{player}", p.getName());
+			String send = ChatColor.translateAlternateColorCodes('&', format);
+			send = send.replace("{player}", p.getName());
 			send = send.replace("{playernick}", p.getDisplayName());
-			send = ChatColor.translateAlternateColorCodes('&', send);
 			p.sendMessage(send);
 		}
-		String consoleF = format.replace("{player}", "Console");
-		consoleF = consoleF.replace("{playernick}", "Console");
-		consoleF = ChatColor.translateAlternateColorCodes('&', consoleF);
-		console.sendMessage(consoleF);
+		format = ChatColor.translateAlternateColorCodes('&', format);
+		format = format.replace("{player}", "Console");
+		format = format.replace("{playernick}", "Console");
+		console.sendMessage(format);
 	}
 
 	public void sendPluginMessage(CommandSender sender, String message) {
 		String format = Config.messageFormat;
-		format = format.replace("{message}", Config.textColor + message);
-		format = format.replace("{name}", Config.prefixColor + plugin.getPluginName());
-		format = format.replace("{nickname}", Config.prefixColor + plugin.getOutputName());
+		format = format.replace("{message}", message);
+		format = format.replace("{name}", plugin.getPluginName());
+		format = format.replace("{nickname}", plugin.getOutputName());
 		if (sender instanceof Player) {
+			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", ((Player) sender).getName());
 			format = format.replace("{playernick}", ((Player) sender).getDisplayName());
-			format = ChatColor.translateAlternateColorCodes('&', format);
 			sender.sendMessage(format);
 		} else {
+			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", "Console");
 			format = format.replace("{playernick}", "Console");
-			format = ChatColor.translateAlternateColorCodes('&', format);
 			console.sendMessage(format);
 		}
 	}
 
 	public void sendPluginError(CommandSender sender, Errors error, String message) {
-		String format = Config.messageFormat;
+		String format = Config.errorMessageFormat;
 		switch (error) {
 			case GENERIC:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", "An unknown error has occured! Please contact the developer!");
 				break;
 			case CUSTOM:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + message);
+				format = format.replace("{message}", message);
 				break;
 			case NEVER_JOINED:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + message + " has never joined!");
+				format = format.replace("{message}", message + " has never joined!");
 				break;
 			case NOT_A_NUMBER:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + message + " is not a number!");
+				format = format.replace("{message}", message + " is not a number!");
 				break;
 			case NOT_LOADED:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + "Plugin " + message + " is not loaded!");
+				format = format.replace("{message}", "Plugin " + message + " is not loaded!");
 				break;
 			case NOT_ONLINE:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + message + " is not online!");
+				format = format.replace("{message}", message + " is not online!");
 				break;
 			case NO_PERMISSION:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + "You do not have permission to " + message);
+				format = format.replace("{message}", "You do not have permission to " + message);
 				break;
 			default:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", "An unknown error has occured! Please contact the developer!");
 				break;
 		}
-		format = format.replace("{name}", Config.errorPrefixColor + plugin.getPluginName());
-		format = format.replace("{nickname}", Config.errorPrefixColor + plugin.getOutputName());
+		format = format.replace("{name}", plugin.getPluginName());
+		format = format.replace("{nickname}", plugin.getOutputName());
 		if (sender instanceof Player) {
+			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", ((Player) sender).getName());
 			format = format.replace("{playernick}", ((Player) sender).getDisplayName());
-			format = ChatColor.translateAlternateColorCodes('&', format);
 			sender.sendMessage(format);
+			try {
+				((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
+			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", "Console");
 			format = format.replace("{playernick}", "Console");
-			format = ChatColor.translateAlternateColorCodes('&', format);
 			console.sendMessage(format);
 		}
 	}
 
 	public void sendPluginError(CommandSender sender, Errors error) {
-		String format = Config.messageFormat;
+		String format = Config.errorMessageFormat;
 		switch (error) {
 			case GENERIC:
-				if (sender instanceof Player) {
-					try {
-						((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				format = format.replace("{message}", Config.errorColor + "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", "An unknown error has occured! Please contact the developer!");
 				break;
 			default:
 				throw new IllegalArgumentException("Only error generic allowed");
 		}
-		format = format.replace("{name}", Config.errorPrefixColor + plugin.getPluginName());
-		format = format.replace("{nickname}", Config.errorPrefixColor + plugin.getOutputName());
+		format = format.replace("{name}", plugin.getPluginName());
+		format = format.replace("{nickname}", plugin.getOutputName());
 		if (sender instanceof Player) {
+			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", ((Player) sender).getName());
 			format = format.replace("{playernick}", ((Player) sender).getDisplayName());
-			format = ChatColor.translateAlternateColorCodes('&', format);
 			sender.sendMessage(format);
+			try {
+				((Player) sender).spawnParticle(Particle.FIREWORKS_SPARK, ((Player) sender).getEyeLocation(), 5, 0.8, 0.8, 0.8, 0);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
+			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", "Console");
 			format = format.replace("{playernick}", "Console");
-			format = ChatColor.translateAlternateColorCodes('&', format);
 			console.sendMessage(format);
 		}
 	}

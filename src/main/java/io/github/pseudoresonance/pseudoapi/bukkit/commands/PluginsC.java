@@ -29,7 +29,7 @@ public class PluginsC implements CommandExecutor {
 				plugins = Bukkit.getServer().getPluginManager().getPlugins();
 			else if (sender.hasPermission("pseudoapi.plugins") && Config.hidePlugins && Config.showPseudoAPI) {
 				plugins = PluginController.getPlugins();
-				messages.add(Config.errorColor + "Please note that all of these plugins are privately developed, but are open source at PseudoResonance's GitHub.");
+				messages.add("&cPlease note that all of these plugins are privately developed, but are open source at PseudoResonance's GitHub.");
 			}
 			for(int i = 0; i < plugins.length; i++) {
 				if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
