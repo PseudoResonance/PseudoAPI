@@ -17,7 +17,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;
 
 public class PluginMessenger implements PluginMessageListener {
 
-	private static final String channelName = "pseudoapi:channel";
+	public static final String channelName = "pseudoapi:channel";
 	
 	private static final ArrayList<PluginMessengerListener> listeners = new ArrayList<PluginMessengerListener>();
 	private static final HashMap<PseudoPlugin, ArrayList<PluginMessengerListener>> pluginListeners = new HashMap<PseudoPlugin, ArrayList<PluginMessengerListener>>();

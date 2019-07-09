@@ -2,6 +2,7 @@ package io.github.pseudoresonance.pseudoapi.bungee;
 
 import java.util.concurrent.TimeUnit;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class PseudoAPI extends Plugin {
@@ -34,6 +35,8 @@ public class PseudoAPI extends Plugin {
 
 	private void initializeListeners() {
 		getProxy().getPluginManager().registerListener(this, new PlayerL());
+		getProxy().getPluginManager().registerListener(this, new PluginMessageL());
+		getProxy().registerChannel(PluginMessenger.channelName);
 	}
 	
 	protected static Config getConfig() {

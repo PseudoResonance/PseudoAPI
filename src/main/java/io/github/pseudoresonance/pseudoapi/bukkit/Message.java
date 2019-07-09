@@ -74,7 +74,7 @@ public class Message {
 
 	public void broadcastPluginMessageWithPerission(String message, String permission) {
 		String format = Config.messageFormat;
-		format = format.replace("{message}", message);
+		format = format.replace("{message}", Config.textColor + message);
 		format = format.replace("{name}", plugin.getPluginName());
 		format = format.replace("{nickname}", plugin.getOutputName());
 		for (Player p : Bukkit.getOnlinePlayers()) {
@@ -93,7 +93,7 @@ public class Message {
 
 	public void broadcastPluginMessage(String message) {
 		String format = Config.messageFormat;
-		format = format.replace("{message}", message);
+		format = format.replace("{message}", Config.textColor + message);
 		format = format.replace("{name}", plugin.getPluginName());
 		format = format.replace("{nickname}", plugin.getOutputName());
 		for (Player p : Bukkit.getOnlinePlayers()) {
@@ -110,7 +110,7 @@ public class Message {
 
 	public void sendPluginMessage(CommandSender sender, String message) {
 		String format = Config.messageFormat;
-		format = format.replace("{message}", message);
+		format = format.replace("{message}", Config.textColor + message);
 		format = format.replace("{name}", plugin.getPluginName());
 		format = format.replace("{nickname}", plugin.getOutputName());
 		if (sender instanceof Player) {
@@ -130,28 +130,28 @@ public class Message {
 		String format = Config.errorMessageFormat;
 		switch (error) {
 			case GENERIC:
-				format = format.replace("{message}", "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", Config.errorTextColor + "An unknown error has occured! Please contact the developer!");
 				break;
 			case CUSTOM:
-				format = format.replace("{message}", message);
+				format = format.replace("{message}", Config.errorTextColor + message);
 				break;
 			case NEVER_JOINED:
-				format = format.replace("{message}", message + " has never joined!");
+				format = format.replace("{message}", Config.errorTextColor + message + " has never joined!");
 				break;
 			case NOT_A_NUMBER:
-				format = format.replace("{message}", message + " is not a number!");
+				format = format.replace("{message}", Config.errorTextColor + message + " is not a number!");
 				break;
 			case NOT_LOADED:
-				format = format.replace("{message}", "Plugin " + message + " is not loaded!");
+				format = format.replace("{message}", Config.errorTextColor + "Plugin " + message + " is not loaded!");
 				break;
 			case NOT_ONLINE:
-				format = format.replace("{message}", message + " is not online!");
+				format = format.replace("{message}", Config.errorTextColor + message + " is not online!");
 				break;
 			case NO_PERMISSION:
-				format = format.replace("{message}", "You do not have permission to " + message);
+				format = format.replace("{message}", Config.errorTextColor + "You do not have permission to " + message);
 				break;
 			default:
-				format = format.replace("{message}", "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", Config.errorTextColor + "An unknown error has occured! Please contact the developer!");
 				break;
 		}
 		format = format.replace("{name}", plugin.getPluginName());
@@ -178,7 +178,7 @@ public class Message {
 		String format = Config.errorMessageFormat;
 		switch (error) {
 			case GENERIC:
-				format = format.replace("{message}", "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", Config.errorTextColor + "An unknown error has occured! Please contact the developer!");
 				break;
 			default:
 				throw new IllegalArgumentException("Only error generic allowed");
