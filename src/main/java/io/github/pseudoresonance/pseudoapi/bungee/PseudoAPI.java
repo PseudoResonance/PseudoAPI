@@ -36,7 +36,7 @@ public class PseudoAPI extends Plugin {
 	private void initializeListeners() {
 		getProxy().getPluginManager().registerListener(this, new PlayerL());
 		getProxy().getPluginManager().registerListener(this, new PluginMessageL());
-		getProxy().registerChannel(PluginMessenger.channelName);
+		getProxy().registerChannel(PluginMessenger.channelBungeeName);
 	}
 	
 	protected static Config getConfig() {

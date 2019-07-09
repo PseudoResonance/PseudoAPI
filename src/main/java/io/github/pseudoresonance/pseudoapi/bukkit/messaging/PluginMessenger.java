@@ -17,14 +17,15 @@ import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;
 
 public class PluginMessenger implements PluginMessageListener {
 
-	public static final String channelName = "pseudoapi:channel";
+	public static final String channelBungeeName = "pseudoapi:bungee";
+	public static final String channelServerName = "pseudoapi:servers";
 	
 	private static final ArrayList<PluginMessengerListener> listeners = new ArrayList<PluginMessengerListener>();
 	private static final HashMap<PseudoPlugin, ArrayList<PluginMessengerListener>> pluginListeners = new HashMap<PseudoPlugin, ArrayList<PluginMessengerListener>>();
 
 	public static void enable() {
-		Bukkit.getMessenger().registerOutgoingPluginChannel(PseudoAPI.plugin, channelName);
-		Bukkit.getMessenger().registerIncomingPluginChannel(PseudoAPI.plugin, channelName, new PluginMessenger());
+		Bukkit.getMessenger().registerOutgoingPluginChannel(PseudoAPI.plugin, channelBungeeName);
+		Bukkit.getMessenger().registerIncomingPluginChannel(PseudoAPI.plugin, channelServerName, new PluginMessenger());
 	}
 	
 	public static void registerListener(PseudoPlugin plugin, PluginMessengerListener listener) {
@@ -50,7 +51,7 @@ public class PluginMessenger implements PluginMessageListener {
 	}
 
 	public void onPluginMessageReceived(String channel, Player p, byte[] message) {
-		if (channel.equals(channelName)) {
+		if (channel.equals(channelServerName)) {
 			ByteArrayDataInput in = ByteStreams.newDataInput(message);
 			String subchannel = in.readUTF();
 			for (PluginMessengerListener listener : listeners) {
@@ -84,7 +85,7 @@ public class PluginMessenger implements PluginMessageListener {
 					out.writeUTF((String) o);
 			}
 		}
-		p.sendPluginMessage(PseudoAPI.plugin, channelName, out.toByteArray());
+		p.sendPluginMessage(PseudoAPI.plugin, channelBungeeName, out.toByteArray());
 	}
 
 }

@@ -16,8 +16,9 @@ public class PluginMessageL implements Listener {
 
 	@EventHandler
 	public void onPluginMessage(PluginMessageEvent e) {
-		if (e.getTag().equals(PluginMessenger.channelName)) {
-			ByteArrayDataInput in = ByteStreams.newDataInput(e.getData());
+		if (e.getTag().equals(PluginMessenger.channelBungeeName)) {
+			byte[] data = e.getData();
+			ByteArrayDataInput in = ByteStreams.newDataInput(data);
 			String subChannel = in.readUTF();
 			if (subChannel.equals("displayname")) {
 				String uuid = in.readUTF();
