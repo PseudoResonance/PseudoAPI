@@ -10,12 +10,14 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -186,7 +188,7 @@ public class PlayerDataController {
 					if (create) {
 						try (Statement st = c.createStatement()) {
 							try {
-								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16) NOT NULL, `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0, `lastserver` VARCHAR(36) DEFAULT NULL, `online` BIT DEFAULT 0, `ip` VARCHAR(15) DEFAULT '0.0.0.0');");
+								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16), `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0, `lastserver` VARCHAR(36) DEFAULT NULL, `online` BIT DEFAULT 0, `ip` VARCHAR(15) DEFAULT '0.0.0.0');");
 							} catch (SQLException e) {
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating table: " + sb.getPrefix() + "Players in database: " + sb.getName());
 								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
@@ -402,6 +404,7 @@ public class PlayerDataController {
 		if (b instanceof FileBackend) {
 			FileBackend fb = (FileBackend) b;
 			File folder = new File(fb.getFolder(), "Players");
+			TreeMap<Long, SimpleEntry<String, String>> tempUuid = new TreeMap<Long, SimpleEntry<String, String>>();
 			try {
 				File[] files = folder.listFiles();
 				if (files != null) {
@@ -410,7 +413,16 @@ public class PlayerDataController {
 							ConfigFile c = new ConfigFile(folder, f.getName(), PseudoAPI.plugin);
 							FileConfiguration fc = c.getConfig();
 							String name = fc.getString("username");
-							uuids.put(f.getName().substring(0, f.getName().length() - 4), name);
+							Object timeO = fc.get("lastjoinleave");
+							if (timeO instanceof Date) {
+								long time = ((Date) timeO).getTime();
+								tempUuid.put(time, new SimpleEntry<String, String>(f.getName().substring(0, f.getName().length() - 4), name));
+							}
+						}
+					}
+					if (tempUuid.size() > 0) {
+						for (SimpleEntry<String, String> entry : tempUuid.values()) {
+							uuids.put(entry.getKey(), entry.getValue());
 						}
 					}
 				}
@@ -422,7 +434,7 @@ public class PlayerDataController {
 			BasicDataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (Statement st = c.createStatement()) {
-					try (ResultSet rs = st.executeQuery("SELECT uuid,username FROM `" + sb.getPrefix() + "Players` ORDER BY `lastjoinleave` ASC;")) {
+					try (ResultSet rs = st.executeQuery("SELECT uuid,username FROM `" + sb.getPrefix() + "Players` ORDER BY `lastjoinleave` DESC;")) {
 						while (rs.next()) {
 							uuids.put(rs.getString("uuid"), rs.getString("username"));
 						}

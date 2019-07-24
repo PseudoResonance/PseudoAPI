@@ -152,7 +152,7 @@ public class PlayerDataController {
 					if (create) {
 						try (Statement st = c.createStatement()) {
 							try {
-								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16) NOT NULL, `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0, `lastserver` VARCHAR(36) DEFAULT NULL, `online` BIT DEFAULT 0, `ip` VARCHAR(15) DEFAULT '0.0.0.0');");
+								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY, `username` VARCHAR(16), `firstjoin` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `lastjoinleave` TIMESTAMP DEFAULT CURRENT_TIMESTAMP, `playtime` BIGINT(20) UNSIGNED DEFAULT 0, `lastserver` VARCHAR(36) DEFAULT NULL, `online` BIT DEFAULT 0, `ip` VARCHAR(15) DEFAULT '0.0.0.0');");
 							} catch (SQLException e) {
 								PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when creating table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
 								PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
@@ -361,7 +361,7 @@ public class PlayerDataController {
 			BasicDataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (Statement st = c.createStatement()) {
-					try (ResultSet rs = st.executeQuery("SELECT uuid,username FROM `" + sb.getPrefix() + "Players` ORDER BY `lastjoinleave` ASC;")) {
+					try (ResultSet rs = st.executeQuery("SELECT uuid,username FROM `" + sb.getPrefix() + "Players` ORDER BY `lastjoinleave` DESC;")) {
 						while (rs.next()) {
 							uuids.put(rs.getString("uuid"), rs.getString("username"));
 						}
