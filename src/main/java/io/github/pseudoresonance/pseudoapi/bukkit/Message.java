@@ -22,7 +22,7 @@ public class Message {
 	}
 
 	public static void sendConsoleMessage(String message) {
-		console.sendMessage(message);
+		sendMessage(console, message);
 	}
 
 	public static void sendMessage(CommandSender sender, String message) {
@@ -31,6 +31,9 @@ public class Message {
 		} else {
 			console.sendMessage(message);
 		}
+	}
+	public static void sendMessage(List<? extends Object> messages) {
+		sendMessage(console, messages);
 	}
 
 	public static void sendMessage(CommandSender sender, List<? extends Object> messages) {
@@ -107,6 +110,10 @@ public class Message {
 		format = format.replace("{playernick}", "Console");
 		console.sendMessage(format);
 	}
+	
+	public void sendConsolePluginMessage(String message) {
+		sendPluginMessage(console, message);
+	}
 
 	public void sendPluginMessage(CommandSender sender, String message) {
 		String format = Config.messageFormat;
@@ -124,6 +131,10 @@ public class Message {
 			format = format.replace("{playernick}", "Console");
 			console.sendMessage(format);
 		}
+	}
+	
+	public void sendConsolePluginError(Errors error, String message) {
+		sendPluginError(console, error, message);
 	}
 
 	public void sendPluginError(CommandSender sender, Errors error, String message) {
@@ -172,6 +183,10 @@ public class Message {
 			format = format.replace("{playernick}", "Console");
 			console.sendMessage(format);
 		}
+	}
+	
+	public void sendConsolePluginError(Errors error) {
+		sendPluginError(console, error);
 	}
 
 	public void sendPluginError(CommandSender sender, Errors error) {

@@ -26,6 +26,11 @@ public class Config {
 	
 	protected static String backend = "file";
 	private static HashMap<String, Backend> backends = new HashMap<String, Backend>();
+	
+	public static boolean enableJoinLeave = true;
+	public static String joinFormat = "&e{nickname} &ejoined the network";
+	public static String leaveFormat = "&e{nickname} &eleft the network";
+	public static String serverChangeFormat = "&e{nickname} &ehas moved to &c{server_nick}";
 
 	protected static boolean startupUpdate = true;
 	protected static int startupDelay = 60;
@@ -77,6 +82,11 @@ public class Config {
 				plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("No backends configured! Disabling PseudoAPI!").color(ChatColor.RED).create());
 				plugin.onDisable();
 			}
+			
+			enableJoinLeave = getBoolean(conf, "EnableJoinLeave", enableJoinLeave);
+			joinFormat = getString(conf, "JoinFormat", joinFormat);
+			leaveFormat = getString(conf, "LeaveFormat", leaveFormat);
+			serverChangeFormat = getString(conf, "ServerChangeFormat", serverChangeFormat);
 			
 			startupUpdate = getBoolean(conf, "StartupUpdate", startupUpdate);
 			startupDelay = getInt(conf, "StartupDelay", startupDelay);

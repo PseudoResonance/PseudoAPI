@@ -78,6 +78,14 @@ public class PseudoAPI extends PseudoPlugin {
 		}
 		Bukkit.getScheduler().cancelTasks(this);
 	}
+	
+	public void doSync(Runnable run) {
+		Bukkit.getScheduler().runTask(this, run);
+	}
+	
+	public void doAsync(Runnable run) {
+		Bukkit.getScheduler().runTaskAsynchronously(this, run);
+	}
 
 	public static void registerConfig(PluginConfig r) {
 		config.add(r);

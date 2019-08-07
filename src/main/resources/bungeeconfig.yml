@@ -36,6 +36,42 @@ Backends:
     requireSSL: false
 
 
+#####################################
+# Join/Leave/Server Change Messages #
+#####################################
+
+# Enable custom join/leave/server change messages
+EnableJoinLeave: true
+
+# Join message format
+# {name} = Full player name
+# {nickname} = Player Nickname (If present, otherwise the full name will be used)
+# {uuid} = Player UUID
+# Color Codes Enabled
+# Leave empty for no message
+JoinFormat: "&e{nickname} &ejoined the network"
+
+# Leave message format
+# {name} = Full player name
+# {nickname} = Player Nickname (If present, otherwise the full name will be used)
+# {uuid} = Player UUID
+# Color Codes Enabled
+# Leave empty for no message
+LeaveFormat: "&e{nickname} &eleft the network"
+
+# Leave message format
+# {name} = Full player name
+# {nickname} = Player Nickname (If present, otherwise the full name will be used)
+# {uuid} = Player UUID
+# {server} = Name of server player has moved to
+# {server_nick} = Friendly nickname of server player has moved to
+# {last_server} = Name of server player was last connected to
+# {last_server_nick} = Friendly nickname of server player was last connected to
+# Color Codes Enabled
+# Leave empty for no message
+ServerChangeFormat: "&e{nickname} &ehas moved to &c{server_nick}"
+
+
 ###########
 # Updater #
 ###########

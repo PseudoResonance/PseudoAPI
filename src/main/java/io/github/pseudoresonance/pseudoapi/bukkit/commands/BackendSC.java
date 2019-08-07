@@ -70,8 +70,13 @@ public class BackendSC implements SubCommandExecutor {
 							PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, args[2] + " is an invalid backend! Try using 'backend list'");
 							return false;
 						}
-						PlayerDataController.migrateBackends(origin, destination);
-						PseudoAPI.message.sendPluginMessage(sender, "Migrated data from backend: " + origin.getName() + " to: " + destination.getName() + "!");
+						String originName = origin.getName();
+						String destinationName = destination.getName();
+						PlayerDataController.migrateBackends(origin, destination).thenRunAsync(() -> {
+							PseudoAPI.plugin.doSync(() -> {
+								PseudoAPI.message.sendPluginMessage(sender, "Migrated data from backend: " + originName + " to: " + destinationName + "!");
+							});
+						});
 						return true;
 					}
 				}

@@ -87,14 +87,14 @@ public class Config extends PluginConfig {
 					MySQLBackend backend = new MySQLBackend(key, host, port, username, password, database, prefix, useSSL, verifyServerCertificate, requireSSL);
 					backends.put(key, backend);
 				} else {
-					Message.sendConsoleMessage(ChatColor.RED + "Invalid backend type for backend: " + key + "!");
+					PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid backend type for backend: " + key + "!");
 				}
 			} catch (Exception e) {
-				Message.sendConsoleMessage(ChatColor.RED + "Invalid backend configuration for backend: " + key + "!");
+				PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid backend configuration for backend: " + key + "!");
 			}
 		}
 		if (backends.size() == 0) {
-			Message.sendConsoleMessage(ChatColor.RED + "No backends configured! Disabling PseudoAPI!");
+			PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "No backends configured! Disabling PseudoAPI!");
 			Bukkit.getServer().getPluginManager().disablePlugin(PseudoAPI.plugin);
 		}
 
@@ -114,7 +114,7 @@ public class Config extends PluginConfig {
 		else if (clickEvent.equalsIgnoreCase("run") || clickEvent.equalsIgnoreCase("run_command"))
 			Config.clickEvent = ComponentType.RUN_COMMAND;
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for ClickEvent!");
+			PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid config option for ClickEvent!");
 		}
 		String consoleFormat = PluginConfig.getString(fc, "ConsoleFormat", Config.consoleFormat.toString());
 		if (consoleFormat.equalsIgnoreCase("bottom"))
@@ -122,7 +122,7 @@ public class Config extends PluginConfig {
 		else if (consoleFormat.equalsIgnoreCase("top"))
 			Config.consoleFormat = ConsoleFormat.TOP;
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for ConsoleFormat!");
+			PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid config option for ConsoleFormat!");
 		}
 
 		startupUpdate = PluginConfig.getBoolean(fc, "StartupUpdate", startupUpdate);

@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -23,6 +24,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.SQLBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.Column;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -266,14 +268,19 @@ public class PlayerDataController {
 		}
 		getUUIDS();
 	}
-	
+
 	protected static void playerJoin(ProxiedPlayer p) {
 		String uuid = p.getUniqueId().toString();
 		String username = p.getName();
+		String nickname = username;
 		if (!playerData.containsKey(uuid)) {
-			if (getPlayer(uuid) != null)
-				playerData.put(uuid, getPlayer(uuid));
-			else
+			HashMap<String, Object> player = getPlayer(uuid).join();
+			if (player != null) {
+				playerData.put(uuid, player);
+				if (player.containsKey("nickname")) {
+					nickname = (String) player.get("nickname");
+				}
+			} else
 				playerData.put(uuid, new HashMap<String, Object>());
 		}
 		HashMap<String, Object> settings = new HashMap<String, Object>();
@@ -287,6 +294,16 @@ public class PlayerDataController {
 		if (name == null)
 			settings.put("firstjoin", timestamp);
 		setPlayerSettings(uuid, settings);
+		if (Config.enableJoinLeave) {
+			if (!Config.joinFormat.equals("")) {
+				String format = Config.joinFormat;
+				format = format.replace("{name}", username);
+				format = format.replace("{nickname}", nickname);
+				format = format.replace("{uuid}", uuid);
+				format = ChatColor.translateAlternateColorCodes('&', format);
+				ProxyServer.getInstance().broadcast(new ComponentBuilder(format).create());
+			}
+		}
 	}
 
 	protected static void playerServer(String uuid, String serverName) {
@@ -328,11 +345,11 @@ public class PlayerDataController {
 		playerData.get(uuid).clear();
 		playerData.remove(uuid);
 	}
-	
+
 	protected static Set<String> getNames() {
 		return uuids.values();
 	}
-	
+
 	protected static Set<String> getUUIDs() {
 		return uuids.keySet();
 	}
@@ -380,61 +397,112 @@ public class PlayerDataController {
 		}
 	}
 
-	protected static void setPlayerSettings(String uuid, HashMap<String, Object> values) {
-		HashMap<String, Object> original;
-		LinkedHashMap<String, Object> changed = new LinkedHashMap<String, Object>();
-		if (playerData.containsKey(uuid)) {
-			original = playerData.get(uuid);
-			if (original == null) {
-				original = getPlayer(uuid);
+	protected static CompletableFuture<Void> setPlayerSettings(String uuid, HashMap<String, Object> values) {
+		return CompletableFuture.runAsync(() -> {
+			HashMap<String, Object> original;
+			LinkedHashMap<String, Object> changed = new LinkedHashMap<String, Object>();
+			if (playerData.containsKey(uuid)) {
+				original = playerData.get(uuid);
+				if (original == null) {
+					original = getPlayer(uuid).join();
+				}
+			} else {
+				original = getPlayer(uuid).join();
 			}
-		} else {
-			original = getPlayer(uuid);
-		}
-		if (original == null) {
-			original = new HashMap<String, Object>();
-		}
-		for (String key : values.keySet()) {
-			Object o = values.get(key);
+			if (original == null) {
+				original = new HashMap<String, Object>();
+			}
+			for (String key : values.keySet()) {
+				Object o = values.get(key);
+				if (original.containsKey(key)) {
+					Object test = original.get(key);
+					if (test != null)
+						if (test.equals(o))
+							continue;
+				}
+				changed.put(key, o);
+				original.put(key, o);
+			}
+			if (changed.size() > 0) {
+				if (playerData.containsKey(uuid))
+					playerData.put(uuid, original);
+				if (b instanceof SQLBackend) {
+					SQLBackend sb = (SQLBackend) b;
+					BasicDataSource data = sb.getDataSource();
+					try (Connection c = data.getConnection()) {
+						String columnList = "";
+						String valueList = "";
+						String keyList = "";
+						for (String key : values.keySet()) {
+							columnList += ",`" + key + "`";
+							valueList += ",?";
+							keyList += ", `" + key + "`=?";
+						}
+						keyList = keyList.substring(2);
+						String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
+						try (PreparedStatement ps = c.prepareStatement(statement)) {
+							ps.setString(1, uuid);
+							int i = 1;
+							Collection<Object> valueCol = values.values();
+							for (Object value : valueCol) {
+								i++;
+								ps.setObject(i, value);
+								ps.setObject(i + valueCol.size(), value);
+							}
+							try {
+								ps.execute();
+							} catch (SQLException e) {
+								PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
+								PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+							}
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+						}
+					} catch (SQLException e) {
+						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
+						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+					}
+				}
+			}
+		});
+	}
+
+	protected static CompletableFuture<Void> setPlayerSetting(String uuid, String key, Object value) {
+		return CompletableFuture.runAsync(() -> {
+			HashMap<String, Object> original;
+			if (playerData.containsKey(uuid)) {
+				original = playerData.get(uuid);
+				if (original == null) {
+					original = getPlayer(uuid).join();
+				}
+			} else {
+				original = getPlayer(uuid).join();
+			}
+			if (original == null) {
+				original = new HashMap<String, Object>();
+			}
 			if (original.containsKey(key)) {
 				Object test = original.get(key);
 				if (test != null)
-					if (test.equals(o))
-						continue;
+					if (test.equals(value))
+						return;
 			}
-			changed.put(key, o);
-			original.put(key, o);
-		}
-		if (changed.size() > 0) {
+			original.put(key, value);
 			if (playerData.containsKey(uuid))
 				playerData.put(uuid, original);
 			if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
 				BasicDataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
-					String columnList = "";
-					String valueList = "";
-					String keyList = "";
-					for (String key : values.keySet()) {
-						columnList += ",`" + key + "`";
-						valueList += ",?";
-						keyList += ", `" + key + "`=?";
-					}
-					keyList = keyList.substring(2);
-					String statement = "INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`" + columnList + ") VALUES (?" + valueList + ") ON DUPLICATE KEY UPDATE " + keyList + ";";
-					try (PreparedStatement ps = c.prepareStatement(statement)) {
+					try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
 						ps.setString(1, uuid);
-						int i = 1;
-						Collection<Object> valueCol = values.values();
-						for (Object value : valueCol) {
-							i++;
-							ps.setObject(i, value);
-							ps.setObject(i + valueCol.size(), value);
-						}
+						ps.setObject(2, value);
+						ps.setObject(3, value);
 						try {
 							ps.execute();
 						} catch (SQLException e) {
-							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in key: " + key + " with value: " + String.valueOf(value) + " in database: " + sb.getName()).create());
 							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 						}
 					} catch (SQLException e) {
@@ -446,134 +514,112 @@ public class PlayerDataController {
 					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 				}
 			}
-		}
+		});
 	}
 
-	protected static void setPlayerSetting(String uuid, String key, Object value) {
-		HashMap<String, Object> original;
-		if (playerData.containsKey(uuid)) {
-			original = playerData.get(uuid);
-			if (original == null) {
-				original = getPlayer(uuid);
-			}
-		} else {
-			original = getPlayer(uuid);
-		}
-		if (original == null) {
-			original = new HashMap<String, Object>();
-		}
-		if (original.containsKey(key)) {
-			Object test = original.get(key);
-			if (test != null)
-				if (test.equals(value))
-					return;
-		}
-		original.put(key, value);
-		if (playerData.containsKey(uuid))
-			playerData.put(uuid, original);
-		if (b instanceof SQLBackend) {
-			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
-			try (Connection c = data.getConnection()) {
-				try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
-					ps.setString(1, uuid);
-					ps.setObject(2, value);
-					ps.setObject(3, value);
-					try {
-						ps.execute();
-					} catch (SQLException e) {
-						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in key: " + key + " with value: " + String.valueOf(value) + " in database: " + sb.getName()).create());
-						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
-					}
-				} catch (SQLException e) {
-					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
-					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
-				}
-			} catch (SQLException e) {
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
-			}
-		}
+	public static CompletableFuture<Object> getPlayerSetting(String uuid, String key) {
+		return getPlayerSetting(uuid, key, false);
 	}
 
-	public static Object getPlayerSetting(String uuid, String key) {
+	public static CompletableFuture<Object> getPlayerSetting(String uuid, String key, boolean forceUpdate) {
 		HashMap<String, Object> data = playerData.get(uuid);
-		if (data != null && !(data.isEmpty()))
-			return data.get(key);
-		else
-			return getPlayerSingle(uuid, key);
-	}
-
-	public static HashMap<String, Object> getPlayerSettings(String uuid) {
-		HashMap<String, Object> data = playerData.get(uuid);
-		if (data != null && !(data.isEmpty()))
-			return data;
+		if (data != null && !(data.isEmpty()) && data.containsKey(key) && !forceUpdate)
+			return CompletableFuture.completedFuture(data.get(key));
 		else {
-			data = getPlayer(uuid);
-			playerData.put(uuid, data);
-			return data;
-		}
-	}
-
-	private static Object getPlayerSingle(String uuid, String key) {
-		if (b instanceof SQLBackend) {
-			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
-			try (Connection c = data.getConnection()) {
-				try (PreparedStatement ps = c.prepareStatement("SELECT " + key + " FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
-					ps.setString(1, uuid);
-					try (ResultSet rs = ps.executeQuery()) {
-						if (rs.next()) {
-							Object o = rs.getObject(1);
-							return o;
-						}
-					} catch (SQLException e) {
-						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when getting key: " + key + " from player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
-						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
-					}
-				} catch (SQLException e) {
-					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
-					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+			CompletableFuture<Object> fut = getPlayerSingle(uuid, key);
+			fut.thenAcceptAsync(ret -> {
+				if (playerData.containsKey(uuid)) {
+					HashMap<String, Object> dataN = playerData.get(uuid);
+					dataN.put(key, ret);
+					playerData.put(uuid, dataN);
 				}
-			} catch (SQLException e) {
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
-			}
+			});
+			return fut;
 		}
-		return null;
 	}
 
-	private static HashMap<String, Object> getPlayer(String uuid) {
-		if (b instanceof SQLBackend) {
-			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
-			try (Connection c = data.getConnection()) {
-				try (PreparedStatement ps = c.prepareStatement("SELECT * FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
-					ps.setString(1, uuid);
-					try (ResultSet rs = ps.executeQuery()) {
-						ResultSetMetaData md = rs.getMetaData();
-						int columns = md.getColumnCount();
-						HashMap<String, Object> result = new HashMap<String, Object>(columns);
-						if (rs.next()) {
-							for (int i = 1; i <= columns; i++) {
-								result.put(md.getColumnName(i), rs.getObject(i));
+	public static CompletableFuture<HashMap<String, Object>> getPlayerSettings(String uuid) {
+		return getPlayerSettings(uuid, false);
+	}
+
+	public static CompletableFuture<HashMap<String, Object>> getPlayerSettings(String uuid, boolean forceUpdate) {
+		HashMap<String, Object> data = playerData.get(uuid);
+		if (data != null && !(data.isEmpty()) && !forceUpdate)
+			return CompletableFuture.completedFuture(data);
+		else {
+			CompletableFuture<HashMap<String, Object>> fut = getPlayer(uuid);
+			fut.thenAcceptAsync(ret -> {
+				if (playerData.containsKey(uuid)) {
+					playerData.put(uuid, ret);
+				}
+			});
+			return fut;
+		}
+	}
+
+	private static CompletableFuture<Object> getPlayerSingle(String uuid, String key) {
+		return CompletableFuture.supplyAsync(() -> {
+			if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				BasicDataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					try (PreparedStatement ps = c.prepareStatement("SELECT " + key + " FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
+						ps.setString(1, uuid);
+						try (ResultSet rs = ps.executeQuery()) {
+							if (rs.next()) {
+								Object o = rs.getObject(1);
+								return o;
 							}
-							return result;
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when getting key: " + key + " from player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 						}
 					} catch (SQLException e) {
-						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when getting player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
+						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
 						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
+					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
 					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 				}
-			} catch (SQLException e) {
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
-				PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
 			}
-		}
-		return null;
+			return null;
+		});
+	}
+
+	private static CompletableFuture<HashMap<String, Object>> getPlayer(String uuid) {
+		return CompletableFuture.supplyAsync(() -> {
+			if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				BasicDataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					try (PreparedStatement ps = c.prepareStatement("SELECT * FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
+						ps.setString(1, uuid);
+						try (ResultSet rs = ps.executeQuery()) {
+							ResultSetMetaData md = rs.getMetaData();
+							int columns = md.getColumnCount();
+							HashMap<String, Object> result = new HashMap<String, Object>(columns);
+							if (rs.next()) {
+								for (int i = 1; i <= columns; i++) {
+									result.put(md.getColumnName(i), rs.getObject(i));
+								}
+								return result;
+							}
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when getting player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName()).create());
+							PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+						}
+					} catch (SQLException e) {
+						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error when preparing statement in database: " + sb.getName()).create());
+						PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+					}
+				} catch (SQLException e) {
+					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("Error while accessing database: " + sb.getName()).create());
+					PseudoAPI.plugin.getProxy().getConsole().sendMessage(new ComponentBuilder("SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage()).create());
+				}
+			}
+			return null;
+		});
 	}
 
 }

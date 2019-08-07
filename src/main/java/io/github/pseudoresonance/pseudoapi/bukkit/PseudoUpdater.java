@@ -59,6 +59,10 @@ public class PseudoUpdater {
 			asyncUpdater.runTaskAsynchronously(PseudoAPI.plugin);
 		}
 	}
+	
+	public static boolean shouldRestart() {
+		return shouldRestart;
+	}
 
 	public static void restartCheck() {
 		if (shouldRestart)
