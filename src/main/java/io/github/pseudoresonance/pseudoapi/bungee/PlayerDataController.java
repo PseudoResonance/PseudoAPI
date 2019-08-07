@@ -278,7 +278,9 @@ public class PlayerDataController {
 			if (player != null) {
 				playerData.put(uuid, player);
 				if (player.containsKey("nickname")) {
-					nickname = (String) player.get("nickname");
+					Object nicknameO = player.get("nickname");
+					if (nicknameO != null)
+						nickname = (String) nicknameO;
 				}
 			} else
 				playerData.put(uuid, new HashMap<String, Object>());

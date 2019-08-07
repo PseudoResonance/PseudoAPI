@@ -3,6 +3,9 @@ package io.github.pseudoresonance.pseudoapi.bungee;
 import java.util.concurrent.TimeUnit;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class PseudoAPI extends Plugin {
@@ -13,6 +16,7 @@ public class PseudoAPI extends Plugin {
 	
 	@Override
 	public void onEnable() {
+		ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Loading PseudoAPI Bungee Link").color(ChatColor.GREEN).create());
 		plugin = this;
 		config = new Config(this);
 		config.updateConfig();
