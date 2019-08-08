@@ -14,6 +14,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.commands.ReloadSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ResetSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.UpdateSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
+import io.github.pseudoresonance.pseudoapi.bukkit.listeners.BlockL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
@@ -125,6 +126,7 @@ public class PseudoAPI extends PseudoPlugin {
 	private void initializeListeners() {
 		getServer().getPluginManager().registerEvents(new CommandL(), this);
 		getServer().getPluginManager().registerEvents(new PlayerJoinLeaveL(), this);
+		getServer().getPluginManager().registerEvents(new BlockL(), this);
 	}
 
 	private void setCommandDescriptions() {
