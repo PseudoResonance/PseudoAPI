@@ -316,7 +316,7 @@ public class PlayerDataController {
 
 	protected static void playerLeave(String uuid) {
 		HashMap<String, Object> settings = new HashMap<String, Object>();
-		Object o = getPlayerSetting(uuid, "lastjoinleave");
+		Object o = getPlayerSetting(uuid, "lastjoinleave").join();
 		Timestamp joinLeaveTS = null;
 		if (o instanceof Timestamp) {
 			joinLeaveTS = (Timestamp) o;
@@ -327,7 +327,7 @@ public class PlayerDataController {
 		if (joinLeaveTS != null) {
 			long joinLeave = joinLeaveTS.getTime();
 			long diff = System.currentTimeMillis() - joinLeave;
-			Object ob = getPlayerSetting(uuid, "playtime");
+			Object ob = getPlayerSetting(uuid, "playtime").join();
 			if (ob instanceof BigInteger || ob instanceof Long) {
 				long playTime = 0;
 				if (ob instanceof BigInteger)
