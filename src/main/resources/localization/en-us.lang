@@ -19,6 +19,14 @@ date:
   relativeDays: "{$1$} Days"
   relativeMonths: "{$1$} Months"
   relativeYears: "{$1$} Years"
+  relativeNanosecondsSingular: "{$1$} Nanosecond"
+  relativeMillisecondsSingular: "{$1$} Millisecond"
+  relativeSecondsSingular: "{$1$} Second"
+  relativeMinutesSingular: "{$1$} Minute"
+  relativeHoursSingular: "{$1$} Hour"
+  relativeDaysSingular: "{$1$} Day"
+  relativeMonthsSingular: "{$1$} Month"
+  relativeYearsSingular: "{$1$} Year"
   relativeAgo: "{$1$} Ago"
   # Whether the first unit is the smallest
   relativeFormatAscending: false

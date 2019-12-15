@@ -12,22 +12,22 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class Language {
-	
+
 	private final String lang;
 	private final HashMap<String, String> languageMap = new HashMap<String, String>();
-	
+
 	private Pattern dateFormatPattern = Pattern.compile("\\{\\$date\\.date\\$\\}");
 	private Pattern dateTimeFormatPattern = Pattern.compile("\\{\\$date\\.dateTime\\$\\}");
 	private Pattern timeFormatPattern = Pattern.compile("\\{\\$date\\.time\\$\\}");
-	
+
 	private Locale locale = null;
 
 	private DateTimeFormatter dateFormat = null;
 	private DateTimeFormatter dateTimeFormat = null;
 	private DateTimeFormatter timeFormat = null;
-	
+
 	private Pattern relativeFormatPattern = Pattern.compile("\\{\\$1\\$\\}");
-	
+
 	private boolean relativeFormatAscending = false;
 	private String relativeNanoseconds = "";
 	private String relativeMilliseconds = "";
@@ -37,19 +37,27 @@ public class Language {
 	private String relativeDays = "";
 	private String relativeMonths = "";
 	private String relativeYears = "";
-	
+	private String relativeNanosecondsSingular = "";
+	private String relativeMillisecondsSingular = "";
+	private String relativeSecondsSingular = "";
+	private String relativeMinutesSingular = "";
+	private String relativeHoursSingular = "";
+	private String relativeDaysSingular = "";
+	private String relativeMonthsSingular = "";
+	private String relativeYearsSingular = "";
+
 	public Language(String lang) {
 		this.lang = lang;
 	}
-	
+
 	public String getName() {
 		return lang;
 	}
-	
+
 	public String getUnprocessedMessage(String key) {
 		return languageMap.get(key);
 	}
-	
+
 	public String getMessage(String key, Object... args) {
 		String msg = languageMap.get(key);
 		if (msg == null) {
@@ -66,54 +74,76 @@ public class Language {
 		}
 		return "Error: Localization for " + key + " is missing!";
 	}
-	
+
 	public String formatDate(LocalDate date) {
 		return dateFormat.format(date);
 	}
-	
+
 	public String formatDate(Date date) {
 		return formatDate(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 	}
-	
+
 	public String formatDateTime(LocalDateTime dateTime) {
 		return dateTimeFormat.format(dateTime);
 	}
-	
+
 	public String formatDateTime(Date dateTime) {
 		return formatDateTime(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 	}
-	
+
 	public String formatTime(LocalTime time) {
 		return timeFormat.format(time);
 	}
-	
+
 	public String formatTime(Date time) {
 		return formatTime(time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
 	}
-	
+
+	public String formatTimeAgo(LocalDateTime dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
+		if (relativeFormatAscending)
+			return timeAgoAscending(dateTime, addAgo, minUnit, maxUnit);
+		else
+			return timeAgoDescending(dateTime, addAgo, minUnit, maxUnit);
+	}
+
 	public String formatTimeAgo(LocalDateTime dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		if (relativeFormatAscending)
-			return timeAgoAscending(dateTime, minUnit, maxUnit);
+			return timeAgoAscending(dateTime, true, minUnit, maxUnit);
 		else
-			return timeAgoDescending(dateTime, minUnit, maxUnit);
+			return timeAgoDescending(dateTime, true, minUnit, maxUnit);
 	}
-	
+
+	public String formatTimeAgo(Date dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
+		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), addAgo, minUnit, maxUnit);
+	}
+
 	public String formatTimeAgo(Date dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), minUnit, maxUnit);
 	}
-	
+
+	public String formatTimeAgo(LocalDateTime dateTime, boolean addAgo) {
+		if (relativeFormatAscending)
+			return timeAgoAscending(dateTime, addAgo);
+		else
+			return timeAgoDescending(dateTime, addAgo);
+	}
+
 	public String formatTimeAgo(LocalDateTime dateTime) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime);
 		else
 			return timeAgoDescending(dateTime);
 	}
-	
+
+	public String formatTimeAgo(Date dateTime, boolean addAgo) {
+		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), addAgo);
+	}
+
 	public String formatTimeAgo(Date dateTime) {
 		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 	}
-	
-	private String timeAgoAscending(LocalDateTime dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
+
+	private String timeAgoAscending(LocalDateTime dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		LocalDateTime temp = LocalDateTime.from(dateTime);
 		LocalDateTime now = LocalDateTime.now();
 		long years = temp.until(now, ChronoUnit.YEARS);
@@ -140,44 +170,74 @@ public class Language {
 		String sMilliseconds = "";
 		String sNanoseconds = "";
 		if (relativeYears.length() > 0 && isUnitInRange(minUnit, ChronoUnit.YEARS, maxUnit) && (years > 0 || minUnit == ChronoUnit.YEARS))
-			sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years)) + " ";
+			if (years == 1)
+				sYears = relativeFormatPattern.matcher(relativeYearsSingular).replaceFirst(String.valueOf(years)) + " ";
+			else
+				sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years)) + " ";
 		else
 			months += years * 12;
 		if (relativeMonths.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MONTHS, maxUnit) && (months > 0 || minUnit == ChronoUnit.MONTHS))
-			sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months)) + " ";
+			if (months == 1)
+				sMonths = relativeFormatPattern.matcher(relativeMonthsSingular).replaceFirst(String.valueOf(months)) + " ";
+			else
+				sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months)) + " ";
 		else
 			days += (long) (months * 30.436875);
 		if (relativeDays.length() > 0 && isUnitInRange(minUnit, ChronoUnit.DAYS, maxUnit) && (days > 0 || minUnit == ChronoUnit.DAYS))
-			sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days)) + " ";
+			if (days == 1)
+				sDays = relativeFormatPattern.matcher(relativeDaysSingular).replaceFirst(String.valueOf(days)) + " ";
+			else
+				sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days)) + " ";
 		else
 			hours += days * 24;
 		if (relativeHours.length() > 0 && isUnitInRange(minUnit, ChronoUnit.HOURS, maxUnit) && (hours > 0 || minUnit == ChronoUnit.HOURS))
-			sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours)) + " ";
+			if (hours == 1)
+				sHours = relativeFormatPattern.matcher(relativeHoursSingular).replaceFirst(String.valueOf(hours)) + " ";
+			else
+				sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours)) + " ";
 		else
 			minutes += hours * 60;
 		if (relativeMinutes.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MINUTES, maxUnit) && (minutes > 0 || minUnit == ChronoUnit.MINUTES))
-			sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes)) + " ";
+			if (minutes == 1)
+				sMinutes = relativeFormatPattern.matcher(relativeMinutesSingular).replaceFirst(String.valueOf(minutes)) + " ";
+			else
+				sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes)) + " ";
 		else
 			seconds += minutes * 60;
 		if (relativeSeconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.SECONDS, maxUnit) && (seconds > 0 || minUnit == ChronoUnit.SECONDS))
-			sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds)) + " ";
+			if (seconds == 1)
+				sSeconds = relativeFormatPattern.matcher(relativeSecondsSingular).replaceFirst(String.valueOf(seconds)) + " ";
+			else
+				sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds)) + " ";
 		else
 			milliseconds += seconds * 1000;
 		if (relativeMilliseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MILLIS, maxUnit) && (milliseconds > 0 || minUnit == ChronoUnit.MILLIS))
-			sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds)) + " ";
+			if (milliseconds == 1)
+				sMilliseconds = relativeFormatPattern.matcher(relativeMillisecondsSingular).replaceFirst(String.valueOf(milliseconds)) + " ";
+			else
+				sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds)) + " ";
 		else
 			nanoseconds += milliseconds * 1000000;
 		if (relativeNanoseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.NANOS, maxUnit) && (nanoseconds > 0 || minUnit == ChronoUnit.NANOS))
-			sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds)) + " ";
+			if (nanoseconds == 1)
+				sNanoseconds = relativeFormatPattern.matcher(relativeNanosecondsSingular).replaceFirst(String.valueOf(nanoseconds)) + " ";
+			else
+				sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds)) + " ";
 		String ret = sNanoseconds + sMilliseconds + sSeconds + sMinutes + sHours + sDays + sMonths + sYears;
-		return getMessage("date.relativeAgo", ret.substring(0, ret.length() - 1));
+		if (addAgo)
+			return getMessage("date.relativeAgo", ret.substring(0, ret.length() - 1));
+		return ret.substring(0, ret.length() - 1);
 	}
-	
+
+	private String timeAgoAscending(LocalDateTime dateTime, boolean addAgo) {
+		return timeAgoAscending(dateTime, addAgo, ChronoUnit.SECONDS, ChronoUnit.YEARS);
+	}
+
 	private String timeAgoAscending(LocalDateTime dateTime) {
-		return timeAgoAscending(dateTime, ChronoUnit.SECONDS, ChronoUnit.YEARS);
+		return timeAgoAscending(dateTime, true, ChronoUnit.SECONDS, ChronoUnit.YEARS);
 	}
-	
-	private String timeAgoDescending(LocalDateTime dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
+
+	private String timeAgoDescending(LocalDateTime dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		LocalDateTime temp = LocalDateTime.from(dateTime);
 		LocalDateTime now = LocalDateTime.now();
 		long years = temp.until(now, ChronoUnit.YEARS);
@@ -204,56 +264,86 @@ public class Language {
 		String sMilliseconds = "";
 		String sNanoseconds = "";
 		if (relativeYears.length() > 0 && isUnitInRange(minUnit, ChronoUnit.YEARS, maxUnit) && (years > 0 || minUnit == ChronoUnit.YEARS))
-			sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years)) + " ";
+			if (years == 1)
+				sYears = relativeFormatPattern.matcher(relativeYearsSingular).replaceFirst(String.valueOf(years)) + " ";
+			else
+				sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years)) + " ";
 		else
 			months += years * 12;
 		if (relativeMonths.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MONTHS, maxUnit) && (months > 0 || minUnit == ChronoUnit.MONTHS))
-			sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months)) + " ";
+			if (months == 1)
+				sMonths = relativeFormatPattern.matcher(relativeMonthsSingular).replaceFirst(String.valueOf(months)) + " ";
+			else
+				sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months)) + " ";
 		else
 			days += (long) (months * 30.436875);
 		if (relativeDays.length() > 0 && isUnitInRange(minUnit, ChronoUnit.DAYS, maxUnit) && (days > 0 || minUnit == ChronoUnit.DAYS))
-			sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days)) + " ";
+			if (days == 1)
+				sDays = relativeFormatPattern.matcher(relativeDaysSingular).replaceFirst(String.valueOf(days)) + " ";
+			else
+				sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days)) + " ";
 		else
 			hours += days * 24;
 		if (relativeHours.length() > 0 && isUnitInRange(minUnit, ChronoUnit.HOURS, maxUnit) && (hours > 0 || minUnit == ChronoUnit.HOURS))
-			sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours)) + " ";
+			if (hours == 1)
+				sHours = relativeFormatPattern.matcher(relativeHoursSingular).replaceFirst(String.valueOf(hours)) + " ";
+			else
+				sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours)) + " ";
 		else
 			minutes += hours * 60;
 		if (relativeMinutes.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MINUTES, maxUnit) && (minutes > 0 || minUnit == ChronoUnit.MINUTES))
-			sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes)) + " ";
+			if (minutes == 1)
+				sMinutes = relativeFormatPattern.matcher(relativeMinutesSingular).replaceFirst(String.valueOf(minutes)) + " ";
+			else
+				sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes)) + " ";
 		else
 			seconds += minutes * 60;
 		if (relativeSeconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.SECONDS, maxUnit) && (seconds > 0 || minUnit == ChronoUnit.SECONDS))
-			sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds)) + " ";
+			if (seconds == 1)
+				sSeconds = relativeFormatPattern.matcher(relativeSecondsSingular).replaceFirst(String.valueOf(seconds)) + " ";
+			else
+				sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds)) + " ";
 		else
 			milliseconds += seconds * 1000;
 		if (relativeMilliseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MILLIS, maxUnit) && (milliseconds > 0 || minUnit == ChronoUnit.MILLIS))
-			sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds)) + " ";
+			if (milliseconds == 1)
+				sMilliseconds = relativeFormatPattern.matcher(relativeMillisecondsSingular).replaceFirst(String.valueOf(milliseconds)) + " ";
+			else
+				sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds)) + " ";
 		else
 			nanoseconds += milliseconds * 1000000;
 		if (relativeNanoseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.NANOS, maxUnit) && (nanoseconds > 0 || minUnit == ChronoUnit.NANOS))
-			sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds)) + " ";
+			if (nanoseconds == 1)
+				sNanoseconds = relativeFormatPattern.matcher(relativeNanosecondsSingular).replaceFirst(String.valueOf(nanoseconds)) + " ";
+			else
+				sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds)) + " ";
 		String ret = sYears + sMonths + sDays + sHours + sMinutes + sSeconds + sMilliseconds + sNanoseconds;
-		return getMessage("date.relativeAgo", ret.substring(0, ret.length() - 1));
+		if (addAgo)
+			return getMessage("date.relativeAgo", ret.substring(0, ret.length() - 1));
+		return ret.substring(0, ret.length() - 1);
 	}
-	
+
+	private String timeAgoDescending(LocalDateTime dateTime, boolean addAgo) {
+		return timeAgoDescending(dateTime, addAgo, ChronoUnit.SECONDS, ChronoUnit.YEARS);
+	}
+
 	private String timeAgoDescending(LocalDateTime dateTime) {
-		return timeAgoDescending(dateTime, ChronoUnit.SECONDS, ChronoUnit.YEARS);
+		return timeAgoDescending(dateTime, true, ChronoUnit.SECONDS, ChronoUnit.YEARS);
 	}
-	
+
 	private boolean isUnitInRange(ChronoUnit min, ChronoUnit test, ChronoUnit max) {
 		if (test.compareTo(min) >= 0 && test.compareTo(max) <= 0)
 			return true;
 		return false;
 	}
-	
+
 	public void addLanguageMap(HashMap<String, String> map) {
 		languageMap.putAll(map);
 		if (locale == null && languageMap.keySet().contains("date.locale")) {
 			locale = Locale.forLanguageTag(languageMap.get("date.locale"));
 		}
 		if (locale != null && dateFormat == null && languageMap.keySet().contains("date.dateFormat")) {
-			
+
 			dateFormat = DateTimeFormatter.ofPattern(languageMap.get("date.dateFormat"), locale);
 		}
 		if (locale != null && dateTimeFormat == null && languageMap.keySet().contains("date.dateTimeFormat")) {
@@ -285,6 +375,30 @@ public class Language {
 		}
 		if (languageMap.keySet().contains("date.relativeYears")) {
 			relativeYears = languageMap.get("date.relativeYears");
+		}
+		if (languageMap.keySet().contains("date.relativeNanosecondsSingular")) {
+			relativeNanosecondsSingular = languageMap.get("date.relativeNanosecondsSingular");
+		}
+		if (languageMap.keySet().contains("date.relativeMillisecondsSingular")) {
+			relativeMillisecondsSingular = languageMap.get("date.relativeMillisecondsSingular");
+		}
+		if (languageMap.keySet().contains("date.relativeSecondsSingular")) {
+			relativeSecondsSingular = languageMap.get("date.relativeSecondsSingular");
+		}
+		if (languageMap.keySet().contains("date.relativeMinutesSingular")) {
+			relativeMinutesSingular = languageMap.get("date.relativeMinutesSingular");
+		}
+		if (languageMap.keySet().contains("date.relativeHoursSingular")) {
+			relativeHoursSingular = languageMap.get("date.relativeHoursSingular");
+		}
+		if (languageMap.keySet().contains("date.relativeDaysSingular")) {
+			relativeDaysSingular = languageMap.get("date.relativeDaysSingular");
+		}
+		if (languageMap.keySet().contains("date.relativeMonthsSingular")) {
+			relativeMonthsSingular = languageMap.get("date.relativeMonthsSingular");
+		}
+		if (languageMap.keySet().contains("date.relativeYearsSingular")) {
+			relativeYearsSingular = languageMap.get("date.relativeYearsSingular");
 		}
 		if (languageMap.keySet().contains("date.relativeFormatAscending")) {
 			relativeFormatAscending = languageMap.get("date.relativeFormatAscending").toLowerCase().startsWith("t") ? true : false;
