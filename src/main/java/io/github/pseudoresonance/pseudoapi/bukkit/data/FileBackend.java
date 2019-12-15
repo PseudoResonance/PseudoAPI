@@ -9,6 +9,12 @@ public class FileBackend implements Backend {
 	private final String name;
 	private final File folder;
 
+	/**
+	 * Constructs a new {@link FileBackend} with the given name and directory location
+	 * 
+	 * @param name Backend name
+	 * @param folder Directory of backend files
+	 */
 	public FileBackend(String name, File folder) {
 		this.name = name;
 		this.folder = folder;
@@ -30,6 +36,11 @@ public class FileBackend implements Backend {
 		return this.name;
 	}
 	
+	/**
+	 * Returns directory that files are stored in
+	 * 
+	 * @return Backend directory
+	 */
 	public File getFolder() {
 		return this.folder;
 	}

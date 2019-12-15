@@ -24,6 +24,12 @@ public class JsonReader {
 		return sb.toString();
 	}
 
+	/**
+	 * Returns {@link JSONArray} of JSON read from a given URL
+	 * 
+	 * @param url URL to read JSON from
+	 * @return {@link JSONArray} of read JSON
+	 */
 	public static JSONArray readJsonFromUrl(String url) {
 		try {
 			InputStream is = new URL(url).openStream();

@@ -41,6 +41,24 @@ permissions:
   pseudoapi.reset:
     description: Allows the player to reset the plugin
     default: op
+    children:
+      pseudoapi.reload: true
+  pseudoapi.reloadlocalization:
+    description: Allows the player to reload the plugin localization
+    default: op
+  pseudoapi.resetlocalization:
+    description: Allows the player to reset the plugin localization
+    default: op
+    children:
+      pseudoapi.reloadlocalization: true
+  pseudoapi.setlocalization:
+    description: Allows the player to set their localization
+    default: true
+  pseudoapi.setlocalization.others:
+    description: Allows the player to set the localization of other players
+    default: op
+    children:
+      pseudoapi.setlocalization: true
   pseudoapi.*:
     description: Gives the user all PseudoAPI permissions
     default: op
@@ -48,7 +66,8 @@ permissions:
       pseudoapi.plugins: true
       pseudoapi.allplugins: true
       pseudoapi.backend: true
-      pseudoapi.reload: true
       pseudoapi.reset: true
+      pseudoapi.resetlocalization: true
+      pseudoapi.setlocalization.others: true
       pseudoapi.update: true
       pseudoapi.update.notify: true

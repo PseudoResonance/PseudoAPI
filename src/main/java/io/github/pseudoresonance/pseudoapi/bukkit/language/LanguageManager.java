@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -28,10 +29,30 @@ public class LanguageManager {
 	
 	private static String defaultLanguage;
 	
+	/**
+	 * Returns the default language
+	 * 
+	 * @return Default language
+	 */
 	public static Language getLanguage() {
 		return getLanguage(defaultLanguage);
 	}
 	
+	/**
+	 * Returns a list of all supported languages
+	 * 
+	 * @return Set of supported languages
+	 */
+	public static Set<String> getLanguageList() {
+		return languages.keySet();
+	}
+	
+	/**
+	 * Returns the set language of the {@link CommandSender}
+	 * 
+	 * @param sender Sender whose language to check
+	 * @return Set language
+	 */
 	public static Language getLanguage(CommandSender sender) {
 		if (sender instanceof Player) {
 			Player p = (Player) sender;
@@ -44,6 +65,12 @@ public class LanguageManager {
 		return getLanguage();
 	}
 	
+	/**
+	 * Returns the given language
+	 * 
+	 * @param lang Name of language to get
+	 * @return Language
+	 */
 	public static Language getLanguage(String lang) {
 		Language language = languages.get(lang.toLowerCase());
 		if (language == null)
@@ -51,6 +78,13 @@ public class LanguageManager {
 		return language;
 	}
 	
+	/**
+	 * Register language with given name
+	 * 
+	 * @param lang Language name
+	 * @param language {@link Language}
+	 * @return Whether or not registration was successful
+	 */
 	public static boolean registerLanguage(String lang, Language language) {
 		if (!languages.containsKey(lang.toLowerCase())) {
 			languages.put(lang.toLowerCase(), language);
@@ -59,12 +93,23 @@ public class LanguageManager {
 		return false;
 	}
 	
+	/**
+	 * Sets default language
+	 * 
+	 * @param lang Default language to set
+	 */
 	public static void setDefaultLanguage(String lang) {
 		defaultLanguage = lang;
 		if (getLanguage(lang) == null)
 			registerLanguage(lang, new Language(lang));
 	}
 	
+	/**
+	 * Copies default plugin language files to plugin folder
+	 * 
+	 * @param plugin Plugin whose language files to copy
+	 * @param overwrite Whether or not to overwrite old language files
+	 */
 	public static void copyDefaultPluginLanguageFiles(PseudoPlugin plugin, boolean overwrite) {
 		URL url = plugin.getClass().getProtectionDomain().getCodeSource().getLocation();
 		File langDir = new File(plugin.getDataFolder(), "localization");

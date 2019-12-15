@@ -1,5 +1,6 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.utils;
 
+@Deprecated
 public class ChatComponent {
 
 	public ComponentType type;

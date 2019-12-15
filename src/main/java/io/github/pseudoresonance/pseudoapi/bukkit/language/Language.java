@@ -46,18 +46,41 @@ public class Language {
 	private String relativeMonthsSingular = "";
 	private String relativeYearsSingular = "";
 
+	/**
+	 * Constructs new {@link Language} with the given name
+	 * 
+	 * @param lang Localization name
+	 */
 	public Language(String lang) {
 		this.lang = lang;
 	}
 
+	/**
+	 * Returns language name
+	 * 
+	 * @return Localization name
+	 */
 	public String getName() {
 		return lang;
 	}
 
+	/**
+	 * Gets raw localization message at the given key
+	 * 
+	 * @param key Localization key
+	 * @return Raw localization message
+	 */
 	public String getUnprocessedMessage(String key) {
 		return languageMap.get(key);
 	}
 
+	/**
+	 * Gets processed localization message at the given key with the given parameters
+	 * 
+	 * @param key Localization key
+	 * @param args Arguments to pass into message
+	 * @return Localized message
+	 */
 	public String getMessage(String key, Object... args) {
 		String msg = languageMap.get(key);
 		if (msg == null) {
@@ -75,30 +98,75 @@ public class Language {
 		return "Error: Localization for " + key + " is missing!";
 	}
 
+	/**
+	 * Formats date
+	 * 
+	 * @param date {@link LocalDate} to format
+	 * @return Formatted date
+	 */
 	public String formatDate(LocalDate date) {
 		return dateFormat.format(date);
 	}
 
+	/**
+	 * Formats date
+	 * 
+	 * @param date {@link Date} to format
+	 * @return Formatted date
+	 */
 	public String formatDate(Date date) {
 		return formatDate(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 	}
 
+	/**
+	 * Formats date-time
+	 * 
+	 * @param date {@link LocalDateTime} to format
+	 * @return Formatted date-time
+	 */
 	public String formatDateTime(LocalDateTime dateTime) {
 		return dateTimeFormat.format(dateTime);
 	}
 
+	/**
+	 * Formats date-time
+	 * 
+	 * @param date {@link Date} to format
+	 * @return Formatted date-time
+	 */
 	public String formatDateTime(Date dateTime) {
 		return formatDateTime(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 	}
 
+	/**
+	 * Formats time
+	 * 
+	 * @param date {@link LocalTime} to format
+	 * @return Formatted time
+	 */
 	public String formatTime(LocalTime time) {
 		return timeFormat.format(time);
 	}
 
+	/**
+	 * Formats time
+	 * 
+	 * @param date {@link Date} to format
+	 * @return Formatted time
+	 */
 	public String formatTime(Date time) {
 		return formatTime(time.toInstant().atZone(ZoneId.systemDefault()).toLocalTime());
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link LocalDateTime} to format
+	 * @param addAgo Whether or not to add "ago" to the end of the string
+	 * @param minUnit Minimum time unit to display
+	 * @param maxUnit Maximum time unit to display
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(LocalDateTime dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime, addAgo, minUnit, maxUnit);
@@ -106,6 +174,14 @@ public class Language {
 			return timeAgoDescending(dateTime, addAgo, minUnit, maxUnit);
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link LocalDateTime} to format
+	 * @param minUnit Minimum time unit to display
+	 * @param maxUnit Maximum time unit to display
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(LocalDateTime dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime, true, minUnit, maxUnit);
@@ -113,14 +189,38 @@ public class Language {
 			return timeAgoDescending(dateTime, true, minUnit, maxUnit);
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link Date} to format
+	 * @param addAgo Whether or not to add "ago" to the end of the string
+	 * @param minUnit Minimum time unit to display
+	 * @param maxUnit Maximum time unit to display
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(Date dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), addAgo, minUnit, maxUnit);
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link Date} to format
+	 * @param minUnit Minimum time unit to display
+	 * @param maxUnit Maximum time unit to display
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(Date dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), minUnit, maxUnit);
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link LocalDateTime} to format
+	 * @param addAgo Whether or not to add "ago" to the end of the string
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(LocalDateTime dateTime, boolean addAgo) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime, addAgo);
@@ -128,6 +228,12 @@ public class Language {
 			return timeAgoDescending(dateTime, addAgo);
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link LocalDateTime} to format
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(LocalDateTime dateTime) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime);
@@ -135,10 +241,23 @@ public class Language {
 			return timeAgoDescending(dateTime);
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link Date} to format
+	 * @param addAgo Whether or not to add "ago" to the end of the string
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(Date dateTime, boolean addAgo) {
 		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(), addAgo);
 	}
 
+	/**
+	 * Formats time ago
+	 * 
+	 * @param dateTime {@link Date} to format
+	 * @return Formatted time ago
+	 */
 	public String formatTimeAgo(Date dateTime) {
 		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 	}
@@ -337,6 +456,11 @@ public class Language {
 		return false;
 	}
 
+	/**
+	 * Adds given language key and message map to the language
+	 * 
+	 * @param map Language key and message map
+	 */
 	public void addLanguageMap(HashMap<String, String> map) {
 		languageMap.putAll(map);
 		if (locale == null && languageMap.keySet().contains("date.locale")) {

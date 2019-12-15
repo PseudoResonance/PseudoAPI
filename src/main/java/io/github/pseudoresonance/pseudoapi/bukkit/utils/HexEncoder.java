@@ -10,20 +10,45 @@ public class HexEncoder {
 	private static final String SEQUENCE_FOOTER = "" + ChatColor.RESET + ChatColor.ITALIC + ChatColor.RESET;
 	
 	
+	/**
+	 * Returns a String encoded in Bukkit color codes
+	 * 
+	 * @param hiddenString String to encode
+	 * @return String of color codes
+	 */
 	public static String encodeString(String hiddenString) {
 		return quote(stringToColors(hiddenString));
 	}
 	
+	/**
+	 * Returns whether or not string contains encoded data
+	 * 
+	 * @param input String to check
+	 * @return Whether or not string contains encoded data
+	 */
 	public static boolean hasHiddenString(String input) {
 		if (input == null) return false;
 		return input.indexOf(SEQUENCE_HEADER) > -1 && input.indexOf(SEQUENCE_FOOTER) > -1;
 	}	
 	
+	/**
+	 * Returns encoded data
+	 * 
+	 * @param input String to decode
+	 * @return Encoded data
+	 */
 	public static String extractHiddenString(String input) {
 		return colorsToString(extract(input));
 	}
 	
 	
+	/**
+	 * Returns string with encoded data replaced by another string
+	 * 
+	 * @param input String to recode
+	 * @param hiddenString Data to encode into string
+	 * @return String with encoded data replaced by another string
+	 */
 	public static String replaceHiddenString(String input, String hiddenString) {
 		if (input == null) return null;
 		int start = input.indexOf(SEQUENCE_HEADER);

@@ -28,6 +28,12 @@ public class PluginMessenger implements PluginMessageListener {
 		Bukkit.getMessenger().registerIncomingPluginChannel(PseudoAPI.plugin, channelServerName, new PluginMessenger());
 	}
 	
+	/**
+	 * Register {@link PluginMessengerListener}r
+	 * 
+	 * @param plugin {@link PseudoPlugin} that listener originates from
+	 * @param listener {@link PluginMessengerListener} to receive messages
+	 */
 	public static void registerListener(PseudoPlugin plugin, PluginMessengerListener listener) {
 		ArrayList<PluginMessengerListener> listenerList = null;
 		if (pluginListeners.containsKey(plugin)) {
@@ -40,6 +46,11 @@ public class PluginMessenger implements PluginMessageListener {
 		listeners.add(listener);
 	}
 	
+	/**
+	 * Unregister all {@link PluginMessengerListener}s from {@link PseudoPlugin}
+	 * 
+	 * @param plugin {@link PseudoPlugin} to unregister
+	 */
 	public static void unregisterPluginListeners(PseudoPlugin plugin) {
 		if (pluginListeners.containsKey(plugin)) {
 			ArrayList<PluginMessengerListener> listenerList = pluginListeners.get(plugin);
@@ -60,6 +71,13 @@ public class PluginMessenger implements PluginMessageListener {
 		}
 	}
 
+	/**
+	 * Send message over plugin messaging channel to BungeeCord
+	 * 
+	 * @param p Player to send message with
+	 * @param channel Channel to send message on
+	 * @param data Data to send
+	 */
 	public static void sendToBungee(Player p, String channel, Collection<Object> data) {
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		out.writeUTF(channel);

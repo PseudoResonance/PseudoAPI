@@ -42,6 +42,9 @@ public class ServerPlayerDataController {
 
 	private static Backend b;
 
+	/**
+	 * Updates settings and setups up backend
+	 */
 	public static void update() {
 		b = Data.getServerBackend();
 		setup();
@@ -51,6 +54,12 @@ public class ServerPlayerDataController {
 		}
 	}
 
+	/**
+	 * Adds the given {@link Column} to the backend
+	 * 
+	 * @param col Column to add
+	 * @return Whether or not adding column was successful
+	 */
 	public static boolean addColumn(Column col) {
 		for (Column column : dataTypes)
 			if (column.getName().equalsIgnoreCase(col.getName()))
@@ -121,6 +130,9 @@ public class ServerPlayerDataController {
 		return false;
 	}
 
+	/**
+	 * Sets up backend
+	 */
 	public static void setup() {
 		if (b instanceof FileBackend) {
 			FileBackend fb = (FileBackend) b;
@@ -299,6 +311,13 @@ public class ServerPlayerDataController {
 		}
 	}
 
+	/**
+	 * Sets a list of settings on the given player
+	 * 
+	 * @param uuid UUID of player to set
+	 * @param values {@link HashMap} of player settings to set
+	 * @return {@link CompletableFuture} of when settings have been set
+	 */
 	public static CompletableFuture<Void> setPlayerSettings(String uuid, HashMap<String, Object> values) {
 		return CompletableFuture.runAsync(() -> {
 			HashMap<String, Object> original;
@@ -386,6 +405,14 @@ public class ServerPlayerDataController {
 		});
 	}
 
+	/**
+	 * Sets a single setting on the given player
+	 * 
+	 * @param uuid UUID of player to set
+	 * @param key Key of player setting to set
+	 * @param value Value of player setting to set
+	 * @return {@link CompletableFuture} of when setting has been set
+	 */
 	public static CompletableFuture<Void> setPlayerSetting(String uuid, String key, Object value) {
 		return CompletableFuture.runAsync(() -> {
 			HashMap<String, Object> original;
@@ -448,10 +475,26 @@ public class ServerPlayerDataController {
 		});
 	}
 
+	/**
+	 * Gets a single setting from the given player
+	 * Returns cached values if available
+	 * 
+	 * @param uuid UUID of player to get
+	 * @param key Key of setting to get
+	 * @return {@link CompletableFuture} of returned setting value
+	 */
 	public static CompletableFuture<Object> getPlayerSetting(String uuid, String key) {
 		return getPlayerSetting(uuid, key, false);
 	}
 
+	/**
+	 * Gets a single setting from the given player
+	 * 
+	 * @param uuid UUID of player to get
+	 * @param key Key of setting to get
+	 * @param forceUpdate Whether or not to force getting an update from the database
+	 * @return {@link CompletableFuture} of returned setting value
+	 */
 	public static CompletableFuture<Object> getPlayerSetting(String uuid, String key, boolean forceUpdate) {
 		HashMap<String, Object> data = playerData.get(uuid);
 		if (data != null && !(data.isEmpty()) && data.containsKey(key) && !forceUpdate)
@@ -469,10 +512,24 @@ public class ServerPlayerDataController {
 		}
 	}
 
+	/**
+	 * Gets a list of settings from the given player
+	 * Returns cached values if available
+	 * 
+	 * @param uuid UUID of player to get
+	 * @return {@link CompletableFuture} of returned {@link HashMap} of player settings
+	 */
 	public static CompletableFuture<HashMap<String, Object>> getPlayerSettings(String uuid) {
 		return getPlayerSettings(uuid, false);
 	}
 
+	/**
+	 * Gets a list of settings from the given player
+	 * 
+	 * @param uuid UUID of player to get
+	 * @param forceUpdate Whether or not to force getting an update from the database
+	 * @return {@link CompletableFuture} of returned {@link HashMap} of player settings
+	 */
 	public static CompletableFuture<HashMap<String, Object>> getPlayerSettings(String uuid, boolean forceUpdate) {
 		HashMap<String, Object> data = playerData.get(uuid);
 		if (data != null && !(data.isEmpty()) && !forceUpdate)
@@ -583,6 +640,13 @@ public class ServerPlayerDataController {
 		});
 	}
 
+	/**
+	 * Migrates all data from one {@link Backend} to another
+	 * 
+	 * @param origin {@link Backend} to migrate from
+	 * @param destination {@link Backend} to migrate to
+	 * @return Whether or not migration was successful
+	 */
 	public static void migrateBackends(Backend origin, Backend destination) {
 		getBackend(origin).thenAcceptAsync(values -> {
 			setBackend(destination, values);

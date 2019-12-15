@@ -30,6 +30,9 @@ public class PseudoPlugin extends JavaPlugin {
 	protected List<CommandDescription> commandDescriptions = new ArrayList<CommandDescription>();
 	private Chat chat;
 	
+	/**
+	 * On enable method that is required to be run by all {@link PseudoPlugin}s in order to properly initialize
+	 */
 	@Override
 	public void onEnable() {
 		super.onEnable();
@@ -82,69 +85,150 @@ public class PseudoPlugin extends JavaPlugin {
 		chat = new Chat(this);
 		LanguageManager.copyDefaultPluginLanguageFiles(this, false);
 	}
-	
+
+	/**
+	 * On disable method that is required to be run by all {@link PseudoPlugin}s in order to properly shut down
+	 */
 	@Override
 	public void onDisable() {
 		CommandHandler.unregisterPlugin(this);
 		PluginMessenger.unregisterPluginListeners(this);
 	}
 	
+	/**
+	 * Returns {@link Chat} instance of this plugin
+	 * 
+	 * @return {@link Chat} instance
+	 */
 	public Chat getChat() {
 		return chat;
 	}
 
+	/**
+	 * Returns plugin name
+	 * 
+	 * @return Plugin name
+	 */
 	public String getPluginName() {
 		return name;
 	}
 
+	/**
+	 * Returns plugin chat prefix
+	 * 
+	 * @return Chat prefix
+	 */
 	public String getPrefix() {
 		return prefix;
 	}
 
+	/**
+	 * Returns friendly output name of plugin
+	 * 
+	 * @return Friendly name
+	 */
 	public String getOutputName() {
 		return output;
 	}
 
+	/**
+	 * Returns plugin description
+	 * 
+	 * @return Plugin description
+	 */
 	public String getPluginDescription() {
 		return description;
 	}
 
+	/**
+	 * Returns list of authors
+	 * 
+	 * @return Plugin authors
+	 */
 	public List<String> getAuthors() {
 		return authors;
 	}
 
+	/**
+	 * Returns plugin version
+	 * 
+	 * @return Plugin version
+	 */
 	public String getVersion() {
 		return version;
 	}
 
+	/**
+	 * Returns list of plugin dependencies
+	 * 
+	 * @return Plugin dependencies
+	 */
 	public List<String> getDepend() {
 		return depend;
 	}
 
+	/**
+	 * Returns list of soft plugin dependencies
+	 * 
+	 * @return Soft plugin dependencies
+	 */
 	public List<String> getSoftDepend() {
 		return softDepend;
 	}
 
+	/**
+	 * Returns list of plugins that depend on this plugin
+	 * 
+	 * @return Load before list
+	 */
 	public List<String> getLoadBefore() {
 		return loadBefore;
 	}
 
+	/**
+	 * Returns map of plugin commands
+	 * 
+	 * @return Plugin commands
+	 */
 	public Map<String, Map<String, Object>> getCommands() {
 		return commands;
 	}
 
+	/**
+	 * Returns list of declared permissions
+	 * 
+	 * @return List of permissions
+	 */
 	public List<Permission> getPermissions() {
 		return permissions;
 	}
 	
+	/**
+	 * Registers a command that will forcefully override all other plugins
+	 * 
+	 * @param cmd Command to be overwritten
+	 * @param executor Executor for the command
+	 */
 	public void registerCommandOverride(String cmd, CommandExecutor executor) {
 		CommandHandler.registerCommand(this, cmd, executor);
 	}
 	
+	/**
+	 * Registers a command that will forcefully override all other plugins
+	 * 
+	 * @param cmd Command to be overwritten
+	 * @param executor Executor for the command
+	 * @param completer Tab completer for command
+	 */
 	public void registerDynamicCommand(String cmd, CommandExecutor executor, TabCompleter completer) {
 		CommandHandler.registerCommand(this, cmd, executor, completer);
 	}
 	
+	/**
+	 * Unregisters overwritten command
+	 * 
+	 * @param cmd Command to be unregistered
+	 */
 	public void unregisterDynamicCommand(String cmd) {
 		CommandHandler.unregisterCommand(this, cmd);
 	}

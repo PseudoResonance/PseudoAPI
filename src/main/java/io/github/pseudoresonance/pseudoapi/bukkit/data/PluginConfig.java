@@ -18,10 +18,20 @@ public abstract class PluginConfig {
 
 	private PseudoPlugin plugin;
 
+	/**
+	 * Instantiates new {@link PluginConfig} for getting plugin configuration data
+	 * 
+	 * @param plugin {@link PseudoPlugin} to get config for
+	 */
 	public PluginConfig(PseudoPlugin plugin) {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Updates plugin configuration files if newer versions are available in the jar
+	 * 
+	 * @return Whether or not update was successful
+	 */
 	public boolean updateConfig() {
 		InputStream configin = plugin.getClass().getResourceAsStream("/config.yml");
 		BufferedReader configreader = new BufferedReader(new InputStreamReader(configin));
@@ -64,8 +74,19 @@ public abstract class PluginConfig {
 		return true;
 	}
 
+	/**
+	 * Reloads configuration files from the disk
+	 */
 	public abstract void reloadConfig();
 
+	/**
+	 * Returns String from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return String from given key
+	 */
 	public static String getString(FileConfiguration fc, String key, String def) {
 		if (fc.contains(key))
 			return fc.getString(key);
@@ -75,6 +96,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns boolean from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return Boolean from given key
+	 */
 	public static boolean getBoolean(FileConfiguration fc, String key, boolean def) {
 		if (fc.contains(key))
 			return fc.getBoolean(key);
@@ -84,6 +113,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns int from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return Int from given key
+	 */
 	public static int getInt(FileConfiguration fc, String key, int def) {
 		if (fc.contains(key))
 			return fc.getInt(key);
@@ -93,6 +130,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns double from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return Double from given key
+	 */
 	public static double getDouble(FileConfiguration fc, String key, double def) {
 		if (fc.contains(key))
 			return fc.getDouble(key);
@@ -102,6 +147,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns long from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return Long from given key
+	 */
 	public static long getLong(FileConfiguration fc, String key, long def) {
 		if (fc.contains(key))
 			return fc.getLong(key);
@@ -111,6 +164,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns {@link Color} from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return {@link Color} from given key
+	 */
 	public static Color getColor(FileConfiguration fc, String key, Color def) {
 		if (fc.contains(key))
 			return fc.getColor(key);
@@ -120,6 +181,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns float from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return Float from given key
+	 */
 	public static float getFloat(FileConfiguration fc, String key, float def) {
 		if (fc.contains(key))
 			return (float) fc.get(key);
@@ -129,6 +198,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns String of color codes from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return String of color codes from given key
+	 */
 	public static String getColorCodes(FileConfiguration fc, String key, String def) {
 		if (fc.contains(key)) {
 			String val = fc.getString(key);
@@ -155,6 +232,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns {@link Material} from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return {@link Material} from given key
+	 */
 	public static Material getMaterial(FileConfiguration fc, String key, Material def) {
 		if (fc.contains(key)) {
 			Material mat = Material.getMaterial(fc.getString(key).toUpperCase());
@@ -170,6 +255,14 @@ public abstract class PluginConfig {
 		}
 	}
 
+	/**
+	 * Returns Object from given key in given {@link FileConfiguration}
+	 * 
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return Object from given key
+	 */
 	public static Object getObject(FileConfiguration fc, String key, Object def) {
 		if (fc.contains(key))
 			return fc.get(key);

@@ -21,6 +21,20 @@ public class MySQLBackend implements SQLBackend {
 	private final boolean requireSSL;
 	private final String url;
 
+	/**
+	 * Constructs new {@link MySQLBackend} with the given parameters
+	 * 
+	 * @param name Backend name
+	 * @param host MySQL server host
+	 * @param port MySQL server port
+	 * @param username MySQL username
+	 * @param password MySQL password
+	 * @param database MySQL database name
+	 * @param prefix MySQL table prefix
+	 * @param useSSL Whether or not to use SSL when connecting to MySQL server
+	 * @param verifyServerCertificate Whether or not to verify server certificates when connecting to MySQL server
+	 * @param requireSSL Whether or not SSL is required when connecting to MySQL server
+	 */
 	public MySQLBackend(String name, String host, int port, String username, String password, String database, String prefix, boolean useSSL, boolean verifyServerCertificate, boolean requireSSL) {
 		this.name = name;
 		this.host = host;
@@ -90,42 +104,92 @@ public class MySQLBackend implements SQLBackend {
 		return this.name;
 	}
 
+	/**
+	 * Returns MySQL server host
+	 * 
+	 * @return MySQL server host
+	 */
 	public String getHost() {
 		return this.host;
 	}
 
+	/**
+	 * Returns MySQL server port
+	 * 
+	 * @return MySQL server port
+	 */
 	public int getPort() {
 		return this.port;
 	}
 
+	/**
+	 * Returns MySQL username
+	 * 
+	 * @return MySQL username
+	 */
 	public String getUsername() {
 		return this.username;
 	}
 
+	/**
+	 * Returns MySQL password
+	 * 
+	 * @return MySQL password
+	 */
 	public String getPassword() {
 		return this.password;
 	}
 
+	/**
+	 * Returns MySQL database name
+	 * 
+	 * @return MySQL database name
+	 */
 	public String getDatabase() {
 		return this.database;
 	}
 
+	/**
+	 * Returns MySQL table prefix
+	 * 
+	 * @return MySQL table prefix
+	 */
 	public String getPrefix() {
 		return this.prefix;
 	}
 
+	/**
+	 * Returns whether or not to use SSL when connecting to MySQL server
+	 * 
+	 * @return Whether or not to use SSL when connecting to MySQL server
+	 */
 	public boolean getUseSSL() {
 		return this.useSSL;
 	}
 
+	/**
+	 * Returns whether or not to verify server certificates when connecting to MySQL server
+	 * 
+	 * @return Whether or not to verify server certificates when connecting to MySQL server
+	 */
 	public boolean getVerifyServerCertificate() {
 		return this.verifyServerCertificate;
 	}
 
+	/**
+	 * Returns whether or not SSL is required when connecting to MySQL server
+	 * 
+	 * @return Whether or not SSL is required when connecting to MySQL server
+	 */
 	public boolean getRequireSSL() {
 		return this.requireSSL;
 	}
 
+	/**
+	 * Returns MySQL connection URL
+	 * 
+	 * @return MySQL connection URL
+	 */
 	public String getURL() {
 		return this.url;
 	}

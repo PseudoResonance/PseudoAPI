@@ -22,10 +22,21 @@ public class Chat {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Sends a plain text message to the console
+	 * 
+	 * @param message Message to send
+	 */
 	public static void sendConsoleMessage(String message) {
 		sendMessage(console, message);
 	}
 
+	/**
+	 * Sends a plain text message to a {@link CommandSender}
+	 * 
+	 * @param sender Recipient of message
+	 * @param message Message to send
+	 */
 	public static void sendMessage(CommandSender sender, String message) {
 		if (sender instanceof Player) {
 			sender.sendMessage(message);
@@ -33,10 +44,21 @@ public class Chat {
 			console.sendMessage(message);
 		}
 	}
+	/**
+	 * Sends a list of plain text messages to the console
+	 * 
+	 * @param messages Messages to send
+	 */
 	public static void sendMessage(List<? extends Object> messages) {
 		sendMessage(console, messages);
 	}
 
+	/**
+	 * Sends a list of plain text messages to a {@link CommandSender}
+	 * 
+	 * @param sender Recipient of messages
+	 * @param messages Messages to send
+	 */
 	public static void sendMessage(CommandSender sender, List<? extends Object> messages) {
 		if (sender instanceof Player) {
 			for (int i = 0; i < messages.size(); i++) {
@@ -75,47 +97,22 @@ public class Chat {
 			}
 		}
 	}
-
-	public void broadcastPluginMessageWithPerission(String message, String permission) {
-		String format = Config.messageFormat;
-		format = format.replace("{message}", Config.textColor + message);
-		format = format.replace("{name}", plugin.getPluginName());
-		format = format.replace("{nickname}", plugin.getOutputName());
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			if (p.hasPermission(permission)) {
-				String send = ChatColor.translateAlternateColorCodes('&', format);
-				send = send.replace("{player}", p.getName());
-				send = send.replace("{playernick}", p.getDisplayName());
-				p.sendMessage(send);
-			}
-		}
-		format = ChatColor.translateAlternateColorCodes('&', format);
-		format = format.replace("{player}", "Console");
-		format = format.replace("{playernick}", "Console");
-		console.sendMessage(format);
-	}
-
-	public void broadcastPluginMessage(String message) {
-		String format = Config.messageFormat;
-		format = format.replace("{message}", Config.textColor + message);
-		format = format.replace("{name}", plugin.getPluginName());
-		format = format.replace("{nickname}", plugin.getOutputName());
-		for (Player p : Bukkit.getOnlinePlayers()) {
-			String send = ChatColor.translateAlternateColorCodes('&', format);
-			send = send.replace("{player}", p.getName());
-			send = send.replace("{playernick}", p.getDisplayName());
-			p.sendMessage(send);
-		}
-		format = ChatColor.translateAlternateColorCodes('&', format);
-		format = format.replace("{player}", "Console");
-		format = format.replace("{playernick}", "Console");
-		console.sendMessage(format);
-	}
 	
+	/**
+	 * Sends a prefixed plugin message to the console
+	 * 
+	 * @param message Message to send
+	 */
 	public void sendConsolePluginMessage(String message) {
 		sendPluginMessage(console, message);
 	}
 
+	/**
+	 * Sends a prefixed plugin message to a {@link CommandSender}
+	 * 
+	 * @param sender Recipient of message
+	 * @param message Message to send
+	 */
 	public void sendPluginMessage(CommandSender sender, String message) {
 		String format = Config.messageFormat;
 		format = format.replace("{message}", Config.textColor + message);
@@ -133,11 +130,25 @@ public class Chat {
 			console.sendMessage(format);
 		}
 	}
-	
+
+
+	/**
+	 * Sends a prefixed plugin error message to the console
+	 * 
+	 * @param error Error type to send
+	 * @param message Additional information about error
+	 */
 	public void sendConsolePluginError(Errors error, String message) {
 		sendPluginError(console, error, message);
 	}
 
+	/**
+	 * Sends a prefixed plugin error message to a {@link CommandSender}
+	 * 
+	 * @param sender Recipient of message
+	 * @param error Error type to send
+	 * @param message Additional information about error
+	 */
 	public void sendPluginError(CommandSender sender, Errors error, String message) {
 		String format = Config.errorMessageFormat;
 		switch (error) {
@@ -186,11 +197,22 @@ public class Chat {
 			console.sendMessage(format);
 		}
 	}
-	
+
+	/**
+	 * Sends a generic prefixed plugin error message to the console
+	 * 
+	 * @param error Error type to send
+	 */
 	public void sendConsolePluginError(Errors error) {
 		sendPluginError(console, error);
 	}
 
+	/**
+	 * Sends a generic prefixed plugin error message to a {@link CommandSender}
+	 * 
+	 * @param sender Recipient of message
+	 * @param error Error type to send
+	 */
 	public void sendPluginError(CommandSender sender, Errors error) {
 		String format = Config.errorMessageFormat;
 		switch (error) {
@@ -220,6 +242,14 @@ public class Chat {
 		}
 	}
 
+	/**
+	 * Sends a JSON message to a {@link Player}
+	 * 
+	 * @param p Recipient of message
+	 * @param elements Elements of JSON message
+	 * 
+	 * @throws NullPointerException If supplied player is offline
+	 */
 	public static void sendJSONMessage(Player p, ChatElement... elements) throws NullPointerException {
 		if (p != null) {
 			String end = "[\"\"";
@@ -237,6 +267,11 @@ public class Chat {
 		}
 	}
 
+	/**
+	 * Sends a JSON message to all online players
+	 * 
+	 * @param elements Elements of JSON message
+	 */
 	public static void broadcastJSONMessage(ChatElement... elements) {
 		String end = "[\"\"";
 		if (elements.length == 0) {
@@ -252,6 +287,14 @@ public class Chat {
 		}
 	}
 
+	/**
+	 * Sends a JSON message to a {@link Player}
+	 * 
+	 * @param p Recipient of message
+	 * @param elements Elements of JSON message
+	 * 
+	 * @throws NullPointerException If supplied player is offline
+	 */
 	public static void sendJSONMessage(Player p, List<ChatElement> elements) throws NullPointerException {
 		if (p != null) {
 			String end = "[\"\"";
@@ -269,6 +312,11 @@ public class Chat {
 		}
 	}
 
+	/**
+	 * Sends a JSON message to all online players
+	 * 
+	 * @param elements Elements of JSON message
+	 */
 	public static void broadcastJSONMessage(List<ChatElement> elements) {
 		String end = "[\"\"";
 		if (elements.size() == 0) {

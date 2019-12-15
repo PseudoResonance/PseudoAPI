@@ -15,6 +15,11 @@ public class PluginController {
 		plugins.remove(plugin);
 	}
 	
+	/**
+	 * Returns list of all loaded {@link PseudoPlugin}s
+	 * 
+	 * @return List of loaded {@link PseudoPlugin}s
+	 */
 	public static PseudoPlugin[] getPlugins() {
 		return plugins.toArray(new PseudoPlugin[plugins.size()]);
 	}

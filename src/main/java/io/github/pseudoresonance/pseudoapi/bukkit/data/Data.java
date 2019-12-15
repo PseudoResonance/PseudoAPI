@@ -13,14 +13,27 @@ public class Data {
 	private static Backend globalBackend = null;
 	private static Backend serverBackend = null;
 	
+	/**
+	 * Returns global network backend
+	 * 
+	 * @return Global network backend
+	 */
 	public static Backend getGlobalBackend() {
 		return globalBackend;
 	}
-	
+
+	/**
+	 * Returns local server backend
+	 * 
+	 * @return Local server backend
+	 */
 	public static Backend getServerBackend() {
 		return serverBackend;
 	}
 	
+	/**
+	 * Shuts down both loaded backends
+	 */
 	public static void stopBackends() {
 		if (globalBackend != null)
 			globalBackend.stop();
@@ -28,6 +41,9 @@ public class Data {
 			serverBackend.stop();
 	}
 	
+	/**
+	 * Initializes and loads backends
+	 */
 	public static void loadBackends() {
 		for (String b : Config.getBackends().keySet()) {
 			if (b.equals(Config.globalBackend)) {

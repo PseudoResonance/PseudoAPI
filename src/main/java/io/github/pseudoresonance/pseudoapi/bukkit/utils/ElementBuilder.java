@@ -1,5 +1,6 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.utils;
 
+@Deprecated
 public class ElementBuilder {
 
 	private ChatElement[] elements;

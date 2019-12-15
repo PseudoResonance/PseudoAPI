@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent.ComponentType;
 
+@Deprecated
 public class ChatElement {
 
 	private ChatComponent[] components;

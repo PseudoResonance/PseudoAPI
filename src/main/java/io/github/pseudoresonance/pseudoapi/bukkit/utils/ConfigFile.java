@@ -19,6 +19,12 @@ public class ConfigFile {
 	private FileConfiguration config;
 	private File configFile;
 
+	/**
+	 * Constructs new {@link ConfigFile} with given parameters
+	 * 
+	 * @param filename Filename of config file
+	 * @param instance {@link PseudoPlugin} config file is for
+	 */
 	public ConfigFile(String filename, PseudoPlugin instance) {
 		if (!filename.endsWith(".yml")) {
 			filename += ".yml";
@@ -31,6 +37,13 @@ public class ConfigFile {
 		reload();
 	}
 
+	/**
+	 * Constructs new {@link ConfigFile} with given parameters
+	 * 
+	 * @param folder Folder that config file is stored in
+	 * @param filename Filename of config file
+	 * @param instance {@link PseudoPlugin} config file is for
+	 */
 	public ConfigFile(File folder, String filename, PseudoPlugin instance) {
 		if (!filename.endsWith(".yml")) {
 			filename += ".yml";
@@ -43,6 +56,11 @@ public class ConfigFile {
 		reload();
 	}
 
+	/**
+	 * Returns {@link FileConfiguration} from config file
+	 * 
+	 * @return {@link FileConfiguration} from config file
+	 */
 	public FileConfiguration getConfig() {
 		if (config == null) {
 			reload();
@@ -50,6 +68,9 @@ public class ConfigFile {
 		return config;
 	}
 
+	/**
+	 * Reloads config file from disk
+	 */
 	public void reload() {
 		if (!this.FOLDER.exists()) {
 			try {
@@ -73,6 +94,9 @@ public class ConfigFile {
 		config = YamlConfiguration.loadConfiguration(configFile);
 	}
 
+	/**
+	 * Saves default config file from the jar
+	 */
 	public void saveDefaultConfig() {
 		if (configFile == null) {
 			configFile = new File(this.FOLDER, this.FILENAME);
@@ -82,6 +106,9 @@ public class ConfigFile {
 		}
 	}
 
+	/**
+	 * Saves config file to disk
+	 */
 	public void save() {
 		if (config == null || configFile == null) {
 			return;
@@ -93,10 +120,22 @@ public class ConfigFile {
 		}
 	}
 
+	/**
+	 * Sets data at the given path
+	 * 
+	 * @param path Path to set data to
+	 * @param o Data to set
+	 */
 	public void set(String path, Object o) {
 		getConfig().set(path, o);
 	}
 
+	/**
+	 * Sets a {@link Location} object at the given path
+	 * 
+	 * @param path Path to set data to
+	 * @param l {@link Location} to set
+	 */
 	public void setLocation(String path, Location l) {
 		getConfig().set(path + ".w", l.getWorld().getName());
 		getConfig().set(path + ".x", l.getX());
@@ -107,6 +146,12 @@ public class ConfigFile {
 		save();
 	}
 
+	/**
+	 * Gets a {@link Location} from the given path
+	 * 
+	 * @param path Path to get data from
+	 * @return {@link Location} from the given path
+	 */
 	public Location getLocation(String path) {
 		Location l = new Location(Bukkit.getWorld(getConfig().getString(path + ".w")), getConfig().getDouble(path + ".x"), getConfig().getDouble(path + ".y"), getConfig().getDouble(path + ".z"), Float.parseFloat("" + getConfig().getDouble(path + ".yaw")), Float.parseFloat("" + getConfig().getDouble(path + ".pitch")));
 		return l;

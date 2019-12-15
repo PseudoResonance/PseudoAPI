@@ -8,6 +8,11 @@ public class Utils {
 
 	private static String bukkitVersion;
 	
+	/**
+	 * Returns the current Bukkit version for use in reflection or ASM methods
+	 * 
+	 * @return Current Bukkit version
+	 */
 	public static String getBukkitVersion() {
 		if (bukkitVersion == null)
 			bukkitVersion = Bukkit.getServer().getClass().getPackage().getName().replace(".", ",").split(",")[3];

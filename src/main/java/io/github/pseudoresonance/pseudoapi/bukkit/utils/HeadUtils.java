@@ -32,6 +32,12 @@ public class HeadUtils {
 	
 	private static UUID genericUuid = UUID.fromString("00000000-0000-0000-0000-000000000000");
 	
+	/**
+	 * Returns an {@link ItemStack} with a head from a given player name
+	 * 
+	 * @param name Player name of head
+	 * @return {@link ItemStack} with a head from the given player name
+	 */
 	public static ItemStack getHeadWithName(String name) {
 		init();
 		ItemStack head = new ItemStack(Material.PLAYER_HEAD);
@@ -48,6 +54,13 @@ public class HeadUtils {
 		return null;
 	}
 	
+	/**
+	 * Returns an {@link ItemStack} with a head from a given player UUID and name
+	 * 
+	 * @param uuid UUID of head
+	 * @param name Player name of head
+	 * @return {@link ItemStack} with a head from the given player UUID and name
+	 */
 	public static ItemStack getHeadWithUUID(UUID uuid, String name) {
 		init();
 		ItemStack head = new ItemStack(Material.PLAYER_HEAD);
@@ -67,6 +80,13 @@ public class HeadUtils {
 		return null;
 	}
 	
+	/**
+	 * Returns an {@link ItemStack} with a head from a given Base64 skin URL and name
+	 * 
+	 * @param base64 Base64 URL of skin
+	 * @param name Player name of head
+	 * @return {@link ItemStack} with a head from the given Base64 skin URL and name
+	 */
 	public static ItemStack getHeadWithBase64(String base64, String name) {
 		init();
 		ItemStack head = new ItemStack(Material.PLAYER_HEAD);
