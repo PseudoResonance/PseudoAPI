@@ -94,27 +94,29 @@ public class LanguageManager {
 				e.printStackTrace();
 			}
 		}
-		for (File f : langDir.listFiles()) {
-			String lang = f.getName().substring(0, f.getName().length() - 5);
-			YamlConfiguration yaml = YamlConfiguration.loadConfiguration(f);
-			Language language = getLanguage(lang);
-			if (language == null) {
-				language = new Language(lang);
-				registerLanguage(lang, language);
-			}
-			HashMap<String, String> langMap = new HashMap<String, String>();
-			for (String namespace : yaml.getKeys(false)) {
-				if (namespace.equals("date")) {
-					if (!plugin.getName().equals(PseudoAPI.plugin.getName())) {
-						continue;
+		if (langDir.exists()) {
+			for (File f : langDir.listFiles()) {
+				String lang = f.getName().substring(0, f.getName().length() - 5);
+				YamlConfiguration yaml = YamlConfiguration.loadConfiguration(f);
+				Language language = getLanguage(lang);
+				if (language == null) {
+					language = new Language(lang);
+					registerLanguage(lang, language);
+				}
+				HashMap<String, String> langMap = new HashMap<String, String>();
+				for (String namespace : yaml.getKeys(false)) {
+					if (namespace.equals("date")) {
+						if (!plugin.getName().equals(PseudoAPI.plugin.getName())) {
+							continue;
+						}
+					}
+					ConfigurationSection cs = yaml.getConfigurationSection(namespace);
+					for (String key : cs.getKeys(false)) {
+						langMap.put(namespace + "." + key, cs.getString(key));
 					}
 				}
-				ConfigurationSection cs = yaml.getConfigurationSection(namespace);
-				for (String key : cs.getKeys(false)) {
-					langMap.put(namespace + "." + key, cs.getString(key));
-				}
+				language.addLanguageMap(langMap);
 			}
-			language.addLanguageMap(langMap);
 		}
 	}
 

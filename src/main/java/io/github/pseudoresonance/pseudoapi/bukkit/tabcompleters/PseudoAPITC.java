@@ -21,14 +21,14 @@ public class PseudoAPITC implements TabCompleter {
 			if (sender.hasPermission("pseudoapi.reload")) {
 				possible.add("reload");
 			}
+			if (sender.hasPermission("pseudoapi.reloadlocalization")) {
+				possible.add("reloadlocalization");
+			}
 			if (sender.hasPermission("pseudoapi.reset")) {
 				possible.add("reset");
 			}
-			if (sender.hasPermission("pseudoapi.metrics")) {
-				possible.add("metrics");
-			}
-			if (sender.hasPermission("pseudoapi.brand")) {
-				possible.add("brand");
+			if (sender.hasPermission("pseudoapi.resetlocalization")) {
+				possible.add("resetlocalization");
 			}
 			if (sender.hasPermission("pseudoapi.backend")) {
 				possible.add("backend");

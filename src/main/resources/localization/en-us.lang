@@ -19,6 +19,7 @@ date:
   relativeDays: "{$1$} Days"
   relativeMonths: "{$1$} Months"
   relativeYears: "{$1$} Years"
+  relativeAgo: "{$1$} Ago"
   # Whether the first unit is the smallest
   relativeFormatAscending: false
   # Java locale for language

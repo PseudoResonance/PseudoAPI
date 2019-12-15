@@ -139,37 +139,38 @@ public class Language {
 		String sSeconds = "";
 		String sMilliseconds = "";
 		String sNanoseconds = "";
-		if (relativeYears.length() > 0 && isUnitInRange(minUnit, ChronoUnit.YEARS, maxUnit))
-			sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years));
+		if (relativeYears.length() > 0 && isUnitInRange(minUnit, ChronoUnit.YEARS, maxUnit) && (years > 0 || minUnit == ChronoUnit.YEARS))
+			sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years)) + " ";
 		else
 			months += years * 12;
-		if (relativeMonths.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MONTHS, maxUnit))
-			sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months));
+		if (relativeMonths.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MONTHS, maxUnit) && (months > 0 || minUnit == ChronoUnit.MONTHS))
+			sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months)) + " ";
 		else
 			days += (long) (months * 30.436875);
-		if (relativeDays.length() > 0 && isUnitInRange(minUnit, ChronoUnit.DAYS, maxUnit))
-			sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days));
+		if (relativeDays.length() > 0 && isUnitInRange(minUnit, ChronoUnit.DAYS, maxUnit) && (days > 0 || minUnit == ChronoUnit.DAYS))
+			sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days)) + " ";
 		else
 			hours += days * 24;
-		if (relativeHours.length() > 0 && isUnitInRange(minUnit, ChronoUnit.HOURS, maxUnit))
-			sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours));
+		if (relativeHours.length() > 0 && isUnitInRange(minUnit, ChronoUnit.HOURS, maxUnit) && (hours > 0 || minUnit == ChronoUnit.HOURS))
+			sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours)) + " ";
 		else
 			minutes += hours * 60;
-		if (relativeMinutes.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MINUTES, maxUnit))
-			sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes));
+		if (relativeMinutes.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MINUTES, maxUnit) && (minutes > 0 || minUnit == ChronoUnit.MINUTES))
+			sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes)) + " ";
 		else
 			seconds += minutes * 60;
-		if (relativeSeconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.SECONDS, maxUnit))
-			sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds));
+		if (relativeSeconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.SECONDS, maxUnit) && (seconds > 0 || minUnit == ChronoUnit.SECONDS))
+			sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds)) + " ";
 		else
 			milliseconds += seconds * 1000;
-		if (relativeMilliseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MILLIS, maxUnit))
-			sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds));
+		if (relativeMilliseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MILLIS, maxUnit) && (milliseconds > 0 || minUnit == ChronoUnit.MILLIS))
+			sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds)) + " ";
 		else
 			nanoseconds += milliseconds * 1000000;
-		if (relativeNanoseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.NANOS, maxUnit))
-			sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds));
-		return sNanoseconds + " " + sMilliseconds + " " + sSeconds + " " + sMinutes + " " + sHours + " " + sDays + " " + sMonths + " " + sYears;
+		if (relativeNanoseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.NANOS, maxUnit) && (nanoseconds > 0 || minUnit == ChronoUnit.NANOS))
+			sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds)) + " ";
+		String ret = sNanoseconds + sMilliseconds + sSeconds + sMinutes + sHours + sDays + sMonths + sYears;
+		return getMessage("date.relativeAgo", ret.substring(0, ret.length() - 1));
 	}
 	
 	private String timeAgoAscending(LocalDateTime dateTime) {
@@ -202,37 +203,38 @@ public class Language {
 		String sSeconds = "";
 		String sMilliseconds = "";
 		String sNanoseconds = "";
-		if (relativeYears.length() > 0 && isUnitInRange(minUnit, ChronoUnit.YEARS, maxUnit))
-			sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years));
+		if (relativeYears.length() > 0 && isUnitInRange(minUnit, ChronoUnit.YEARS, maxUnit) && (years > 0 || minUnit == ChronoUnit.YEARS))
+			sYears = relativeFormatPattern.matcher(relativeYears).replaceFirst(String.valueOf(years)) + " ";
 		else
 			months += years * 12;
-		if (relativeMonths.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MONTHS, maxUnit))
-			sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months));
+		if (relativeMonths.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MONTHS, maxUnit) && (months > 0 || minUnit == ChronoUnit.MONTHS))
+			sMonths = relativeFormatPattern.matcher(relativeMonths).replaceFirst(String.valueOf(months)) + " ";
 		else
 			days += (long) (months * 30.436875);
-		if (relativeDays.length() > 0 && isUnitInRange(minUnit, ChronoUnit.DAYS, maxUnit))
-			sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days));
+		if (relativeDays.length() > 0 && isUnitInRange(minUnit, ChronoUnit.DAYS, maxUnit) && (days > 0 || minUnit == ChronoUnit.DAYS))
+			sDays = relativeFormatPattern.matcher(relativeDays).replaceFirst(String.valueOf(days)) + " ";
 		else
 			hours += days * 24;
-		if (relativeHours.length() > 0 && isUnitInRange(minUnit, ChronoUnit.HOURS, maxUnit))
-			sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours));
+		if (relativeHours.length() > 0 && isUnitInRange(minUnit, ChronoUnit.HOURS, maxUnit) && (hours > 0 || minUnit == ChronoUnit.HOURS))
+			sHours = relativeFormatPattern.matcher(relativeHours).replaceFirst(String.valueOf(hours)) + " ";
 		else
 			minutes += hours * 60;
-		if (relativeMinutes.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MINUTES, maxUnit))
-			sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes));
+		if (relativeMinutes.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MINUTES, maxUnit) && (minutes > 0 || minUnit == ChronoUnit.MINUTES))
+			sMinutes = relativeFormatPattern.matcher(relativeMinutes).replaceFirst(String.valueOf(minutes)) + " ";
 		else
 			seconds += minutes * 60;
-		if (relativeSeconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.SECONDS, maxUnit))
-			sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds));
+		if (relativeSeconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.SECONDS, maxUnit) && (seconds > 0 || minUnit == ChronoUnit.SECONDS))
+			sSeconds = relativeFormatPattern.matcher(relativeSeconds).replaceFirst(String.valueOf(seconds)) + " ";
 		else
 			milliseconds += seconds * 1000;
-		if (relativeMilliseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MILLIS, maxUnit))
-			sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds));
+		if (relativeMilliseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.MILLIS, maxUnit) && (milliseconds > 0 || minUnit == ChronoUnit.MILLIS))
+			sMilliseconds = relativeFormatPattern.matcher(relativeMilliseconds).replaceFirst(String.valueOf(milliseconds)) + " ";
 		else
 			nanoseconds += milliseconds * 1000000;
-		if (relativeNanoseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.NANOS, maxUnit))
-			sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds));
-		return sYears + " " + sMonths + " " + sDays + " " + sHours + " " + sMinutes + " " + sSeconds + " " + sMilliseconds + " " + sNanoseconds;
+		if (relativeNanoseconds.length() > 0 && isUnitInRange(minUnit, ChronoUnit.NANOS, maxUnit) && (nanoseconds > 0 || minUnit == ChronoUnit.NANOS))
+			sNanoseconds = relativeFormatPattern.matcher(relativeNanoseconds).replaceFirst(String.valueOf(nanoseconds)) + " ";
+		String ret = sYears + sMonths + sDays + sHours + sMinutes + sSeconds + sMilliseconds + sNanoseconds;
+		return getMessage("date.relativeAgo", ret.substring(0, ret.length() - 1));
 	}
 	
 	private String timeAgoDescending(LocalDateTime dateTime) {
