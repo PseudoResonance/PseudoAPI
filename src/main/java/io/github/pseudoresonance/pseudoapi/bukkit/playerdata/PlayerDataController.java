@@ -367,12 +367,14 @@ public class PlayerDataController {
 				long joinLeave = joinLeaveTS.getTime();
 				long diff = System.currentTimeMillis() - joinLeave;
 				Object ob = getPlayerSetting(uuid, "playtime").join();
-				if (ob instanceof BigInteger || ob instanceof Long) {
+				if (ob instanceof BigInteger || ob instanceof Long || ob instanceof Integer) {
 					long playTime = 0;
 					if (ob instanceof BigInteger)
 						playTime = ((BigInteger) ob).longValueExact();
-					else
+					else if (ob instanceof Long)
 						playTime = (Long) ob;
+					else
+						playTime = (Integer) ob;
 					playTime = diff >= 0 ? playTime + diff : playTime - diff;
 					settings.put("playtime", playTime);
 				} else if (ob == null) {
