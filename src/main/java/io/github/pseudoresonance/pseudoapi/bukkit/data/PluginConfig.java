@@ -10,7 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.Message;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;
 import net.md_5.bungee.api.ChatColor;
 
@@ -31,7 +31,7 @@ public abstract class PluginConfig {
 			configreader.close();
 			configin.close();
 		} catch (IOException e1) {
-			Message.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
 			e1.printStackTrace();
 			return false;
 		}
@@ -53,14 +53,14 @@ public abstract class PluginConfig {
 				}
 				plugin.saveDefaultConfig();
 				plugin.reloadConfig();
-				Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date! Old config file renamed to " + oldFile + ".");
+				Chat.sendConsoleMessage(ChatColor.GREEN + "Config is up to date! Old config file renamed to " + oldFile + ".");
 				return true;
 			} catch (Exception e) {
-				Message.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
+				Chat.sendConsoleMessage(ChatColor.RED + "Error while updating config!");
 				return false;
 			}
 		}
-		Message.sendConsoleMessage(ChatColor.GREEN + "Config is up to date!");
+		Chat.sendConsoleMessage(ChatColor.GREEN + "Config is up to date!");
 		return true;
 	}
 
@@ -70,7 +70,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return fc.getString(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -79,7 +79,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return fc.getBoolean(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -88,7 +88,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return fc.getInt(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -97,7 +97,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return fc.getDouble(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -106,7 +106,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return fc.getLong(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -115,7 +115,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return fc.getColor(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -124,7 +124,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return (float) fc.get(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -144,13 +144,13 @@ public abstract class PluginConfig {
 						sb.append(Enum.valueOf(ChatColor.class, s.toUpperCase()));
 					}
 				} catch (Exception e) {
-					Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+					Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 					return def;
 				}
 			}
 			return sb.toString();
 		} else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -161,11 +161,11 @@ public abstract class PluginConfig {
 			if (mat != null)
 				return mat;
 			else {
-				Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+				Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 				return def;
 			}
 		} else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}
@@ -174,7 +174,7 @@ public abstract class PluginConfig {
 		if (fc.contains(key))
 			return fc.get(key);
 		else {
-			Message.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;
 		}
 	}

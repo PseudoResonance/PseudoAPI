@@ -24,6 +24,8 @@ public class Config {
 	
 	private static HashMap<String, String> serverList = new HashMap<String, String>();
 	
+	public static String defaultLocale = "en-us";
+	
 	protected static String backend = "file";
 	private static HashMap<String, Backend> backends = new HashMap<String, Backend>();
 	
@@ -49,6 +51,9 @@ public class Config {
 				String name = getString(conf, "ServerList." + key, key);
 				serverList.put(key, name);
 			}
+			
+			defaultLocale = getString(conf, "DefaultLocale", defaultLocale);
+			BungeeLanguageManager.setDefaultLanguage(defaultLocale);
 			
 			backend = getString(conf, "Backend", backend);
 

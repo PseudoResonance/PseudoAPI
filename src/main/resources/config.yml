@@ -15,6 +15,9 @@ HidePlugins: true
 # Allow players to see PseudoAPI plugins?
 ShowPseudoAPI: true
 
+# Default server locale
+DefaultLocale: en-us
+
 
 ################
 # Data Storage #

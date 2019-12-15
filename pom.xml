@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.github.PseudoResonance</groupId>
 	<artifactId>PseudoAPI</artifactId>
-	<version>${version}-SNAPSHOT</version>
+	<version>${revision}-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version>4.0</version>
+		<revision>5.0</revision>
 	</properties>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -87,7 +87,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.14.3-SNAPSHOT</version>
+			<version>1.15-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -114,7 +114,7 @@
 		<dependency>
 			<groupId>net.md-5</groupId>
 			<artifactId>bungeecord-api</artifactId>
-			<version>1.14-SNAPSHOT</version>
+			<version>1.15-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

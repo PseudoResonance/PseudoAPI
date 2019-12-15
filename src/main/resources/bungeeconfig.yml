@@ -14,6 +14,15 @@ ServerList:
   main: "Main"
   skyblock: "Skyblock"
 
+
+##########
+# Plugin #
+##########
+
+# Default server locale
+DefaultLocale: en-us
+
+
 ################
 # Data Storage #
 ################

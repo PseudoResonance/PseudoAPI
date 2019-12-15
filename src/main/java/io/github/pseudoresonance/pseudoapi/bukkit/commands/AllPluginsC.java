@@ -8,8 +8,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.Message;
-import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 
 public class AllPluginsC implements CommandExecutor {
@@ -46,9 +47,9 @@ public class AllPluginsC implements CommandExecutor {
 					}
 				}
 			}
-			Message.sendMessage(sender, "Plugins (" + plugins.length + "): " + pluginlist);
+			Chat.sendMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.plugins") + " (" + plugins.length + "): " + pluginlist);
 		} else {
-			PseudoAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
+			PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.NO_PERMISSION, LanguageManager.getLanguage(sender).getMessage("pseudoapi.permission_view_plugins"));
 			return false;
 		}
 		return false;

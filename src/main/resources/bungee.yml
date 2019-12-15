@@ -1,5 +1,5 @@
 name: ${project.artifactId}
 author: PseudoResonance
 main: io.github.pseudoresonance.pseudoapi.bungee.PseudoAPI
-version: ${version}
+version: ${revision}
 description: An API for Easy Access to Resources

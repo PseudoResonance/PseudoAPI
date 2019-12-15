@@ -8,7 +8,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatElement;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.ElementBuilder;
@@ -26,8 +27,8 @@ public class MainCommand implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (args.length == 0) {
 			List<Object> messages = new ArrayList<Object>();
-			messages.add(Config.borderColor + "===---" + Config.titleColor + plugin.getPluginName() + " Info" + Config.borderColor + "---===");
-			messages.add(Config.descriptionColor + plugin.getPluginName() + " Version " + plugin.getVersion() + ".");
+			messages.add(Config.borderColor + "===---" + Config.titleColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.plugin_info_header", plugin.getPluginName()) + Config.borderColor + "---===");
+			messages.add(Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.plugin_info", plugin.getPluginName(), plugin.getVersion()));
 			String developers = "";
 			for (int i = 0; i <= plugin.getAuthors().size() - 1; i++) {
 				if (i >= 1) {
@@ -35,9 +36,13 @@ public class MainCommand implements CommandExecutor {
 				}
 				developers = developers + plugin.getAuthors().get(i);
 			}
-			messages.add(Config.descriptionColor + "Was developed by " + developers + ".");
-			messages.add(new ElementBuilder(new ChatElement(Config.descriptionColor + "Use "), new ChatElement(Config.commandColor + "/" + cmd.getName() + " help", new ChatComponent(Config.clickEvent, "/" + plugin.getOutputName() + ":" + cmd.getName() + " help"), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + "Click to run the command!")), new ChatElement(Config.descriptionColor + " for commands.")).build());
-			Message.sendMessage(sender, messages);
+			messages.add(Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.plugin_developers", developers));
+			String[] split = LanguageManager.getLanguage(sender).getUnprocessedMessage("pseudoapi.plugin_help_suggestion").split("\\{\\$1\\$\\}");
+			String end = "";
+			if (split.length > 1)
+				end = split[1];
+			messages.add(new ElementBuilder(new ChatElement(Config.descriptionColor + split[0]), new ChatElement(Config.commandColor + "/" + cmd.getName() + " help", new ChatComponent(Config.clickEvent, "/" + plugin.getOutputName() + ":" + cmd.getName() + " help"), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"))), new ChatElement(Config.descriptionColor + end)).build());
+			Chat.sendMessage(sender, messages);
 			return true;
 		} else {
 			Map<String, SubCommandExecutor> subCommands = plugin.subCommands;
@@ -53,7 +58,7 @@ public class MainCommand implements CommandExecutor {
 					return true;
 				}
 			}
-			new Message(plugin).sendPluginError(sender, Errors.CUSTOM, "Unknown subcommand. Type \"/" + cmd.getName() + " help\" for help.");
+			new Chat(plugin).sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.unknown_subcommand", cmd.getName()));
 		}
 		return false;
 	}

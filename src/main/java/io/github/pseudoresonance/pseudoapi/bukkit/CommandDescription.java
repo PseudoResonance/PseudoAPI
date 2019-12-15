@@ -3,19 +3,19 @@ package io.github.pseudoresonance.pseudoapi.bukkit;
 public class CommandDescription {
 
 	private String command = "";
-	private String description = "";
+	private String description_key = "";
 	private String permission = "";
 	private boolean runnable = true;
 
-	public CommandDescription(String command, String description, String permission) {
+	public CommandDescription(String command, String description_key, String permission) {
 		this.command = command;
-		this.description = description;
+		this.description_key = description_key;
 		this.permission = permission;
 	}
 
-	public CommandDescription(String command, String description, String permission, boolean runnable) {
+	public CommandDescription(String command, String description_key, String permission, boolean runnable) {
 		this.command = command;
-		this.description = description;
+		this.description_key = description_key;
 		this.permission = permission;
 		this.runnable = runnable;
 	}
@@ -24,8 +24,8 @@ public class CommandDescription {
 		return command;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getDescriptionKey() {
+		return description_key;
 	}
 
 	public String getPermission() {

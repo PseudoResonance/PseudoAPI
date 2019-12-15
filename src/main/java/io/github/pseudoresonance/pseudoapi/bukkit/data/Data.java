@@ -3,8 +3,9 @@ package io.github.pseudoresonance.pseudoapi.bukkit.data;
 import org.bukkit.Bukkit;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Config;
-import io.github.pseudoresonance.pseudoapi.bukkit.Message;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import net.md_5.bungee.api.ChatColor;
 
 public class Data {
@@ -39,11 +40,11 @@ public class Data {
 			}
 		}
 		if (globalBackend == null) {
-			Message.sendConsoleMessage(ChatColor.RED + "No global backend selected! Disabling PseudoAPI!");
+			Chat.sendConsoleMessage(ChatColor.RED + LanguageManager.getLanguage().getMessage("pseudoapi.no_global_backend"));
 			Bukkit.getServer().getPluginManager().disablePlugin(PseudoAPI.plugin);
 		}
 		if (serverBackend == null) {
-			Message.sendConsoleMessage(ChatColor.RED + "No server backend selected! Disabling PseudoAPI!");
+			Chat.sendConsoleMessage(ChatColor.RED + LanguageManager.getLanguage().getMessage("pseudoapi.no_server_backend"));
 			serverBackend = globalBackend;
 		}
 		PseudoAPI.reloadAll();

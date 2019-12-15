@@ -11,8 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Config;
-import io.github.pseudoresonance.pseudoapi.bukkit.Message;
-import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.PluginController;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 import net.md_5.bungee.api.ChatColor;
@@ -29,7 +30,7 @@ public class PluginsC implements CommandExecutor {
 				plugins = Bukkit.getServer().getPluginManager().getPlugins();
 			else if (sender.hasPermission("pseudoapi.plugins") && Config.hidePlugins && Config.showPseudoAPI) {
 				plugins = PluginController.getPlugins();
-				messages.add("&cPlease note that all of these plugins are privately developed, but are open source at PseudoResonance's GitHub.");
+				messages.add(ChatColor.RED + LanguageManager.getLanguage(sender).getMessage("pseudoapi.plugins_privately_developed"));
 			}
 			for(int i = 0; i < plugins.length; i++) {
 				if (Bukkit.getServer().getPluginManager().isPluginEnabled(plugins[i])) {
@@ -58,11 +59,11 @@ public class PluginsC implements CommandExecutor {
 					}
 				}
 			}
-			messages.add("Plugins (" + plugins.length + "): " + pluginlist);
-			Message.sendMessage(sender, messages);
+			messages.add(LanguageManager.getLanguage(sender).getMessage("pseudoapi.plugins") + " (" + plugins.length + "): " + pluginlist);
+			Chat.sendMessage(sender, messages);
 			return true;
 		} else {
-			PseudoAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "view plugins!");
+			PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.NO_PERMISSION, LanguageManager.getLanguage(sender).getMessage("pseudoapi.permission_view_plugins"));
 			return false;
 		}
 	}

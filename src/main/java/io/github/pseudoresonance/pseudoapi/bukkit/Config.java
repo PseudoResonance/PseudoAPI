@@ -14,6 +14,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.FileBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent.ComponentType;
 import net.md_5.bungee.api.ChatColor;
 
@@ -21,6 +22,7 @@ public class Config extends PluginConfig {
 
 	public static boolean hidePlugins = true;
 	public static boolean showPseudoAPI = true;
+	public static String defaultLocale = "en-us";
 
 	public static String globalBackend = "globalfile";
 	public static String serverBackend = "file";
@@ -51,6 +53,8 @@ public class Config extends PluginConfig {
 		FileConfiguration fc = PseudoAPI.plugin.getConfig();
 		hidePlugins = PluginConfig.getBoolean(fc, "HidePlugins", hidePlugins);
 		showPseudoAPI = PluginConfig.getBoolean(fc, "ShowPseudoAPI", showPseudoAPI);
+		defaultLocale = PluginConfig.getString(fc, "DefaultLocale", defaultLocale);
+		LanguageManager.setDefaultLanguage(defaultLocale);
 
 		globalBackend = PluginConfig.getString(fc, "GlobalBackend", globalBackend);
 		serverBackend = PluginConfig.getString(fc, "ServerBackend", serverBackend);
@@ -87,14 +91,14 @@ public class Config extends PluginConfig {
 					MySQLBackend backend = new MySQLBackend(key, host, port, username, password, database, prefix, useSSL, verifyServerCertificate, requireSSL);
 					backends.put(key, backend);
 				} else {
-					PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid backend type for backend: " + key + "!");
+					PseudoAPI.plugin.getChat().sendConsolePluginMessage(ChatColor.RED + "Invalid backend type for backend: " + key + "!");
 				}
 			} catch (Exception e) {
-				PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid backend configuration for backend: " + key + "!");
+				PseudoAPI.plugin.getChat().sendConsolePluginMessage(ChatColor.RED + "Invalid backend configuration for backend: " + key + "!");
 			}
 		}
 		if (backends.size() == 0) {
-			PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "No backends configured! Disabling PseudoAPI!");
+			PseudoAPI.plugin.getChat().sendConsolePluginMessage(ChatColor.RED + "No backends configured! Disabling PseudoAPI!");
 			Bukkit.getServer().getPluginManager().disablePlugin(PseudoAPI.plugin);
 		}
 
@@ -114,7 +118,7 @@ public class Config extends PluginConfig {
 		else if (clickEvent.equalsIgnoreCase("run") || clickEvent.equalsIgnoreCase("run_command"))
 			Config.clickEvent = ComponentType.RUN_COMMAND;
 		else {
-			PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid config option for ClickEvent!");
+			PseudoAPI.plugin.getChat().sendConsolePluginMessage(ChatColor.RED + "Invalid config option for ClickEvent!");
 		}
 		String consoleFormat = PluginConfig.getString(fc, "ConsoleFormat", Config.consoleFormat.toString());
 		if (consoleFormat.equalsIgnoreCase("bottom"))
@@ -122,7 +126,7 @@ public class Config extends PluginConfig {
 		else if (consoleFormat.equalsIgnoreCase("top"))
 			Config.consoleFormat = ConsoleFormat.TOP;
 		else {
-			PseudoAPI.message.sendConsolePluginMessage(ChatColor.RED + "Invalid config option for ConsoleFormat!");
+			PseudoAPI.plugin.getChat().sendConsolePluginMessage(ChatColor.RED + "Invalid config option for ConsoleFormat!");
 		}
 
 		startupUpdate = PluginConfig.getBoolean(fc, "StartupUpdate", startupUpdate);

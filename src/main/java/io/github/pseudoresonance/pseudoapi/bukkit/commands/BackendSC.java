@@ -8,10 +8,11 @@ import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.SubCommandExecutor;
 import io.github.pseudoresonance.pseudoapi.bukkit.Config;
-import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.FileBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 
@@ -21,7 +22,7 @@ public class BackendSC implements SubCommandExecutor {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!(sender instanceof Player) || sender.hasPermission("pseudoapi.backend")) {
 			if (args.length == 0) {
-				PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Please choose either 'list' or 'migrate <from> <to>'");
+				PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.INVALID_SUBCOMMAND, "'list', 'migrate <from> <to>'");
 				return false;
 			} else {
 				if (args[0].equalsIgnoreCase("list")) {
@@ -33,24 +34,24 @@ public class BackendSC implements SubCommandExecutor {
 						if (b instanceof FileBackend) {
 							if (first) {
 								first = false;
-								backendString += name + ": File";
+								backendString += name + ": " + LanguageManager.getLanguage(sender).getMessage("pseudoapi.file");
 							} else
-								backendString += ", " + name + ": File";
+								backendString += ", " + name + ": " + LanguageManager.getLanguage(sender).getMessage("pseudoapi.file");
 						} else if (b instanceof MySQLBackend) {
 							if (first) {
 								first = false;
-								backendString += name + ": MySQL";
+								backendString += name + ": " + LanguageManager.getLanguage(sender).getMessage("pseudoapi.mysql");
 							} else
-								backendString += ", " + name + ": MySQL";
+								backendString += ", " + name + ": " + LanguageManager.getLanguage(sender).getMessage("pseudoapi.mysql");
 						}
 					}
-					PseudoAPI.message.sendPluginMessage(sender, "Backends: " + backendString);
+					PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.backends") + ": " + backendString);
 				} else if (args[0].equalsIgnoreCase("migrate")) {
 					if (args.length == 1) {
-						PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Please add a backend to migrate from and to");
+						PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.add_backends_to_migrate"));
 						return false;
 					} else if (args.length == 2) {
-						PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Please add a backend to migrate to");
+						PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.add_backends_to_migrate"));
 						return false;
 					} else if (args.length >= 3) {
 						HashMap<String, Backend> backends = Config.getBackends();
@@ -63,18 +64,18 @@ public class BackendSC implements SubCommandExecutor {
 								destination = backends.get(name);
 						}
 						if (origin == null) {
-							PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, args[1] + " is an invalid backend! Try using 'backend list'");
+							PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.is_invalid_backend", args[1]));
 							return false;
 						}
 						if (destination == null) {
-							PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, args[2] + " is an invalid backend! Try using 'backend list'");
+							PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.is_invalid_backend", args[2]));
 							return false;
 						}
 						String originName = origin.getName();
 						String destinationName = destination.getName();
 						PlayerDataController.migrateBackends(origin, destination).thenRunAsync(() -> {
 							PseudoAPI.plugin.doSync(() -> {
-								PseudoAPI.message.sendPluginMessage(sender, "Migrated data from backend: " + originName + " to: " + destinationName + "!");
+								PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.migrated_from_to", originName, destinationName));
 							});
 						});
 						return true;
@@ -82,7 +83,7 @@ public class BackendSC implements SubCommandExecutor {
 				}
 			}
 		} else
-			PseudoAPI.message.sendPluginError(sender, Errors.NO_PERMISSION, "modify backends!");
+			PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.NO_PERMISSION, LanguageManager.getLanguage(sender).getMessage("pseudoapi.modify_backends"));
 		return false;
 	}
 

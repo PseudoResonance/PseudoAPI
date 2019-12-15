@@ -15,7 +15,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.JSONArray;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.JsonReader;
 
 public class PseudoUpdater {
@@ -72,11 +73,12 @@ public class PseudoUpdater {
 
 	private static void restart() {
 		if (Bukkit.getOnlinePlayers().size() != 0) {
-			PseudoAPI.message.broadcastPluginMessage("&cServer will restart in " + Config.restartWarning + " seconds to perform updates!");
+			for (Player p : Bukkit.getOnlinePlayers())
+				PseudoAPI.plugin.getChat().sendPluginMessage(p, Config.errorTextColor + LanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates_in", Config.restartWarning));
 			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(PseudoAPI.plugin, new Runnable() {
 				public void run() {
 					for (Player p : Bukkit.getOnlinePlayers()) {
-						p.kickPlayer("§cServer is restarting for updates!\nPlease come back in a few minutes!");
+						p.kickPlayer(LanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates"));
 					}
 					if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot")) {
 						Bukkit.getServer().spigot().restart();
@@ -86,7 +88,8 @@ public class PseudoUpdater {
 				}
 			}, Config.restartWarning * 20);
 		} else {
-			PseudoAPI.message.broadcastPluginMessage("&cServer will restart now to perform updates!");
+			for (Player p : Bukkit.getOnlinePlayers())
+				PseudoAPI.plugin.getChat().sendPluginMessage(p, Config.errorTextColor + LanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates_now"));
 			if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot")) {
 				Bukkit.getServer().spigot().restart();
 			} else {
@@ -172,7 +175,7 @@ public class PseudoUpdater {
 				getFileM = javaPluginC.getDeclaredMethod("getFile");
 				getFileM.setAccessible(true);
 			} catch (NoSuchMethodException | SecurityException e1) {
-				PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file! Failed to update!");
+				PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
 				e1.printStackTrace();
 			}
 			boolean pluginFound = false;
@@ -180,7 +183,7 @@ public class PseudoUpdater {
 				if (p.getName().equalsIgnoreCase(pluginName)) {
 					pluginFound = true;
 					if (alreadyUpdated.contains(p)) {
-						PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is already waiting to be updated upon server restart!");
+						PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.already_waiting_to_update", p.getName()));
 						return;
 					}
 					String urlPart = "https://circleci.com/api/v1.1/project/github/" + p.getAuthors().get(0) + "/" + p.getName();
@@ -204,10 +207,10 @@ public class PseudoUpdater {
 						}
 					}
 					if (isNewer(version, p.getVersion())) {
-						PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+						PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
 						for (Player pl : Bukkit.getOnlinePlayers()) {
 							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-								PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+								PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
 							}
 						}
 						try {
@@ -223,32 +226,32 @@ public class PseudoUpdater {
 								}
 							}
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file! Failed to update!");
+							PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
 							e.printStackTrace();
 							return;
 						}
 					} else {
-						PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+						PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
 						for (Player pl : Bukkit.getOnlinePlayers()) {
 							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-								PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+								PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
 							}
 						}
 					}
 				}
 			}
 			if (!pluginFound) {
-				PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Invalid plugin name: " + pluginName);
+				PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.invalid_plugin_name", pluginName));
 			}
 		}
 
 		public static void checkUpdates(CommandSender sender) {
 			ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
 			int updates = 0;
-			PseudoAPI.message.sendPluginMessage(sender, "Beginning update check!");
+			PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.beginning_update_check"));
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-					PseudoAPI.message.sendPluginMessage(p, "Beginning update check!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.beginning_update_check"));
 				}
 			}
 			Class<JavaPlugin> javaPluginC = JavaPlugin.class;
@@ -257,7 +260,7 @@ public class PseudoUpdater {
 				getFileM = javaPluginC.getDeclaredMethod("getFile");
 				getFileM.setAccessible(true);
 			} catch (NoSuchMethodException | SecurityException e1) {
-				PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file!");
+				PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
 				e1.printStackTrace();
 			}
 			for (PseudoPlugin p : plugins) {
@@ -286,10 +289,10 @@ public class PseudoUpdater {
 				}
 				if (isNewer(version, p.getVersion())) {
 					updates++;
-					PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
 					for (Player pl : Bukkit.getOnlinePlayers()) {
 						if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
 						}
 					}
 					try {
@@ -302,31 +305,31 @@ public class PseudoUpdater {
 							}
 						}
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						PseudoAPI.message.sendPluginError(sender, Errors.CUSTOM, "Could not get plugin jar file! Failed to update!");
+						PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
 						e.printStackTrace();
 					}
 				} else {
-					PseudoAPI.message.sendPluginMessage(sender, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
 					for (Player pl : Bukkit.getOnlinePlayers()) {
 						if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
 						}
 					}
 				}
 			}
 			if (updates > 0) {
-				PseudoAPI.message.sendPluginMessage(sender, "Completed update check! " + updates + " updates found!");
+				PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.completed_update_check", updates));
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-						PseudoAPI.message.sendPluginMessage(p, "Completed update check! " + updates + " updates found!");
+						PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", updates));
 					}
 				}
 				if (updates > updateUrls.size()) {
 					int failedUpdates = updates - updateUrls.size();
-					PseudoAPI.message.sendPluginMessage(sender, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.plugins_could_not_be_updated", failedUpdates));
 					for (Player p : Bukkit.getOnlinePlayers()) {
 						if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.message.sendPluginMessage(p, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
+							PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.plugins_could_not_be_updated", failedUpdates));
 						}
 					}
 				}
@@ -334,10 +337,10 @@ public class PseudoUpdater {
 					downloadFiles(updateUrls, sender);
 				}
 			} else {
-				PseudoAPI.message.sendPluginMessage(sender, "Completed update check! No updates found!");
+				PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.completed_update_check", "No"));
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-						PseudoAPI.message.sendPluginMessage(p, "Completed update check! No updates found!");
+						PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", "No"));
 					}
 				}
 				if (updateTaskID != -1) {
@@ -361,10 +364,10 @@ public class PseudoUpdater {
 			}
 			ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
 			int updates = 0;
-			PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Beginning update check!");
+			PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.beginning_update_check"));
 			for (Player p : Bukkit.getOnlinePlayers()) {
 				if (p.hasPermission("pseudoapi.update.notify")) {
-					PseudoAPI.message.sendPluginMessage(p, "Beginning update check!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.beginning_update_check"));
 				}
 			}
 			Class<JavaPlugin> javaPluginC = JavaPlugin.class;
@@ -373,7 +376,7 @@ public class PseudoUpdater {
 				getFileM = javaPluginC.getDeclaredMethod("getFile");
 				getFileM.setAccessible(true);
 			} catch (NoSuchMethodException | SecurityException e1) {
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
+				PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_plugin_jar"));
 				e1.printStackTrace();
 			}
 			for (PseudoPlugin p : plugins) {
@@ -402,10 +405,10 @@ public class PseudoUpdater {
 				}
 				if (isNewer(version, p.getVersion())) {
 					updates++;
-					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
 					for (Player pl : Bukkit.getOnlinePlayers()) {
 						if (pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Queuing to update!");
+							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
 						}
 					}
 					try {
@@ -418,31 +421,31 @@ public class PseudoUpdater {
 							}
 						}
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get plugin jar file!");
+						PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_plugin_jar"));
 						e.printStackTrace();
 					}
 				} else {
-					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
 					for (Player pl : Bukkit.getOnlinePlayers()) {
 						if (pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.message.sendPluginMessage(pl, p.getName() + " is currently on version: " + p.getVersion() + " and latest update is: " + version + "! Already up to date!");
+							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
 						}
 					}
 				}
 			}
 			if (updates > 0) {
-				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Completed update check! " + updates + " updates found!");
+				PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", updates));
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (p.hasPermission("pseudoapi.update.notify")) {
-						PseudoAPI.message.sendPluginMessage(p, "Completed update check! " + updates + " updates found!");
+						PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", updates));
 					}
 				}
 				if (updates > updateUrls.size()) {
 					int failedUpdates = updates - updateUrls.size();
-					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), failedUpdates + " plugins could not be updated due to errors! Please check the console!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.plugins_could_not_be_updated", failedUpdates));
 					for (Player p : Bukkit.getOnlinePlayers()) {
 						if (p.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.message.sendPluginMessage(p, failedUpdates + " plugins could not be updated due to errors! Please check the console!");
+							PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.plugins_could_not_be_updated", failedUpdates));
 						}
 					}
 				}
@@ -450,10 +453,10 @@ public class PseudoUpdater {
 					downloadFiles(updateUrls);
 				}
 			} else {
-				PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Completed update check! No updates found!");
+				PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", "No"));
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					if (p.hasPermission("pseudoapi.update.notify")) {
-						PseudoAPI.message.sendPluginMessage(p, "Completed update check! No updates found!");
+						PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", "No"));
 					}
 				}
 				if (updateTaskID != -1) {
@@ -495,7 +498,7 @@ public class PseudoUpdater {
 					Files.copy(new URL(d.getURL()).openStream(), d.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
 					successfulUpdates++;
 				} catch (Exception e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not download update to: " + d.getNewFile().getAbsolutePath());
+					PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", d.getNewFile().getAbsolutePath()));
 					e.printStackTrace();
 				}
 			}
@@ -503,20 +506,20 @@ public class PseudoUpdater {
 				shouldRestart = true;
 				restartCheck();
 				if (!(!Config.restartEmpty || Bukkit.getOnlinePlayers().size() == 0)) {
-					PseudoAPI.message.sendPluginMessage(Bukkit.getConsoleSender(), "Waiting for server to empty before restarting!");
+					PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.waiting_for_server_to_empty"));
 					if (sender != null) {
 						for (Player p : Bukkit.getOnlinePlayers()) {
 							if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-								PseudoAPI.message.sendPluginMessage(p, "Waiting for server to empty before restarting!");
+								PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.waiting_for_server_to_empty"));
 							}
 						}
 						if (sender instanceof Player) {
-							PseudoAPI.message.sendPluginMessage(sender, "Waiting for server to empty before restarting!");
+							PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.waiting_for_server_to_empty"));
 						}
 					} else {
 						for (Player p : Bukkit.getOnlinePlayers()) {
 							if (p.hasPermission("pseudoapi.update.notify")) {
-								PseudoAPI.message.sendPluginMessage(p, "Waiting for server to empty before restarting!");
+								PseudoAPI.plugin.getChat().sendPluginMessage(p, LanguageManager.getLanguage(p).getMessage("pseudoapi.waiting_for_server_to_empty"));
 							}
 						}
 					}

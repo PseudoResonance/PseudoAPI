@@ -21,8 +21,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.Message;
-import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
@@ -79,22 +79,22 @@ public class ServerPlayerDataController {
 												st2.execute("ALTER TABLE `" + sb.getPrefix() + "Players` CHANGE " + key + " " + key + suffix + " " + value + ";");
 												return true;
 											} catch (SQLException ex) {
-												PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when renaming column: " + key + " to: " + key + suffix + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-												PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + ex.getErrorCode() + ": (State: " + ex.getSQLState() + ") - " + ex.getMessage());
+												PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when renaming column: " + key + " to: " + key + suffix + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+												PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + ex.getErrorCode() + ": (State: " + ex.getSQLState() + ") - " + ex.getMessage());
 												break;
 											}
 										} catch (SQLException ex) {
-											PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-											PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + ex.getErrorCode() + ": (State: " + ex.getSQLState() + ") - " + ex.getMessage());
+											PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+											PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + ex.getErrorCode() + ": (State: " + ex.getSQLState() + ") - " + ex.getMessage());
 										}
 									}
 								}
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when converting column: " + key + " to type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when converting column: " + key + " to type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					}
 				}
@@ -106,16 +106,16 @@ public class ServerPlayerDataController {
 						st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` ADD " + key + " " + value + " DEFAULT " + defaultValue + ";");
 						return true;
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
 			} catch (SQLException e) {
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 			}
 		}
 		return false;
@@ -133,7 +133,7 @@ public class ServerPlayerDataController {
 				if (!folder.isDirectory())
 					folder.mkdir();
 			} catch (SecurityException e) {
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
 			}
 		} else if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
@@ -160,8 +160,8 @@ public class ServerPlayerDataController {
 						if (e.getErrorCode() == 1146) {
 							create = true;
 						} else {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when getting table description in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when getting table description in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					}
 					serverDataTypes = columns;
@@ -170,12 +170,12 @@ public class ServerPlayerDataController {
 							try {
 								st.execute("CREATE TABLE IF NOT EXISTS `" + sb.getPrefix() + "Players` (`uuid` VARCHAR(36) PRIMARY KEY);");
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 						try (Statement st = c.createStatement()) {
 							for (Column col : dataTypes) {
@@ -185,13 +185,13 @@ public class ServerPlayerDataController {
 								try {
 									st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` ADD " + key + " " + value + " DEFAULT " + defaultValue + ";");
 								} catch (SQLException e) {
-									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+									PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+									PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 								}
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					} else {
 						if (uuidCol) {
@@ -225,13 +225,13 @@ public class ServerPlayerDataController {
 												newColumns.add(col);
 											}
 										}
-										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when converting column: " + key + " to type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+										PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when converting column: " + key + " to type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+										PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 									}
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 							try (Statement st = c.createStatement()) {
 								for (Column col : oldColumns) {
@@ -241,13 +241,13 @@ public class ServerPlayerDataController {
 									try {
 										st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` CHANGE " + key + " " + key + suffix + " " + value + ";");
 									} catch (SQLException e) {
-										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when renaming column: " + key + " to: " + key + suffix + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+										PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when renaming column: " + key + " to: " + key + suffix + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+										PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 									}
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 							try (Statement st = c.createStatement()) {
 								for (Column col : newColumns) {
@@ -257,27 +257,27 @@ public class ServerPlayerDataController {
 									try {
 										st.execute("ALTER TABLE `" + sb.getPrefix() + "Players` ADD " + key + " " + value + " DEFAULT " + defaultValue + ";");
 									} catch (SQLException e) {
-										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-										PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+										PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when adding column: " + key + " of type: " + value + " with default value: " + defaultValue + " in table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+										PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 									}
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						} else {
-							Message.sendConsoleMessage(ChatColor.RED + "Selected backend contains incorrectly formatted table: " + sb.getPrefix() + "Players! Disabling PseudoAPI!");
+							Chat.sendConsoleMessage(ChatColor.RED + "Selected backend contains incorrectly formatted table: " + sb.getPrefix() + "Players! Disabling PseudoAPI!");
 							Bukkit.getServer().getPluginManager().disablePlugin(PseudoAPI.plugin);
 							return;
 						}
 					}
 				} catch (SQLException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
 			} catch (SQLException e) {
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 			}
 		}
 	}
@@ -342,7 +342,7 @@ public class ServerPlayerDataController {
 							c.save();
 						}
 					} catch (SecurityException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
 					}
 				} else if (b instanceof SQLBackend) {
 					SQLBackend sb = (SQLBackend) b;
@@ -370,16 +370,16 @@ public class ServerPlayerDataController {
 							try {
 								ps.execute();
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				}
 			}
@@ -420,7 +420,7 @@ public class ServerPlayerDataController {
 						c.save();
 					}
 				} catch (SecurityException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
@@ -433,16 +433,16 @@ public class ServerPlayerDataController {
 						try {
 							ps.execute();
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in key: " + key + " with value: " + String.valueOf(value) + " in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in key: " + key + " with value: " + String.valueOf(value) + " in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
 			}
 		});
@@ -501,7 +501,7 @@ public class ServerPlayerDataController {
 						return o;
 					}
 				} catch (SecurityException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
@@ -515,16 +515,16 @@ public class ServerPlayerDataController {
 								return o;
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when getting key: " + key + " from player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when getting key: " + key + " from player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
 			}
 			return null;
@@ -548,7 +548,7 @@ public class ServerPlayerDataController {
 						return result;
 					}
 				} catch (SecurityException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
@@ -567,16 +567,16 @@ public class ServerPlayerDataController {
 								return result;
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when getting player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when getting player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				} catch (SQLException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 				}
 			}
 			return null;
@@ -610,7 +610,7 @@ public class ServerPlayerDataController {
 						}
 					}
 				} catch (SecurityException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
@@ -641,17 +641,17 @@ public class ServerPlayerDataController {
 								try {
 									ps.execute();
 								} catch (SQLException e) {
-									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-									PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+									PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error updating player: " + uuid + " from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+									PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						}
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				}
 			}
@@ -681,7 +681,7 @@ public class ServerPlayerDataController {
 						}
 					}
 				} catch (SecurityException e) {
-					PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "No permission to access: " + folder.getAbsolutePath());
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
@@ -704,16 +704,16 @@ public class ServerPlayerDataController {
 									allData.put(uuid, result);
 								}
 							} catch (SQLException e) {
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when getting player data from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
-								PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when getting player data from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+								PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 							}
 						} catch (SQLException e) {
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
-							PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 						}
 					} catch (SQLException e) {
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Error while accessing database: " + sb.getName());
-						PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				}
 			}

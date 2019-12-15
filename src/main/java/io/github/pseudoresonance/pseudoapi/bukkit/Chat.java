@@ -9,15 +9,16 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Config.ConsoleFormat;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatElement;
 import net.md_5.bungee.api.ChatColor;
 
-public class Message {
+public class Chat {
 
 	private static ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
 	private PseudoPlugin plugin;
 
-	public Message(PseudoPlugin plugin) {
+	protected Chat(PseudoPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -43,7 +44,7 @@ public class Message {
 				if (o instanceof String) {
 					sender.sendMessage((String) o);
 				} else if (o instanceof ChatElement[]) {
-					Message.sendJSONMessage((Player) sender, (ChatElement[]) o);
+					Chat.sendJSONMessage((Player) sender, (ChatElement[]) o);
 				} else {
 					throw new IllegalArgumentException("Not String or JSON");
 				}
@@ -140,29 +141,30 @@ public class Message {
 	public void sendPluginError(CommandSender sender, Errors error, String message) {
 		String format = Config.errorMessageFormat;
 		switch (error) {
-			case GENERIC:
-				format = format.replace("{message}", Config.errorTextColor + "An unknown error has occured! Please contact the developer!");
-				break;
 			case CUSTOM:
 				format = format.replace("{message}", Config.errorTextColor + message);
 				break;
 			case NEVER_JOINED:
-				format = format.replace("{message}", Config.errorTextColor + message + " has never joined!");
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_never_joined", message));
 				break;
 			case NOT_A_NUMBER:
-				format = format.replace("{message}", Config.errorTextColor + message + " is not a number!");
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_not_a_number", message));
 				break;
 			case NOT_LOADED:
-				format = format.replace("{message}", Config.errorTextColor + "Plugin " + message + " is not loaded!");
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_not_loaded", message));
 				break;
 			case NOT_ONLINE:
-				format = format.replace("{message}", Config.errorTextColor + message + " is not online!");
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_not_online", message));
 				break;
 			case NO_PERMISSION:
-				format = format.replace("{message}", Config.errorTextColor + "You do not have permission to " + message);
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_no_permission", message));
 				break;
+			case INVALID_SUBCOMMAND:
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_invalid_subcommand", message));
+				break;
+			case GENERIC:
 			default:
-				format = format.replace("{message}", Config.errorTextColor + "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_generic"));
 				break;
 		}
 		format = format.replace("{name}", plugin.getPluginName());
@@ -193,7 +195,7 @@ public class Message {
 		String format = Config.errorMessageFormat;
 		switch (error) {
 			case GENERIC:
-				format = format.replace("{message}", Config.errorTextColor + "An unknown error has occured! Please contact the developer!");
+				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_generic"));
 				break;
 			default:
 				throw new IllegalArgumentException("Only error generic allowed");
@@ -283,7 +285,7 @@ public class Message {
 	}
 
 	public enum Errors {
-		NO_PERMISSION, NOT_A_NUMBER, NOT_ONLINE, NEVER_JOINED, NOT_LOADED, CUSTOM, GENERIC;
+		NO_PERMISSION, NOT_A_NUMBER, NOT_ONLINE, NEVER_JOINED, NOT_LOADED, INVALID_SUBCOMMAND, CUSTOM, GENERIC;
 	}
 
 }

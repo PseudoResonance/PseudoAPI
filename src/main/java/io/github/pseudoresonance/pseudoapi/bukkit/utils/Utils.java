@@ -14,6 +14,7 @@ public class Utils {
 		return bukkitVersion;
 	}
 
+	@Deprecated
 	public static String millisToHumanFormat(long millis) {
 		if (millis < 0) {
 			throw new IllegalArgumentException("Duration must be greater than zero!");

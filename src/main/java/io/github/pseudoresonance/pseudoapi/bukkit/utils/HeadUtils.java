@@ -13,7 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.Message.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 
 public class HeadUtils {
@@ -41,7 +42,7 @@ public class HeadUtils {
 			head.setItemMeta(meta);
 			return head;
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get head from UUID!");
+			PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_head_from_uuid"));
 			e.printStackTrace();
 		}
 		return null;
@@ -60,7 +61,7 @@ public class HeadUtils {
 			head.setItemMeta(meta);
 			return head;
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get head from UUID!");
+			PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_head_from_uuid"));
 			e.printStackTrace();
 		}
 		return null;
@@ -82,7 +83,7 @@ public class HeadUtils {
 			head.setItemMeta(meta);
 			return head;
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not get head from Base64!");
+			PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_head_from_base64"));
 			e.printStackTrace();
 		}
 		return null;
@@ -108,7 +109,7 @@ public class HeadUtils {
 				profileField = meta.getClass().getDeclaredField("profile");
 				profileField.setAccessible(true);
 			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
-				PseudoAPI.message.sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, "Could not initialize Head API!");
+				PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_initialize_head_api"));
 				e.printStackTrace();
 			}
 		}

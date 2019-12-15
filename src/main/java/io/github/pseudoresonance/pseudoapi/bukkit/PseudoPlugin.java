@@ -10,6 +10,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
 
 public class PseudoPlugin extends JavaPlugin {
@@ -27,7 +28,7 @@ public class PseudoPlugin extends JavaPlugin {
 	private String output = "";
 	protected Map<String, SubCommandExecutor> subCommands = new HashMap<String, SubCommandExecutor>();
 	protected List<CommandDescription> commandDescriptions = new ArrayList<CommandDescription>();
-	public Message message;
+	private Chat chat;
 	
 	@Override
 	public void onEnable() {
@@ -78,13 +79,18 @@ public class PseudoPlugin extends JavaPlugin {
 		} else {
 			output = prefix;
 		}
-		message = new Message(this);
+		chat = new Chat(this);
+		LanguageManager.copyDefaultPluginLanguageFiles(this, false);
 	}
 	
 	@Override
 	public void onDisable() {
 		CommandHandler.unregisterPlugin(this);
 		PluginMessenger.unregisterPluginListeners(this);
+	}
+	
+	public Chat getChat() {
+		return chat;
 	}
 
 	public String getPluginName() {

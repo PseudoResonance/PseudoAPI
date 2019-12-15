@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.utils.JsonReader;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -57,19 +58,19 @@ public class PseudoUpdater {
 	private static void restart() {
 		if (ProxyServer.getInstance().getOnlineCount() != 0) {
 			for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-				p.sendMessage(new ComponentBuilder("Server will restart in " + Config.restartWarning + " seconds to perform updates!").color(ChatColor.RED).create());
+				p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates_in", Config.restartWarning)).color(ChatColor.RED).create());
 			}
 			ProxyServer.getInstance().getScheduler().schedule(PseudoAPI.plugin, new Runnable() {
 				public void run() {
 					for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-						p.disconnect(new ComponentBuilder("Server is restarting for updates!\nPlease come back in a few minutes!").color(ChatColor.RED).create());
+						p.disconnect(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates")).color(ChatColor.RED).create());
 					}
 					ProxyServer.getInstance().stop("Performing updates!");
 				}
 			}, Config.restartWarning, TimeUnit.SECONDS);
 		} else {
 			for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-				p.sendMessage(new ComponentBuilder("Server will restart now to perform updates!").color(ChatColor.RED).create());
+				p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates_now")).color(ChatColor.RED).create());
 			}
 			ProxyServer.getInstance().stop("Performing updates!");
 		}
@@ -137,10 +138,10 @@ public class PseudoUpdater {
 		protected static void checkUpdates(CommandSender sender) {
 			UpdateData updateUrl = null;
 			boolean update = false;
-			sender.sendMessage(new ComponentBuilder("Beginning update check!").color(ChatColor.GREEN).create());
+			sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.beginning_update_check")).color(ChatColor.GREEN).create());
 			for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 				if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-					p.sendMessage(new ComponentBuilder("Beginning update check!").color(ChatColor.GREEN).create());
+					p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.beginning_update_check")).color(ChatColor.GREEN).create());
 				}
 			}
 			String urlPart = "https://circleci.com/api/v1.1/project/github/" + PseudoAPI.plugin.getDescription().getAuthor() + "/" + PseudoAPI.plugin.getDescription().getName();
@@ -165,10 +166,10 @@ public class PseudoUpdater {
 			}
 			if (isNewer(version, PseudoAPI.plugin.getDescription().getVersion())) {
 				update = true;
-				sender.sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Queuing to update!").color(ChatColor.GREEN).create());
+				sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer pl : ProxyServer.getInstance().getPlayers()) {
 					if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-						pl.sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Queuing to update!").color(ChatColor.GREEN).create());
+						pl.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 					}
 				}
 				try {
@@ -178,29 +179,29 @@ public class PseudoUpdater {
 						updateUrl = new UpdateData(new File(PseudoAPI.plugin.getProxy().getPluginsFolder(), ((File) file).getName()), url);
 					}
 				} catch (IllegalArgumentException e) {
-					sender.sendMessage(new ComponentBuilder("Could not get plugin jar file! Failed to update!").color(ChatColor.RED).create());
+					sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar")).color(ChatColor.RED).create());
 					e.printStackTrace();
 				}
 			} else {
-				sender.sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Already up to date!").color(ChatColor.GREEN).create());
+				sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer pl : ProxyServer.getInstance().getPlayers()) {
 					if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-						pl.sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Already up to date!").color(ChatColor.GREEN).create());
+						pl.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 					}
 				}
 			}
 			if (update) {
-				sender.sendMessage(new ComponentBuilder("Completed update check!").color(ChatColor.GREEN).create());
+				sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.completed_update_check", 1)).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 					if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder("Completed update check!").color(ChatColor.GREEN).create());
+						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", 1)).color(ChatColor.GREEN).create());
 					}
 				}
 				if (updateUrl == null) {
-					sender.sendMessage(new ComponentBuilder("Plugin could not be updated due to errors! Please check the console!").color(ChatColor.GREEN).create());
+					sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.plugins_could_not_be_updated", 1)).color(ChatColor.GREEN).create());
 					for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 						if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-							p.sendMessage(new ComponentBuilder("Plugin could not be updated due to errors! Please check the console!").color(ChatColor.GREEN).create());
+							p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.plugins_could_not_be_updated", 1)).color(ChatColor.GREEN).create());
 						}
 					}
 				}
@@ -208,10 +209,10 @@ public class PseudoUpdater {
 					downloadFiles(updateUrl, sender);
 				}
 			} else {
-				sender.sendMessage(new ComponentBuilder("Completed update check! No update found!").color(ChatColor.GREEN).create());
+				sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.completed_update_check", "No")).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 					if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder("Completed update check! No update found!").color(ChatColor.GREEN).create());
+						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", "No")).color(ChatColor.GREEN).create());
 					}
 				}
 				if (updateTask != null) {
@@ -235,10 +236,10 @@ public class PseudoUpdater {
 			}
 			boolean update = false;
 			UpdateData updateUrl = null;
-			ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Beginning update check!").color(ChatColor.GREEN).create());
+			ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.beginning_update_check")).color(ChatColor.GREEN).create());
 			for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 				if (p.hasPermission("pseudoapi.update.notify")) {
-					p.sendMessage(new ComponentBuilder("Beginning update check!").color(ChatColor.GREEN).create());
+					p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.beginning_update_check")).color(ChatColor.GREEN).create());
 				}
 			}
 			String urlPart = "https://circleci.com/api/v1.1/project/github/" + PseudoAPI.plugin.getDescription().getAuthor() + "/" + PseudoAPI.plugin.getDescription().getName();
@@ -263,10 +264,10 @@ public class PseudoUpdater {
 			}
 			if (isNewer(version, PseudoAPI.plugin.getDescription().getVersion())) {
 				update = true;
-				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Queuing to update!").color(ChatColor.GREEN).create());
+				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 					if (p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Queuing to update!").color(ChatColor.GREEN).create());
+						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 					}
 				}
 				try {
@@ -276,29 +277,29 @@ public class PseudoUpdater {
 						updateUrl = new UpdateData(new File(PseudoAPI.plugin.getProxy().getPluginsFolder(), ((File) file).getName()), url);
 					}
 				} catch (IllegalArgumentException e) {
-					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Could not get plugin jar file!").color(ChatColor.RED).create());
+					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_plugin_jar")).color(ChatColor.RED).create());
 					e.printStackTrace();
 				}
 			} else {
-				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Already up to date!").color(ChatColor.GREEN).create());
+				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 					if (p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder(PseudoAPI.plugin.getDescription().getName() + " is currently on version: " + PseudoAPI.plugin.getDescription().getVersion() + " and latest update is: " + version + "! Already up to date!").color(ChatColor.GREEN).create());
+						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
 					}
 				}
 			}
 			if (update) {
-				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Completed update check!").color(ChatColor.GREEN).create());
+				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", 1)).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 					if (p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder("Completed update check!").color(ChatColor.GREEN).create());
+						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", 1)).color(ChatColor.GREEN).create());
 					}
 				}
 				if (updateUrl == null) {
-					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Plugin could not be updated due to errors! Please check the console!").color(ChatColor.GREEN).create());
+					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.plugins_could_not_be_updated", 1)).color(ChatColor.GREEN).create());
 					for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 						if (p.hasPermission("pseudoapi.update.notify")) {
-							p.sendMessage(new ComponentBuilder("Plugin could not be updated due to errors! Please check the console!").color(ChatColor.GREEN).create());
+							p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.plugins_could_not_be_updated", 1)).color(ChatColor.GREEN).create());
 						}
 					}
 				}
@@ -306,10 +307,10 @@ public class PseudoUpdater {
 					downloadFiles(updateUrl);
 				}
 			} else {
-				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Completed update check! No update found!").color(ChatColor.GREEN).create());
+				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", "No")).color(ChatColor.GREEN).create());
 				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 					if (p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder("Completed update check! No update found!").color(ChatColor.GREEN).create());
+						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.completed_update_check", "No")).color(ChatColor.GREEN).create());
 					}
 				}
 				if (updateTask != null) {
@@ -350,27 +351,27 @@ public class PseudoUpdater {
 				Files.copy(new URL(file.getURL()).openStream(), file.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
 				successfulUpdate = true;
 			} catch (Exception e) {
-				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Could not download update to: " + file.getNewFile().getAbsolutePath()).color(ChatColor.RED).create());
+				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.could_not_download_update", file.getNewFile().getAbsolutePath())).color(ChatColor.RED).create());
 				e.printStackTrace();
 			}
 			if (Config.updateRestart && successfulUpdate == true) {
 				shouldRestart = true;
 				restartCheck();
 				if (!(!Config.restartEmpty || ProxyServer.getInstance().getOnlineCount() == 0)) {
-					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Waiting for server to empty before restarting!").color(ChatColor.GREEN).create());
+					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.waiting_for_server_to_empty")).color(ChatColor.GREEN).create());
 					if (sender != null) {
 						for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 							if (!p.getName().equals(sender.getName()) && p.hasPermission("pseudoapi.update.notify")) {
-								p.sendMessage(new ComponentBuilder("Waiting for server to empty before restarting!").color(ChatColor.GREEN).create());
+								p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.waiting_for_server_to_empty")).color(ChatColor.GREEN).create());
 							}
 						}
 						if (sender instanceof ProxiedPlayer) {
-							sender.sendMessage(new ComponentBuilder("Waiting for server to empty before restarting!").color(ChatColor.GREEN).create());
+							sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.waiting_for_server_to_empty")).color(ChatColor.GREEN).create());
 						}
 					} else {
 						for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
 							if (p.hasPermission("pseudoapi.update.notify")) {
-								p.sendMessage(new ComponentBuilder("Waiting for server to empty before restarting!").color(ChatColor.GREEN).create());
+								p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.waiting_for_server_to_empty")).color(ChatColor.GREEN).create());
 							}
 						}
 					}
