@@ -7,7 +7,7 @@
 	<version>${revision}-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<revision>5.0.4</revision>
+		<revision>5.0.5</revision>
 	</properties>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -45,6 +45,30 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>com.coderplus.maven.plugins</groupId>
 				<artifactId>copy-rename-maven-plugin</artifactId>
 				<version>1.0</version>
@@ -64,6 +88,22 @@
 								<fileSet>
 									<sourceFile>target/${project.artifactId}-${project.version}.jar</sourceFile>
 									<destinationFile>artifacts/${project.artifactId}.jar</destinationFile>
+								</fileSet>
+								<fileSet>
+									<sourceFile>target/${project.artifactId}-${project.version}-javadoc.jar</sourceFile>
+									<destinationFile>artifacts/${project.artifactId}-${project.version}-javadoc.jar</destinationFile>
+								</fileSet>
+								<fileSet>
+									<sourceFile>target/${project.artifactId}-${project.version}-javadoc.jar</sourceFile>
+									<destinationFile>artifacts/${project.artifactId}-javadoc.jar</destinationFile>
+								</fileSet>
+								<fileSet>
+									<sourceFile>target/${project.artifactId}-${project.version}-sources.jar</sourceFile>
+									<destinationFile>artifacts/${project.artifactId}-${project.version}-sources.jar</destinationFile>
+								</fileSet>
+								<fileSet>
+									<sourceFile>target/${project.artifactId}-${project.version}-sources.jar</sourceFile>
+									<destinationFile>artifacts/${project.artifactId}-sources.jar</destinationFile>
 								</fileSet>
 							</fileSets>
 						</configuration>

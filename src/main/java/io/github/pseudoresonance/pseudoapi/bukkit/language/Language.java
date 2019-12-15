@@ -121,7 +121,7 @@ public class Language {
 	/**
 	 * Formats date-time
 	 * 
-	 * @param date {@link LocalDateTime} to format
+	 * @param dateTime {@link LocalDateTime} to format
 	 * @return Formatted date-time
 	 */
 	public String formatDateTime(LocalDateTime dateTime) {
@@ -131,7 +131,7 @@ public class Language {
 	/**
 	 * Formats date-time
 	 * 
-	 * @param date {@link Date} to format
+	 * @param dateTime {@link Date} to format
 	 * @return Formatted date-time
 	 */
 	public String formatDateTime(Date dateTime) {
@@ -141,7 +141,7 @@ public class Language {
 	/**
 	 * Formats time
 	 * 
-	 * @param date {@link LocalTime} to format
+	 * @param time {@link LocalTime} to format
 	 * @return Formatted time
 	 */
 	public String formatTime(LocalTime time) {
@@ -151,7 +151,7 @@ public class Language {
 	/**
 	 * Formats time
 	 * 
-	 * @param date {@link Date} to format
+	 * @param time {@link Date} to format
 	 * @return Formatted time
 	 */
 	public String formatTime(Date time) {

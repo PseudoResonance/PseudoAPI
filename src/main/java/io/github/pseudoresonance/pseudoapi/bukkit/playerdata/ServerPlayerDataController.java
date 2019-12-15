@@ -647,8 +647,8 @@ public class ServerPlayerDataController {
 	 * @param destination {@link Backend} to migrate to
 	 * @return Whether or not migration was successful
 	 */
-	public static void migrateBackends(Backend origin, Backend destination) {
-		getBackend(origin).thenAcceptAsync(values -> {
+	public static CompletableFuture<Void> migrateBackends(Backend origin, Backend destination) {
+		return getBackend(origin).thenAcceptAsync(values -> {
 			setBackend(destination, values);
 		});
 	}
