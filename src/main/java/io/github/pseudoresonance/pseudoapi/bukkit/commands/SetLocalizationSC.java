@@ -34,10 +34,10 @@ public class SetLocalizationSC implements SubCommandExecutor {
 				}
 			} else {
 				if (!(sender instanceof Player) || sender.hasPermission("pseudoapi.setlocalization.others")) {
-					String uuid = PlayerDataController.getUUID(args[0]);
+					String uuid = PlayerDataController.getUUID(args[1]);
 					if (uuid != null) {
 						String name = PlayerDataController.getName(uuid);
-						String locale = args[1].toLowerCase();
+						String locale = args[0].toLowerCase();
 						if (LanguageManager.getLanguageList().contains(locale)) {
 							PlayerDataController.setPlayerSetting(uuid, "locale", locale);
 							PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.set_localization_others", locale, name));
@@ -47,7 +47,7 @@ public class SetLocalizationSC implements SubCommandExecutor {
 							return false;
 						}
 					} else {
-						PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.NEVER_JOINED, args[0]);
+						PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.NEVER_JOINED, args[1]);
 						return false;
 					}
 				} else {

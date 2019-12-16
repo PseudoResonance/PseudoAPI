@@ -30,6 +30,9 @@ public class PseudoAPITC implements TabCompleter {
 			if (sender.hasPermission("pseudoapi.resetlocalization")) {
 				possible.add("resetlocalization");
 			}
+			if (sender.hasPermission("pseudoapi.setlocalization")) {
+				possible.add("setlocalization");
+			}
 			if (sender.hasPermission("pseudoapi.backend")) {
 				possible.add("backend");
 			}
@@ -54,6 +57,12 @@ public class PseudoAPITC implements TabCompleter {
 					possible.add("migrate");
 				}
 			} else if (args[0].equalsIgnoreCase("update")) {
+				if (sender.hasPermission("pseudoapi.update")) {
+					for (PseudoPlugin p : PluginController.getPlugins()) {
+						possible.add(p.getName());
+					}
+				}
+			} else if (args[0].equalsIgnoreCase("setlocalization")) {
 				if (sender.hasPermission("pseudoapi.update")) {
 					for (PseudoPlugin p : PluginController.getPlugins()) {
 						possible.add(p.getName());

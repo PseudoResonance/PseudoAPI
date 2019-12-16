@@ -9,8 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import org.apache.commons.lang3.LocaleUtils;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.language.Language;
 import net.md_5.bungee.api.ChatColor;
@@ -94,25 +97,34 @@ public class BungeeLanguageManager {
 			}
 		}
 		for (File f : langDir.listFiles()) {
-			String lang = f.getName().substring(0, f.getName().length() - 5);
-			try {
-				Configuration yaml = YamlConfiguration.getProvider(YamlConfiguration.class).load(f);
-				Language language = getLanguage(lang);
-				if (language == null) {
-					language = new Language(lang);
-					registerLanguage(lang, language);
+			if (f.getName().length() > 5) {
+				String lang = f.getName().substring(0, f.getName().length() - 5);
+				Locale locale = new Locale.Builder().setLanguageTag(lang).build();
+				if (!LocaleUtils.isAvailableLocale(locale)) {
+					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Invalid locale file: " + f.getName() + " Unknown locale!").color(ChatColor.RED).create());
+					continue;
 				}
-				HashMap<String, String> langMap = new HashMap<String, String>();
-				for (String namespace : yaml.getKeys()) {
-					Configuration cs = yaml.getSection(namespace);
-					for (String key : cs.getKeys()) {
-						langMap.put(namespace + "." + key, cs.getString(key));
+				lang = locale.toLanguageTag();
+				try {
+					Configuration yaml = YamlConfiguration.getProvider(YamlConfiguration.class).load(f);
+					Language language = getLanguage(lang);
+					if (language == null) {
+						language = new Language(lang);
+						registerLanguage(lang, language);
 					}
+					HashMap<String, String> langMap = new HashMap<String, String>();
+					for (String namespace : yaml.getKeys()) {
+						Configuration cs = yaml.getSection(namespace);
+						for (String key : cs.getKeys()) {
+							langMap.put(namespace + "." + key, cs.getString(key));
+						}
+					}
+					language.addLanguageMap(langMap);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-				language.addLanguageMap(langMap);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			} else
+				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Invalid locale file: " + f.getName() + " Unknown locale!").color(ChatColor.RED).create());
 		}
 	}
 

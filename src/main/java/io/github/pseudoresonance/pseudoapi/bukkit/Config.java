@@ -4,11 +4,14 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Set;
 
+import org.apache.commons.lang.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.FileBackend;
@@ -54,6 +57,12 @@ public class Config extends PluginConfig {
 		hidePlugins = PluginConfig.getBoolean(fc, "HidePlugins", hidePlugins);
 		showPseudoAPI = PluginConfig.getBoolean(fc, "ShowPseudoAPI", showPseudoAPI);
 		defaultLocale = PluginConfig.getString(fc, "DefaultLocale", defaultLocale);
+		Locale locale = new Locale.Builder().setLanguageTag(defaultLocale).build();
+		if (!LocaleUtils.isAvailableLocale(locale)) {
+			locale = Locale.US;
+			PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Invalid default locale: " + defaultLocale + " Unknown locale! Defaulting to: " + locale.toLanguageTag());
+		}
+		defaultLocale = locale.toLanguageTag();
 		LanguageManager.setDefaultLanguage(defaultLocale);
 
 		globalBackend = PluginConfig.getString(fc, "GlobalBackend", globalBackend);

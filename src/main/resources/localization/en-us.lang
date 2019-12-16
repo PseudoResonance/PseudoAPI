@@ -51,6 +51,7 @@ pseudoapi:
   pseudoapi_reloadlocalization_help: "Reloads PseudoAPI localization"
   pseudoapi_reset_help: "Resets PseudoAPI config"
   pseudoapi_resetlocalization_help: "Resets PseudoAPI localization"
+  pseudoapi_setlocalization_help: "Sets player localization"
   pseudoapi_backend_list_help: "Lists all backends"
   pseudoapi_backend_migrate_help: "Migrates from one backend to another"
   pseudoapi_update_help: "Updates all PseudoAPI plugins"

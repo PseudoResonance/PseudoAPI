@@ -2,6 +2,10 @@ package io.github.pseudoresonance.pseudoapi.bungee;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.tools.ToolProvider;
+
+import org.bstats.bungeecord.Metrics;
+
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -13,6 +17,8 @@ public class PseudoAPI extends Plugin {
 	protected static PseudoAPI plugin;
 	
 	private static Config config;
+	
+	private static Metrics metrics = null;
 	
 	@Override
 	public void onEnable() {
@@ -29,8 +35,22 @@ public class PseudoAPI extends Plugin {
 			public void run() {
 				PseudoUpdater.checkUpdates(true);
 			}
-
 		}, Config.startupDelay, TimeUnit.SECONDS);
+		initializeMetrics();
+	}
+	
+	public static Metrics getMetrics() {
+		return metrics;
+	}
+	
+	private void initializeMetrics() {
+		metrics = new Metrics(this);
+		metrics.addCustomChart(new Metrics.SimplePie("default_language", () -> {
+	        return Config.defaultLocale;
+	    }));
+		metrics.addCustomChart(new Metrics.SimplePie("java_type", () -> {
+			return ToolProvider.getSystemJavaCompiler() == null ? "JRE" : "JDK";
+	    }));
 	}
 
 	private void registerCommands() {

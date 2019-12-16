@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.Locale;
+
+import org.apache.commons.lang.LocaleUtils;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
@@ -53,6 +56,12 @@ public class Config {
 			}
 			
 			defaultLocale = getString(conf, "DefaultLocale", defaultLocale);
+			Locale locale = new Locale.Builder().setLanguageTag(defaultLocale).build();
+			if (!LocaleUtils.isAvailableLocale(locale)) {
+				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Invalid default locale: " + defaultLocale + " Unknown locale! Defaulting to: " + locale.toLanguageTag()).color(ChatColor.RED).create());
+				locale = Locale.US;
+			}
+			defaultLocale = locale.toLanguageTag();
 			BungeeLanguageManager.setDefaultLanguage(defaultLocale);
 			
 			backend = getString(conf, "Backend", backend);

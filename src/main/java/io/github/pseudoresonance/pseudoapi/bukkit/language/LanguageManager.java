@@ -9,10 +9,12 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -141,26 +143,35 @@ public class LanguageManager {
 		}
 		if (langDir.exists()) {
 			for (File f : langDir.listFiles()) {
-				String lang = f.getName().substring(0, f.getName().length() - 5);
-				YamlConfiguration yaml = YamlConfiguration.loadConfiguration(f);
-				Language language = getLanguage(lang);
-				if (language == null) {
-					language = new Language(lang);
-					registerLanguage(lang, language);
-				}
-				HashMap<String, String> langMap = new HashMap<String, String>();
-				for (String namespace : yaml.getKeys(false)) {
-					if (namespace.equals("date")) {
-						if (!plugin.getName().equals(PseudoAPI.plugin.getName())) {
-							continue;
+				if (f.getName().length() > 5) {
+					String lang = f.getName().substring(0, f.getName().length() - 5);
+					Locale locale = new Locale.Builder().setLanguageTag(lang).build();
+					if (!LocaleUtils.isAvailableLocale(locale)) {
+						plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Invalid locale file: " + f.getName() + " Unknown locale!");
+						continue;
+					}
+					lang = locale.toLanguageTag();
+					YamlConfiguration yaml = YamlConfiguration.loadConfiguration(f);
+					Language language = getLanguage(lang);
+					if (language == null) {
+						language = new Language(lang);
+						registerLanguage(lang, language);
+					}
+					HashMap<String, String> langMap = new HashMap<String, String>();
+					for (String namespace : yaml.getKeys(false)) {
+						if (namespace.equals("date")) {
+							if (!plugin.getName().equals(PseudoAPI.plugin.getName())) {
+								continue;
+							}
+						}
+						ConfigurationSection cs = yaml.getConfigurationSection(namespace);
+						for (String key : cs.getKeys(false)) {
+							langMap.put(namespace + "." + key, cs.getString(key));
 						}
 					}
-					ConfigurationSection cs = yaml.getConfigurationSection(namespace);
-					for (String key : cs.getKeys(false)) {
-						langMap.put(namespace + "." + key, cs.getString(key));
-					}
-				}
-				language.addLanguageMap(langMap);
+					language.addLanguageMap(langMap);
+				} else
+					plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Invalid locale file: " + f.getName() + " Unknown locale!");
 			}
 		}
 	}

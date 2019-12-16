@@ -2,6 +2,10 @@ package io.github.pseudoresonance.pseudoapi.bukkit;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import javax.tools.ToolProvider;
+
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -13,6 +17,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.commands.ReloadLocalizationSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ReloadSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ResetLocalizationSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.ResetSC;
+import io.github.pseudoresonance.pseudoapi.bukkit.commands.SetLocalizationSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.commands.UpdateSC;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.BlockL;
@@ -36,6 +41,8 @@ public class PseudoAPI extends PseudoPlugin {
 	private static Config pluginConfig;
 
 	private static ArrayList<PluginConfig> config = new ArrayList<PluginConfig>();
+	
+	private static Metrics metrics = null;
 
 	public void onLoad() {
 		PseudoUpdater.registerPlugin(this);
@@ -68,8 +75,8 @@ public class PseudoAPI extends PseudoPlugin {
 			public void run() {
 				PseudoUpdater.checkUpdates(true);
 			}
-
 		}, Config.startupDelay * 20);
+		initializeMetrics();
 	}
 
 	public void onDisable() {
@@ -78,6 +85,20 @@ public class PseudoAPI extends PseudoPlugin {
 			getChat().sendConsolePluginError(Errors.CUSTOM, BungeeLanguageManager.getLanguage().getMessage("pseudoapi.delete_before_restart", f.getName()));
 		}
 		Bukkit.getScheduler().cancelTasks(this);
+	}
+	
+	private void initializeMetrics() {
+		metrics = new Metrics(this);
+		metrics.addCustomChart(new Metrics.SimplePie("default_language", () -> {
+	        return Config.defaultLocale;
+	    }));
+		metrics.addCustomChart(new Metrics.SimplePie("java_type", () -> {
+			return ToolProvider.getSystemJavaCompiler() == null ? "JRE" : "JDK";
+	    }));
+	}
+	
+	public static Metrics getMetrics() {
+		return metrics;
 	}
 	
 	public void doSync(Runnable run) {
@@ -117,6 +138,7 @@ public class PseudoAPI extends PseudoPlugin {
 		subCommands.put("reset", new ResetSC());
 		subCommands.put("reloadlocalization", new ReloadLocalizationSC());
 		subCommands.put("resetlocalization", new ResetLocalizationSC());
+		subCommands.put("setlocalization", new SetLocalizationSC());
 		subCommands.put("backend", new BackendSC());
 		subCommands.put("update", new UpdateSC());
 	}
@@ -138,6 +160,7 @@ public class PseudoAPI extends PseudoPlugin {
 		this.commandDescriptions.add(new CommandDescription("pseudoapi reloadlocalization", "pseudoapi.pseudoapi_reloadlocalization_help", "pseudoapi.reloadlocalization"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi reset", "pseudoapi.pseudoapi_reset_help", "pseudoapi.reset"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi resetlocalization", "pseudoapi.pseudoapi_resetlocalization_help", "pseudoapi.resetlocalization"));
+		this.commandDescriptions.add(new CommandDescription("pseudoapi setlocalization <locale> (player)", "pseudoapi.pseudoapi_setlocalization_help", "pseudoapi.setlocalization", false));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi backend list", "pseudoapi.pseudoapi_backend_list_help", "pseudoapi.backend"));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi backend migrate <from> <to>", "pseudoapi.pseudoapi_backend_migrate_help", "pseudoapi.backend", false));
 		this.commandDescriptions.add(new CommandDescription("pseudoapi update", "pseudoapi.pseudoapi_update_help", "pseudoapi.update"));
