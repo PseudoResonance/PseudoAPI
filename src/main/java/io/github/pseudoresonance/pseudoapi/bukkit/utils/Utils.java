@@ -1,7 +1,5 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.utils;
 
-import java.util.concurrent.TimeUnit;
-
 import org.bukkit.Bukkit;
 
 public class Utils {
@@ -19,47 +17,13 @@ public class Utils {
 		return bukkitVersion;
 	}
 
-	@Deprecated
-	public static String millisToHumanFormat(long millis) {
-		if (millis < 0) {
-			throw new IllegalArgumentException("Duration must be greater than zero!");
-		}
-
-		long days = TimeUnit.MILLISECONDS.toDays(millis);
-		millis -= TimeUnit.DAYS.toMillis(days);
-		long hours = TimeUnit.MILLISECONDS.toHours(millis);
-		millis -= TimeUnit.HOURS.toMillis(hours);
-		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-		millis -= TimeUnit.MINUTES.toMillis(minutes);
-		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
-
-		String day = days + " Day";
-		if (days > 1 || days == 0) {
-			day += "s";
-		}
-		String hour = hours + " Hour";
-		if (hours > 1 || hours == 0) {
-			hour += "s";
-		}
-		String minute = minutes + " Minute";
-		if (minutes > 1 || minutes == 0) {
-			minute += "s";
-		}
-		String second = seconds + " Second";
-		if (seconds > 1 || seconds == 0) {
-			second += "s";
-		}
-
-		String s = "";
-		if (days > 0)
-			s = day + " " + hour + " " + minute + " " + second;
-		else if (hours > 0)
-			s = hour + " " + minute + " " + second;
-		else if (minutes > 0)
-			s = minute + " " + second;
-		else
-			s = second;
-		return s;
+	public static String bytesToHumanFormat(long bytes, boolean si) {
+		int unit = si ? 1000 : 1024;
+		if (bytes < unit)
+			return bytes + " B";
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
 }
