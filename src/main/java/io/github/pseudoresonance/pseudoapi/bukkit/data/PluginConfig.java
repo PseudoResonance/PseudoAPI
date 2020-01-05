@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -206,26 +208,26 @@ public abstract class PluginConfig {
 	 * @param def Default value
 	 * @return String of color codes from given key
 	 */
-	public static String getColorCodes(FileConfiguration fc, String key, String def) {
+	public static ChatColor[] getColorCodes(FileConfiguration fc, String key, ChatColor[] def) {
 		if (fc.contains(key)) {
 			String val = fc.getString(key);
 			String[] colors = val.split(",");
-			StringBuilder sb = new StringBuilder();
+			ArrayList<ChatColor> ret = new ArrayList<ChatColor>();
 			for (String s : colors) {
 				try {
 					if (s.length() == 1) {
-						sb.append(ChatColor.getByChar(s.charAt(0)));
+						ret.add(ChatColor.getByChar(s.charAt(0)));
 					} else if (s.length() == 2 && (s.charAt(0) == '&' || s.charAt(0) == '§')) {
-						sb.append(ChatColor.getByChar(s.charAt(1)));
+						ret.add(ChatColor.getByChar(s.charAt(1)));
 					} else {
-						sb.append(Enum.valueOf(ChatColor.class, s.toUpperCase()));
+						ret.add(Enum.valueOf(ChatColor.class, s.toUpperCase()));
 					}
 				} catch (Exception e) {
 					Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 					return def;
 				}
 			}
-			return sb.toString();
+			return ret.toArray(new ChatColor[ret.size()]);
 		} else {
 			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
 			return def;

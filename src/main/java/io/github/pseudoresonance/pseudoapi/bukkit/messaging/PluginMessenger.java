@@ -99,8 +99,8 @@ public class PluginMessenger implements PluginMessageListener {
 					out.writeLong((long) o);
 				else if (o instanceof Short)
 					out.writeShort((short) o);
-				else if (o instanceof String)
-					out.writeUTF((String) o);
+				else
+					out.writeUTF(o.toString());
 			}
 		}
 		p.sendPluginMessage(PseudoAPI.plugin, channelBungeeName, out.toByteArray());

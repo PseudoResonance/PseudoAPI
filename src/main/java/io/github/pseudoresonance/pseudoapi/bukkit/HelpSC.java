@@ -9,11 +9,11 @@ import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatElement;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ElementBuilder;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent.ComponentType;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class HelpSC implements SubCommandExecutor {
 
@@ -45,11 +45,15 @@ public class HelpSC implements SubCommandExecutor {
 			for (int i = 0; i <= 9; i++) {
 				if (i < commands.size()) {
 					CommandDescription cd = commands.get(i);
-					if (cd.getRunnable()) {
-						messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(Config.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"))), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(LanguageManager.getLanguage(sender).getMessage(cd.getDescriptionKey())))).build());
-					} else {
-						messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"))), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(LanguageManager.getLanguage(sender).getMessage(cd.getDescriptionKey())))).build());
-					}
+					TextComponent cmdMessage = new TextComponent("/" + ChatColor.stripColor(cd.getCommand()));
+					Chat.setComponentColors(cmdMessage, Config.commandColorArray);
+					cmdMessage.setClickEvent(new ClickEvent(cd.getRunnable() ? Config.clickEvent : ClickEvent.Action.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())));
+					TextComponent hoverMessage = new TextComponent(LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"));
+					Chat.setComponentColors(hoverMessage, Config.descriptionColorArray);
+					cmdMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {hoverMessage}));
+					TextComponent message = new TextComponent(" " + ChatColor.stripColor(LanguageManager.getLanguage(sender).getMessage(cd.getDescriptionKey())));
+					Chat.setComponentColors(message, Config.descriptionColorArray);
+					messages.add(new BaseComponent[] {cmdMessage, message});
 				}
 			}
 			if (commands.size() > 10) {
@@ -74,11 +78,15 @@ public class HelpSC implements SubCommandExecutor {
 					for (int i = (page - 1) * 10; i <= ((page - 1) * 10) + 9; i++) {
 						if (i < commands.size()) {
 							CommandDescription cd = commands.get(i);
-							if (cd.getRunnable()) {
-								messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(Config.clickEvent, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"))), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(LanguageManager.getLanguage(sender).getMessage(cd.getDescriptionKey())))).build());
-							} else {
-								messages.add(new ElementBuilder(new ChatElement(Config.commandColor + "/" + ChatColor.stripColor(cd.getCommand()), new ChatComponent(ComponentType.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"))), new ChatElement(" " + Config.descriptionColor + ChatColor.stripColor(LanguageManager.getLanguage(sender).getMessage(cd.getDescriptionKey())))).build());
-							}
+							TextComponent cmdMessage = new TextComponent("/" + ChatColor.stripColor(cd.getCommand()));
+							Chat.setComponentColors(cmdMessage, Config.commandColorArray);
+							cmdMessage.setClickEvent(new ClickEvent(cd.getRunnable() ? Config.clickEvent : ClickEvent.Action.SUGGEST_COMMAND, "/" + ChatColor.stripColor(cd.getCommand())));
+							TextComponent hoverMessage = new TextComponent(LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"));
+							Chat.setComponentColors(hoverMessage, Config.descriptionColorArray);
+							cmdMessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {hoverMessage}));
+							TextComponent message = new TextComponent(" " + ChatColor.stripColor(LanguageManager.getLanguage(sender).getMessage(cd.getDescriptionKey())));
+							Chat.setComponentColors(message, Config.descriptionColorArray);
+							messages.add(new BaseComponent[] {cmdMessage, message});
 						}
 					}
 					messages.add(Config.borderColor + "===---" + Config.titleColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.page_number", page, total) + Config.borderColor + "---===");

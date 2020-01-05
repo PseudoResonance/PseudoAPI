@@ -3,7 +3,7 @@
 ###########################
 
 # DO NOT CHANGE THIS LINE! YOUR CONFIG WILL BE RESET UPON LOADING IF THIS LINE IS EDITED!
-Version: 9
+Version: 10
 
 ###########
 # Plugins #
@@ -86,14 +86,19 @@ TextColor: GREEN
 # Error Text Color
 ErrorTextColor: RED
 
+# Plugin Prefix Color
+PluginPrefixColor: BLUE,BOLD
+
+# Plugin Error Prefix Color
+PluginErrorPrefixColor: BLUE,BOLD
+
 # Plugin Message Format
 # {name} = Full Plugin Name
 # {nickname} = Plugin Nickname (If present, otherwise the full name will be used)
 # {player} = Player Name
 # {playernick} = Player Nickname
 # {message} = Message
-# Color Codes Enabled
-MessageFormat: "&9&l{nickname}> {message}"
+MessageFormat: "{nickname}> {message}"
 
 # Plugin Error Message Format
 # {name} = Full Plugin Name
@@ -101,8 +106,7 @@ MessageFormat: "&9&l{nickname}> {message}"
 # {player} = Player Name
 # {playernick} = Player Nickname
 # {message} = Message
-# Color Codes Enabled
-ErrorMessageFormat: "&9&l{nickname}> {message}"
+ErrorMessageFormat: "{nickname}> {message}"
 
 # Click Command Event
 # Suggest or Run

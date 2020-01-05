@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Config.ConsoleFormat;
 import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatElement;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
 
 public class Chat {
 
@@ -65,8 +65,8 @@ public class Chat {
 				Object o = messages.get(i);
 				if (o instanceof String) {
 					sender.sendMessage((String) o);
-				} else if (o instanceof ChatElement[]) {
-					Chat.sendJSONMessage((Player) sender, (ChatElement[]) o);
+				} else if (o instanceof BaseComponent[]) {
+					sender.spigot().sendMessage((BaseComponent[]) o);
 				} else {
 					throw new IllegalArgumentException("Not String or JSON");
 				}
@@ -77,8 +77,8 @@ public class Chat {
 					Object o = messages.get(i);
 					if (o instanceof String) {
 						console.sendMessage((String) o);
-					} else if (o instanceof ChatElement[]) {
-						console.sendMessage(ChatElement.toText((ChatElement[]) o));
+					} else if (o instanceof BaseComponent[]) {
+						console.spigot().sendMessage((BaseComponent[]) o);
 					} else {
 						throw new IllegalArgumentException("Not String or JSON");
 					}
@@ -88,8 +88,8 @@ public class Chat {
 					Object o = messages.get(i);
 					if (o instanceof String) {
 						console.sendMessage((String) o);
-					} else if (o instanceof ChatElement[]) {
-						console.sendMessage(ChatElement.toText((ChatElement[]) o));
+					} else if (o instanceof BaseComponent[]) {
+						console.spigot().sendMessage((BaseComponent[]) o);
 					} else {
 						throw new IllegalArgumentException("Not String or JSON");
 					}
@@ -116,8 +116,8 @@ public class Chat {
 	public void sendPluginMessage(CommandSender sender, String message) {
 		String format = Config.messageFormat;
 		format = format.replace("{message}", Config.textColor + message);
-		format = format.replace("{name}", plugin.getPluginName());
-		format = format.replace("{nickname}", plugin.getOutputName());
+		format = format.replace("{name}", Config.pluginPrefixColor + plugin.getPluginName());
+		format = format.replace("{nickname}", Config.pluginPrefixColor + plugin.getOutputName());
 		if (sender instanceof Player) {
 			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", ((Player) sender).getName());
@@ -178,8 +178,8 @@ public class Chat {
 				format = format.replace("{message}", Config.errorTextColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.errors_generic"));
 				break;
 		}
-		format = format.replace("{name}", plugin.getPluginName());
-		format = format.replace("{nickname}", plugin.getOutputName());
+		format = format.replace("{name}", Config.pluginPrefixColor + plugin.getPluginName());
+		format = format.replace("{nickname}", Config.pluginPrefixColor + plugin.getOutputName());
 		if (sender instanceof Player) {
 			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", ((Player) sender).getName());
@@ -222,8 +222,8 @@ public class Chat {
 			default:
 				throw new IllegalArgumentException("Only error generic allowed");
 		}
-		format = format.replace("{name}", plugin.getPluginName());
-		format = format.replace("{nickname}", plugin.getOutputName());
+		format = format.replace("{name}", Config.pluginPrefixColor + plugin.getPluginName());
+		format = format.replace("{nickname}", Config.pluginPrefixColor + plugin.getOutputName());
 		if (sender instanceof Player) {
 			format = ChatColor.translateAlternateColorCodes('&', format);
 			format = format.replace("{player}", ((Player) sender).getName());
@@ -241,95 +241,50 @@ public class Chat {
 			console.sendMessage(format);
 		}
 	}
-
+	
 	/**
-	 * Sends a JSON message to a {@link Player}
+	 * Sets the colors of the given {@link BaseComponent} from the given array of {@link ChatColor}s
 	 * 
-	 * @param p Recipient of message
-	 * @param elements Elements of JSON message
+	 * @param component {@link BaseComponent} to be modified
+	 * @param colors Array of {@link ChatColor}s
 	 * 
-	 * @throws NullPointerException If supplied player is offline
+	 * @return Modified {@link BaseComponent}
 	 */
-	public static void sendJSONMessage(Player p, ChatElement... elements) throws NullPointerException {
-		if (p != null) {
-			String end = "[\"\"";
-			if (elements.length == 0) {
-				end = end + "]";
-			} else {
-				for (ChatElement e : elements) {
-					end = end + e.build();
-				}
-				end = end + "]";
+	public static BaseComponent setComponentColors(BaseComponent component, ChatColor[] colors) {
+		ChatColor color = ChatColor.RESET;
+		boolean obfuscated = false;
+		boolean bold = false;
+		boolean strikethrough = false;
+		boolean underline = false;
+		boolean italic = false;
+		for (ChatColor c : colors) {
+			switch (c) {
+			case MAGIC:
+				obfuscated = true;
+				break;
+			case BOLD:
+				bold = true;
+				break;
+			case STRIKETHROUGH:
+				strikethrough = true;
+				break;
+			case UNDERLINE:
+				underline = true;
+				break;
+			case ITALIC:
+				italic = true;
+				break;
+			default:
+				color = c;
 			}
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + p.getName() + " " + end);
-		} else {
-			throw new NullPointerException("Player not online");
 		}
-	}
-
-	/**
-	 * Sends a JSON message to all online players
-	 * 
-	 * @param elements Elements of JSON message
-	 */
-	public static void broadcastJSONMessage(ChatElement... elements) {
-		String end = "[\"\"";
-		if (elements.length == 0) {
-			end = end + "]";
-		} else {
-			for (ChatElement e : elements) {
-				end = end + e.build();
-			}
-			end = end + "]";
-		}
-		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + p.getName() + " " + end);
-		}
-	}
-
-	/**
-	 * Sends a JSON message to a {@link Player}
-	 * 
-	 * @param p Recipient of message
-	 * @param elements Elements of JSON message
-	 * 
-	 * @throws NullPointerException If supplied player is offline
-	 */
-	public static void sendJSONMessage(Player p, List<ChatElement> elements) throws NullPointerException {
-		if (p != null) {
-			String end = "[\"\"";
-			if (elements.size() == 0) {
-				end = end + "]";
-			} else {
-				for (ChatElement e : elements) {
-					end = end + e.build();
-				}
-				end = end + "]";
-			}
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + p.getName() + " " + end);
-		} else {
-			throw new NullPointerException("Player not online");
-		}
-	}
-
-	/**
-	 * Sends a JSON message to all online players
-	 * 
-	 * @param elements Elements of JSON message
-	 */
-	public static void broadcastJSONMessage(List<ChatElement> elements) {
-		String end = "[\"\"";
-		if (elements.size() == 0) {
-			end = end + "]";
-		} else {
-			for (ChatElement e : elements) {
-				end = end + e.build();
-			}
-			end = end + "]";
-		}
-		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "tellraw " + p.getName() + " " + end);
-		}
+		component.setColor(color);
+		component.setObfuscated(obfuscated);
+		component.setBold(bold);
+		component.setStrikethrough(strikethrough);
+		component.setUnderlined(underline);
+		component.setItalic(italic);
+		return component;
 	}
 
 	public enum Errors {

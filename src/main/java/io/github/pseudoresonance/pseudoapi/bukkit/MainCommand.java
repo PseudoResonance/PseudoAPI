@@ -10,10 +10,10 @@ import org.bukkit.command.CommandSender;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatElement;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ElementBuilder;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent.ComponentType;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class MainCommand implements CommandExecutor {
 
@@ -40,8 +40,19 @@ public class MainCommand implements CommandExecutor {
 			String[] split = LanguageManager.getLanguage(sender).getUnprocessedMessage("pseudoapi.plugin_help_suggestion").split("\\{\\$1\\$\\}");
 			String end = "";
 			if (split.length > 1)
-				end = split[1];
-			messages.add(new ElementBuilder(new ChatElement(Config.descriptionColor + split[0]), new ChatElement(Config.commandColor + "/" + cmd.getName() + " help", new ChatComponent(Config.clickEvent, "/" + plugin.getOutputName() + ":" + cmd.getName() + " help"), new ChatComponent(ComponentType.SHOW_TEXT, Config.descriptionColor + LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"))), new ChatElement(Config.descriptionColor + end)).build());
+				for (int i = 1; i < split.length; i++)
+					end += split[i];
+			TextComponent first = new TextComponent(split[0]);
+			Chat.setComponentColors(first, Config.descriptionColorArray);
+			TextComponent command = new TextComponent("/" + cmd.getName() + " help");
+			Chat.setComponentColors(command, Config.commandColorArray);
+			command.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getOutputName() + ":" + cmd.getName() + " help"));
+			TextComponent hover = new TextComponent(LanguageManager.getLanguage(sender).getMessage("pseudoapi.click_to_run"));
+			Chat.setComponentColors(hover, Config.descriptionColorArray);
+			command.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new BaseComponent[] {hover}));
+			TextComponent last = new TextComponent(end);
+			Chat.setComponentColors(last, Config.descriptionColorArray);
+			messages.add(new BaseComponent[] {first, command, last});
 			Chat.sendMessage(sender, messages);
 			return true;
 		} else {

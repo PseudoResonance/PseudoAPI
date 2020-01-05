@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.apache.commons.lang.LocaleUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -18,8 +19,8 @@ import io.github.pseudoresonance.pseudoapi.bukkit.data.FileBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.PluginConfig;
 import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.ChatComponent.ComponentType;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ClickEvent;
 
 public class Config extends PluginConfig {
 
@@ -33,15 +34,25 @@ public class Config extends PluginConfig {
 
 	public static boolean bungeeEnabled = false;
 
-	public static String borderColor = "&3";
-	public static String titleColor = "&6";
-	public static String commandColor = "&c";
-	public static String descriptionColor = "&b";
-	public static String textColor = "&a";
-	public static String errorTextColor = "&c";
+	public static String borderColor = "§3";
+	public static String titleColor = "§6";
+	public static String commandColor = "§c";
+	public static String descriptionColor = "§b";
+	public static String textColor = "§a";
+	public static String errorTextColor = "§c";
+	public static String pluginPrefixColor = "§9§l";
+	public static String pluginErrorPrefixColor = "§9§l";
+	public static ChatColor[] borderColorArray = new ChatColor[] { ChatColor.DARK_AQUA };
+	public static ChatColor[] titleColorArray = new ChatColor[] { ChatColor.GOLD };
+	public static ChatColor[] commandColorArray = new ChatColor[] { ChatColor.RED};
+	public static ChatColor[] descriptionColorArray = new ChatColor[] { ChatColor.AQUA };
+	public static ChatColor[] textColorArray = new ChatColor[] { ChatColor.GREEN };
+	public static ChatColor[] errorTextColorArray = new ChatColor[] { ChatColor.RED };
+	public static ChatColor[] pluginPrefixColorArray = new ChatColor[] { ChatColor.BLUE, ChatColor.BOLD };
+	public static ChatColor[] pluginErrorPrefixColorArray = new ChatColor[] { ChatColor.BLUE, ChatColor.BOLD };
 	public static String messageFormat = "&9&l{nickname}> &a{message}";
 	public static String errorMessageFormat = "&9&l{nickname}> &c{message}";
-	public static ComponentType clickEvent = ComponentType.RUN_COMMAND;
+	public static ClickEvent.Action clickEvent = ClickEvent.Action.RUN_COMMAND;
 	public static ConsoleFormat consoleFormat = ConsoleFormat.BOTTOM;
 
 	public static boolean startupUpdate = true;
@@ -113,19 +124,29 @@ public class Config extends PluginConfig {
 
 		bungeeEnabled = PluginConfig.getBoolean(fc, "BungeeEnabled", bungeeEnabled);
 
-		borderColor = PluginConfig.getColorCodes(fc, "BorderColor", borderColor);
-		titleColor = PluginConfig.getColorCodes(fc, "TitleColor", titleColor);
-		commandColor = PluginConfig.getColorCodes(fc, "CommandColor", commandColor);
-		descriptionColor = PluginConfig.getColorCodes(fc, "DescriptionColor", descriptionColor);
-		textColor = PluginConfig.getColorCodes(fc, "TextColor", textColor);
-		errorTextColor = PluginConfig.getColorCodes(fc, "ErrorTextColor", errorTextColor);
+		borderColorArray = PluginConfig.getColorCodes(fc, "BorderColor", borderColorArray);
+		titleColorArray = PluginConfig.getColorCodes(fc, "TitleColor", titleColorArray);
+		commandColorArray = PluginConfig.getColorCodes(fc, "CommandColor", commandColorArray);
+		descriptionColorArray = PluginConfig.getColorCodes(fc, "DescriptionColor", descriptionColorArray);
+		textColorArray = PluginConfig.getColorCodes(fc, "TextColor", textColorArray);
+		errorTextColorArray = PluginConfig.getColorCodes(fc, "ErrorTextColor", errorTextColorArray);
+		pluginPrefixColorArray = PluginConfig.getColorCodes(fc, "PluginPrefixColor", pluginPrefixColorArray);
+		pluginErrorPrefixColorArray = PluginConfig.getColorCodes(fc, "PluginErrorPrefixColor", pluginErrorPrefixColorArray);
+		borderColor = StringUtils.join(borderColorArray);
+		titleColor = StringUtils.join(titleColorArray);
+		commandColor = StringUtils.join(commandColorArray);
+		descriptionColor = StringUtils.join(descriptionColorArray);
+		textColor = StringUtils.join(textColorArray);
+		errorTextColor = StringUtils.join(errorTextColorArray);
+		pluginPrefixColor = StringUtils.join(pluginPrefixColorArray);
+		pluginErrorPrefixColor = StringUtils.join(pluginErrorPrefixColorArray);
 		messageFormat = PluginConfig.getString(fc, "MessageFormat", messageFormat);
 		errorMessageFormat = PluginConfig.getString(fc, "ErrorMessageFormat", errorMessageFormat);
 		String clickEvent = PluginConfig.getString(fc, "ClickEvent", Config.clickEvent.toString());
 		if (clickEvent.equalsIgnoreCase("suggest") || clickEvent.equalsIgnoreCase("suggest_command"))
-			Config.clickEvent = ComponentType.SUGGEST_COMMAND;
+			Config.clickEvent = ClickEvent.Action.SUGGEST_COMMAND;
 		else if (clickEvent.equalsIgnoreCase("run") || clickEvent.equalsIgnoreCase("run_command"))
-			Config.clickEvent = ComponentType.RUN_COMMAND;
+			Config.clickEvent = ClickEvent.Action.RUN_COMMAND;
 		else {
 			PseudoAPI.plugin.getChat().sendConsolePluginMessage(ChatColor.RED + "Invalid config option for ClickEvent!");
 		}
