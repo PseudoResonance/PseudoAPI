@@ -102,6 +102,8 @@ pseudoapi:
   set_localization_others: "Set localization to {$1$} for {$2$}!"
   unknown_localization: "Unknown localization!"
   add_player_to_set: "Please add a player to set!"
+  error_failed_itemutils_setup: "Failed to setup ItemUtils!"
+  error_itemutils_failed: "ItemUtils failed!"
   permission_view_plugins: "view plugins"
   permission_modify_backends: "modify backends"
   permission_reload_localization: "reload the localization"
