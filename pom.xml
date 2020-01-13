@@ -8,7 +8,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<revision>5.1.2</revision>
-		<lowerName>pseudoplayers</lowerName>
+		<lowerName>pseudoapi</lowerName>
 	</properties>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
