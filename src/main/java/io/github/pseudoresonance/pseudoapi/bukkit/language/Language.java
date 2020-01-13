@@ -9,12 +9,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public class Language {
 
 	private final String lang;
-	private final HashMap<String, String> languageMap = new HashMap<String, String>();
+	private final ConcurrentHashMap<String, String> languageMap = new ConcurrentHashMap<String, String>();
 
 	private Pattern dateFormatPattern = Pattern.compile("\\{\\$date\\.date\\$\\}");
 	private Pattern dateTimeFormatPattern = Pattern.compile("\\{\\$date\\.dateTime\\$\\}");

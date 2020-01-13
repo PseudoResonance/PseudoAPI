@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -27,7 +28,7 @@ import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 
 public class LanguageManager {
 	
-	private static final HashMap<String, Language> languages = new HashMap<String, Language>();
+	private static final ConcurrentHashMap<String, Language> languages = new ConcurrentHashMap<String, Language>();
 	
 	private static String defaultLanguage;
 	
