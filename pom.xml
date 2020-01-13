@@ -7,7 +7,7 @@
 	<version>${revision}</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<revision>5.1.1</revision>
+		<revision>5.1.2</revision>
 	</properties>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

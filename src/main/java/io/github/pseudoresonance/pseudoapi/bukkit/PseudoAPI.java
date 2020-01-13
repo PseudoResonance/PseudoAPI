@@ -51,11 +51,11 @@ public class PseudoAPI extends PseudoPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
-		super.onEnable();
 		this.saveDefaultConfig();
 		pluginConfig = new Config(this);
 		pluginConfig.updateConfig();
 		pluginConfig.reloadConfig();
+		super.onEnable();
 		mainCommand = new MainCommand(plugin);
 		helpSubCommand = new HelpSC(plugin);
 		pluginsCommand = new PluginsC();
