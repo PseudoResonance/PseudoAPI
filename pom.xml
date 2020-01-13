@@ -8,6 +8,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<revision>5.1.2</revision>
+		<lowerName>pseudoplayers</lowerName>
 	</properties>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -42,7 +43,7 @@
 							<relocations>
 								<relocation>
 									<pattern>org.bstats</pattern>
-									<shadedPattern>io.github.pseudoresonance.bstats</shadedPattern>
+									<shadedPattern>${project.groupId}.${lowerName}.bstats</shadedPattern>
 								</relocation>
 							</relocations>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
