@@ -77,8 +77,9 @@ public class ItemUtils {
 				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.error_failed_itemutils_setup"));
 				e.printStackTrace();
 			}
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	public static BaseComponent[] getAsTextComponent(ItemStack is) {
