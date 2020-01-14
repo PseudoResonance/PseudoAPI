@@ -8,9 +8,7 @@ import org.bukkit.entity.Player;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.SubCommandExecutor;
 import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
-import io.github.pseudoresonance.pseudoapi.bukkit.data.Data;
 import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
-import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 
 public class ResetSC implements SubCommandExecutor {
@@ -28,8 +26,6 @@ public class ResetSC implements SubCommandExecutor {
 				return false;
 			}
 			PseudoAPI.getPluginConfig().reloadConfig();
-			Data.loadBackends();
-			PlayerDataController.update();
 			PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.config_reset"));
 			return true;
 		} else {

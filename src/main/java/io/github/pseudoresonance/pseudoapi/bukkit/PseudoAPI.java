@@ -68,8 +68,6 @@ public class PseudoAPI extends PseudoPlugin {
 		for (Player p : Bukkit.getServer().getOnlinePlayers()) {
 			PlayerJoinLeaveL.playerJoin(p);
 		}
-		PlayerDataController.update();
-		ServerPlayerDataController.update();
 		PluginMessenger.enable();
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			public void run() {
@@ -111,12 +109,6 @@ public class PseudoAPI extends PseudoPlugin {
 
 	public static void registerConfig(PluginConfig r) {
 		config.add(r);
-	}
-
-	public static void reloadAll() {
-		for (PluginConfig r : config) {
-			r.reloadConfig();
-		}
 	}
 
 	public static Config getPluginConfig() {

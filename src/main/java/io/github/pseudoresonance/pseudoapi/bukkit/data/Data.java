@@ -6,6 +6,8 @@ import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.Chat;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
+import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
+import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.ServerPlayerDataController;
 import net.md_5.bungee.api.ChatColor;
 
 public class Data {
@@ -63,6 +65,8 @@ public class Data {
 			Chat.sendConsoleMessage(ChatColor.RED + LanguageManager.getLanguage().getMessage("pseudoapi.no_server_backend"));
 			serverBackend = globalBackend;
 		}
+		PlayerDataController.update();
+		ServerPlayerDataController.update();
 	}
 
 }
