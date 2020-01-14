@@ -1,16 +1,23 @@
 package io.github.pseudoresonance.pseudoapi.bungee;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import org.json.JSONArray;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Config;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.JsonReader;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -26,6 +33,8 @@ public class PseudoUpdater {
 
 	private static Download asyncUpdater = null;
 	private static ScheduledTask updateTask = null;
+
+	private static final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 	protected static void checkUpdates(CommandSender sender) {
 		ProxyServer.getInstance().getScheduler().runAsync(PseudoAPI.plugin, new Update(sender));
@@ -121,17 +130,17 @@ public class PseudoUpdater {
 		@Override
 		public void run() {
 			switch (type) {
-				case 0:
-					checkUpdates(true);
-					break;
-				case 1:
-					checkUpdates(false);
-					break;
-				case 2:
-					checkUpdates(sender);
-					break;
-				default:
-					break;
+			case 0:
+				checkUpdates(true);
+				break;
+			case 1:
+				checkUpdates(false);
+				break;
+			case 2:
+				checkUpdates(sender);
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -144,51 +153,45 @@ public class PseudoUpdater {
 					p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.beginning_update_check")).color(ChatColor.GREEN).create());
 				}
 			}
-			String urlPart = "https://circleci.com/api/v1.1/project/github/" + PseudoAPI.plugin.getDescription().getAuthor() + "/" + PseudoAPI.plugin.getDescription().getName();
-			String buildCheck = urlPart + "?limit=1&filter=completed";
-			JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
-			int build = buildJson.getJSONObject(0).getInt("build_num");
-			String artifactCheck = urlPart + "/" + build + "/artifacts";
-			JSONArray artifactJson = JsonReader.readJsonFromUrl(artifactCheck);
-			String url = "";
-			String version = "";
-			for (int i = 0; i < artifactJson.length(); i++) {
-				String aUrl = artifactJson.getJSONObject(i).getString("url");
-				if (aUrl.endsWith(".jar")) {
-					if (!aUrl.endsWith("-SNAPSHOT.jar")) {
-						url = aUrl;
+			String versionURL = "https://nexus.otake.pw/repository/maven-public/io/github/pseudoresonance/PseudoAPI/maven-metadata.xml";
+			try {
+				DocumentBuilder db = dbf.newDocumentBuilder();
+				URLConnection con = new URL(versionURL).openConnection();
+				con.setRequestProperty("User-Agent", io.github.pseudoresonance.pseudoapi.bukkit.PseudoUpdater.userAgent);
+				con.connect();
+				try (InputStream is = con.getInputStream()) {
+					Document doc = db.parse(is);
+					doc.getDocumentElement().normalize();
+					String version = doc.getElementsByTagName("latest").item(0).getTextContent();
+					if (isNewer(version, PseudoAPI.plugin.getDescription().getVersion())) {
+						update = true;
+						sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+						for (ProxiedPlayer pl : ProxyServer.getInstance().getPlayers()) {
+							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+								pl.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+							}
+						}
+						try {
+							File file = PseudoAPI.plugin.getFile();
+							if (file instanceof File) {
+								PseudoAPI.plugin.getProxy().getPluginsFolder().mkdir();
+								updateUrl = new UpdateData(new File(PseudoAPI.plugin.getProxy().getPluginsFolder(), ((File) file).getName()), "https://ci.otake.pw/job/PseudoAPI/lastSuccessfulBuild/artifact/artifacts/PseudoAPI.jar");
+							}
+						} catch (IllegalArgumentException e) {
+							sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar")).color(ChatColor.RED).create());
+							e.printStackTrace();
+						}
 					} else {
-						String test = aUrl.replaceFirst(".*\\/artifacts\\/" + PseudoAPI.plugin.getDescription().getName() + "-", "");
-						test = test.substring(0, test.length() - 13);
-						version = test;
+						sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+						for (ProxiedPlayer pl : ProxyServer.getInstance().getPlayers()) {
+							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+								pl.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+							}
+						}
 					}
 				}
-			}
-			if (isNewer(version, PseudoAPI.plugin.getDescription().getVersion())) {
-				update = true;
-				sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-				for (ProxiedPlayer pl : ProxyServer.getInstance().getPlayers()) {
-					if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-						pl.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-					}
-				}
-				try {
-					File file = PseudoAPI.plugin.getFile();
-					if (file instanceof File) {
-						PseudoAPI.plugin.getProxy().getPluginsFolder().mkdir();
-						updateUrl = new UpdateData(new File(PseudoAPI.plugin.getProxy().getPluginsFolder(), ((File) file).getName()), url);
-					}
-				} catch (IllegalArgumentException e) {
-					sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar")).color(ChatColor.RED).create());
-					e.printStackTrace();
-				}
-			} else {
-				sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-				for (ProxiedPlayer pl : ProxyServer.getInstance().getPlayers()) {
-					if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-						pl.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-					}
-				}
+			} catch (IOException | SAXException | ParserConfigurationException e1) {
+				e1.printStackTrace();
 			}
 			if (update) {
 				sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.completed_update_check", 1)).color(ChatColor.GREEN).create());
@@ -242,51 +245,45 @@ public class PseudoUpdater {
 					p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.beginning_update_check")).color(ChatColor.GREEN).create());
 				}
 			}
-			String urlPart = "https://circleci.com/api/v1.1/project/github/" + PseudoAPI.plugin.getDescription().getAuthor() + "/" + PseudoAPI.plugin.getDescription().getName();
-			String buildCheck = urlPart + "?limit=1&filter=completed";
-			JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
-			int build = buildJson.getJSONObject(0).getInt("build_num");
-			String artifactCheck = urlPart + "/" + build + "/artifacts";
-			JSONArray artifactJson = JsonReader.readJsonFromUrl(artifactCheck);
-			String url = "";
-			String version = "";
-			for (int i = 0; i < artifactJson.length(); i++) {
-				String aUrl = artifactJson.getJSONObject(i).getString("url");
-				if (aUrl.endsWith(".jar")) {
-					if (!aUrl.endsWith("-SNAPSHOT.jar")) {
-						url = aUrl;
+			String versionURL = "https://nexus.otake.pw/repository/maven-public/io/github/pseudoresonance/PseudoAPI/maven-metadata.xml";
+			try {
+				DocumentBuilder db = dbf.newDocumentBuilder();
+				URLConnection con = new URL(versionURL).openConnection();
+				con.setRequestProperty("User-Agent", io.github.pseudoresonance.pseudoapi.bukkit.PseudoUpdater.userAgent);
+				con.connect();
+				try (InputStream is = con.getInputStream()) {
+					Document doc = db.parse(is);
+					doc.getDocumentElement().normalize();
+					String version = doc.getElementsByTagName("latest").item(0).getTextContent();
+					if (isNewer(version, PseudoAPI.plugin.getDescription().getVersion())) {
+						update = true;
+						ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+						for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
+							if (p.hasPermission("pseudoapi.update.notify")) {
+								p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+							}
+						}
+						try {
+							File file = PseudoAPI.plugin.getFile();
+							if (file instanceof File) {
+								PseudoAPI.plugin.getProxy().getPluginsFolder().mkdir();
+								updateUrl = new UpdateData(new File(PseudoAPI.plugin.getProxy().getPluginsFolder(), ((File) file).getName()), "https://ci.otake.pw/job/PseudoAPI/lastSuccessfulBuild/artifact/artifacts/PseudoAPI.jar");
+							}
+						} catch (IllegalArgumentException e) {
+							ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_plugin_jar")).color(ChatColor.RED).create());
+							e.printStackTrace();
+						}
 					} else {
-						String test = aUrl.replaceFirst(".*\\/artifacts\\/" + PseudoAPI.plugin.getDescription().getName() + "-", "");
-						test = test.substring(0, test.length() - 13);
-						version = test;
+						ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+						for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
+							if (p.hasPermission("pseudoapi.update.notify")) {
+								p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
+							}
+						}
 					}
 				}
-			}
-			if (isNewer(version, PseudoAPI.plugin.getDescription().getVersion())) {
-				update = true;
-				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-					if (p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.version_queue_update", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-					}
-				}
-				try {
-					File file = PseudoAPI.plugin.getFile();
-					if (file instanceof File) {
-						PseudoAPI.plugin.getProxy().getPluginsFolder().mkdir();
-						updateUrl = new UpdateData(new File(PseudoAPI.plugin.getProxy().getPluginsFolder(), ((File) file).getName()), url);
-					}
-				} catch (IllegalArgumentException e) {
-					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_plugin_jar")).color(ChatColor.RED).create());
-					e.printStackTrace();
-				}
-			} else {
-				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-				for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-					if (p.hasPermission("pseudoapi.update.notify")) {
-						p.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(p).getMessage("pseudoapi.version_already_updated", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getVersion(), version)).color(ChatColor.GREEN).create());
-					}
-				}
+			} catch (IOException | SAXException | ParserConfigurationException e1) {
+				e1.printStackTrace();
 			}
 			if (update) {
 				ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", 1)).color(ChatColor.GREEN).create());

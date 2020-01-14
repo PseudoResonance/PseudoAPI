@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.apache.commons.lang.LocaleUtils;
+import org.apache.commons.lang3.LocaleUtils;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
