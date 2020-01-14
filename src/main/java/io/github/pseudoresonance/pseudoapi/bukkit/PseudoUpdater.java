@@ -1,23 +1,30 @@
 package io.github.pseudoresonance.pseudoapi.bukkit;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.JSONArray;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 import io.github.pseudoresonance.pseudoapi.bukkit.language.LanguageManager;
-import io.github.pseudoresonance.pseudoapi.bukkit.utils.JsonReader;
 
 public class PseudoUpdater {
 
@@ -30,6 +37,8 @@ public class PseudoUpdater {
 
 	private static Download asyncUpdater = null;
 	private static int updateTaskID = -1;
+
+	private static final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
 	public static void registerPlugin(PseudoPlugin plugin) {
 		plugins.add(plugin);
@@ -60,7 +69,7 @@ public class PseudoUpdater {
 			asyncUpdater.runTaskAsynchronously(PseudoAPI.plugin);
 		}
 	}
-	
+
 	public static boolean shouldRestart() {
 		return shouldRestart;
 	}
@@ -118,13 +127,13 @@ public class PseudoUpdater {
 		}
 		return false;
 	}
-	
+
 	protected static ArrayList<File> getOldFiles() {
 		return oldFiles;
 	}
 
 	private static class Update extends BukkitRunnable {
-		
+
 		private final int type;
 		private CommandSender sender = null;
 		private String pluginName = null;
@@ -149,103 +158,29 @@ public class PseudoUpdater {
 
 		@Override
 		public void run() {
-			switch(type) {
-				case 0:
-					checkUpdates(true);
-					break;
-				case 1:
-					checkUpdates(false);
-					break;
-				case 2:
-					checkUpdates(sender);
-					break;
-				case 3:
-					checkUpdates(sender, pluginName);
-					break;
-				default:
-					break;
-			}
-		}
-
-		public static void checkUpdates(CommandSender sender, String pluginName) {
-			ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
-			Class<JavaPlugin> javaPluginC = JavaPlugin.class;
-			Method getFileM = null;
-			try {
-				getFileM = javaPluginC.getDeclaredMethod("getFile");
-				getFileM.setAccessible(true);
-			} catch (NoSuchMethodException | SecurityException e1) {
-				PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
-				e1.printStackTrace();
-			}
-			boolean pluginFound = false;
-			for (PseudoPlugin p : plugins) {
-				if (p.getName().equalsIgnoreCase(pluginName)) {
-					pluginFound = true;
-					if (alreadyUpdated.contains(p)) {
-						PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.already_waiting_to_update", p.getName()));
-						return;
-					}
-					String urlPart = "https://circleci.com/api/v1.1/project/github/" + p.getAuthors().get(0) + "/" + p.getName();
-					String buildCheck = urlPart + "?limit=1&filter=completed";
-					JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
-					int build = buildJson.getJSONObject(0).getInt("build_num");
-					String artifactCheck = urlPart + "/" + build + "/artifacts";
-					JSONArray artifactJson = JsonReader.readJsonFromUrl(artifactCheck);
-					String url = "";
-					String version = "";
-					for (int i = 0; i < artifactJson.length(); i++) {
-						String aUrl = artifactJson.getJSONObject(i).getString("url");
-						if (aUrl.endsWith(".jar")) {
-							if (!aUrl.endsWith("-SNAPSHOT.jar")) {
-								url = aUrl;
-							} else {
-								String test = aUrl.replaceFirst(".*\\/artifacts\\/" + p.getName() + "-", "");
-								test = test.substring(0, test.length() - 13);
-								version = test;
-							}
-						}
-					}
-					if (isNewer(version, p.getVersion())) {
-						PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
-						for (Player pl : Bukkit.getOnlinePlayers()) {
-							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-								PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
-							}
-						}
-						try {
-							if (getFileM != null) {
-								Object file = getFileM.invoke(p);
-								if (file instanceof File) {
-									Bukkit.getUpdateFolderFile().mkdir();
-									updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), url));
-									if (updateUrls.size() > 0 && Config.downloadUpdates) {
-										alreadyUpdated.add(p);
-										downloadFiles(updateUrls, sender);
-									}
-								}
-							}
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
-							e.printStackTrace();
-							return;
-						}
-					} else {
-						PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
-						for (Player pl : Bukkit.getOnlinePlayers()) {
-							if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-								PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
-							}
-						}
-					}
-				}
-			}
-			if (!pluginFound) {
-				PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.invalid_plugin_name", pluginName));
+			switch (type) {
+			case 0:
+				checkUpdates(true);
+				break;
+			case 1:
+				checkUpdates(false);
+				break;
+			case 2:
+				checkUpdates(sender);
+				break;
+			case 3:
+				checkUpdates(sender, pluginName);
+				break;
+			default:
+				break;
 			}
 		}
 
 		public static void checkUpdates(CommandSender sender) {
+			checkUpdates(sender, null);
+		}
+
+		public static void checkUpdates(CommandSender sender, String pluginName) {
 			ArrayList<UpdateData> updateUrls = new ArrayList<UpdateData>();
 			int updates = 0;
 			PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.beginning_update_check"));
@@ -264,56 +199,52 @@ public class PseudoUpdater {
 				e1.printStackTrace();
 			}
 			for (PseudoPlugin p : plugins) {
-				if (alreadyUpdated.contains(p)) {
-					continue;
-				}
-				String urlPart = "https://circleci.com/api/v1.1/project/github/" + p.getAuthors().get(0) + "/" + p.getName();
-				String buildCheck = urlPart + "?limit=1&filter=completed";
-				JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
-				int build = buildJson.getJSONObject(0).getInt("build_num");
-				String artifactCheck = urlPart + "/" + build + "/artifacts";
-				JSONArray artifactJson = JsonReader.readJsonFromUrl(artifactCheck);
-				String url = "";
-				String version = "";
-				for (int i = 0; i < artifactJson.length(); i++) {
-					String aUrl = artifactJson.getJSONObject(i).getString("url");
-					if (aUrl.endsWith(".jar")) {
-						if (!aUrl.endsWith("-SNAPSHOT.jar")) {
-							url = aUrl;
-						} else {
-							String test = aUrl.replaceFirst(".*\\/artifacts\\/" + p.getName() + "-", "");
-							test = test.substring(0, test.length() - 13);
-							version = test;
-						}
+				if (pluginName == null || p.getName().equalsIgnoreCase(pluginName)) {
+					if (alreadyUpdated.contains(p)) {
+						continue;
 					}
-				}
-				if (isNewer(version, p.getVersion())) {
-					updates++;
-					PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
-					for (Player pl : Bukkit.getOnlinePlayers()) {
-						if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
-						}
-					}
+					String versionURL = "https://nexus.otake.pw/repository/maven-public/io/github/pseudoresonance/" + p.getName() + "/maven-metadata.xml";
 					try {
-						if (getFileM != null) {
-							Object file = getFileM.invoke(p);
-							if (file instanceof File) {
-								Bukkit.getUpdateFolderFile().mkdir();
-								updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), url));
-								alreadyUpdated.add(p);
+						DocumentBuilder db = dbf.newDocumentBuilder();
+						URLConnection con = new URL(versionURL).openConnection();
+						con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0");
+						con.connect();
+						try (InputStream is = con.getInputStream()) {
+							Document doc = db.parse(is);
+							doc.getDocumentElement().normalize();
+							String version = doc.getElementsByTagName("latest").item(0).getTextContent();
+							if (isNewer(version, p.getVersion())) {
+								updates++;
+								PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
+								for (Player pl : Bukkit.getOnlinePlayers()) {
+									if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+										PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
+									}
+								}
+								try {
+									if (getFileM != null) {
+										Object file = getFileM.invoke(p);
+										if (file instanceof File) {
+											Bukkit.getUpdateFolderFile().mkdir();
+											updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), "https://ci.otake.pw/job/" + p.getName() + "/lastSuccessfulBuild/artifact/artifacts/" + p.getName() + ".jar"));
+											alreadyUpdated.add(p);
+										}
+									}
+								} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+									PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
+									e.printStackTrace();
+								}
+							} else {
+								PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
+								for (Player pl : Bukkit.getOnlinePlayers()) {
+									if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
+										PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
+									}
+								}
 							}
 						}
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						PseudoAPI.plugin.getChat().sendPluginError(sender, Errors.CUSTOM, LanguageManager.getLanguage(sender).getMessage("pseudoapi.could_not_get_plugin_jar"));
-						e.printStackTrace();
-					}
-				} else {
-					PseudoAPI.plugin.getChat().sendPluginMessage(sender, LanguageManager.getLanguage(sender).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
-					for (Player pl : Bukkit.getOnlinePlayers()) {
-						if (!pl.getName().equals(sender.getName()) && pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
-						}
+					} catch (IOException | SAXException | ParserConfigurationException e1) {
+						e1.printStackTrace();
 					}
 				}
 			}
@@ -383,54 +314,48 @@ public class PseudoUpdater {
 				if (alreadyUpdated.contains(p)) {
 					continue;
 				}
-				String urlPart = "https://circleci.com/api/v1.1/project/github/" + p.getAuthors().get(0) + "/" + p.getName();
-				String buildCheck = urlPart + "?limit=1&filter=completed";
-				JSONArray buildJson = JsonReader.readJsonFromUrl(buildCheck);
-				int build = buildJson.getJSONObject(0).getInt("build_num");
-				String artifactCheck = urlPart + "/" + build + "/artifacts";
-				JSONArray artifactJson = JsonReader.readJsonFromUrl(artifactCheck);
-				String url = "";
-				String version = "";
-				for (int i = 0; i < artifactJson.length(); i++) {
-					String aUrl = artifactJson.getJSONObject(i).getString("url");
-					if (aUrl.endsWith(".jar")) {
-						if (!aUrl.endsWith("-SNAPSHOT.jar")) {
-							url = aUrl;
+				String versionURL = "https://nexus.otake.pw/repository/maven-public/io/github/pseudoresonance/" + p.getName() + "/maven-metadata.xml";
+				try {
+					DocumentBuilder db = dbf.newDocumentBuilder();
+					URLConnection con = new URL(versionURL).openConnection();
+					con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0");
+					con.connect();
+					try (InputStream is = con.getInputStream()) {
+						Document doc = db.parse(is);
+						doc.getDocumentElement().normalize();
+						String version = doc.getElementsByTagName("latest").item(0).getTextContent();
+						if (isNewer(version, p.getVersion())) {
+							updates++;
+							PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
+							for (Player pl : Bukkit.getOnlinePlayers()) {
+								if (pl.hasPermission("pseudoapi.update.notify")) {
+									PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
+								}
+							}
+							try {
+								if (getFileM != null) {
+									Object file = getFileM.invoke(p);
+									if (file instanceof File) {
+										Bukkit.getUpdateFolderFile().mkdir();
+										updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), "https://ci.otake.pw/job/" + p.getName() + "/lastSuccessfulBuild/artifact/artifacts/" + p.getName() + ".jar"));
+										alreadyUpdated.add(p);
+									}
+								}
+							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+								PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_plugin_jar"));
+								e.printStackTrace();
+							}
 						} else {
-							String test = aUrl.replaceFirst(".*\\/artifacts\\/" + p.getName() + "-", "");
-							test = test.substring(0, test.length() - 13);
-							version = test;
-						}
-					}
-				}
-				if (isNewer(version, p.getVersion())) {
-					updates++;
-					PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
-					for (Player pl : Bukkit.getOnlinePlayers()) {
-						if (pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_queue_update", p.getName(), p.getVersion(), version));
-						}
-					}
-					try {
-						if (getFileM != null) {
-							Object file = getFileM.invoke(p);
-							if (file instanceof File) {
-								Bukkit.getUpdateFolderFile().mkdir();
-								updateUrls.add(new UpdateData(new File(Bukkit.getUpdateFolderFile(), ((File) file).getName()), url));
-								alreadyUpdated.add(p);
+							PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
+							for (Player pl : Bukkit.getOnlinePlayers()) {
+								if (pl.hasPermission("pseudoapi.update.notify")) {
+									PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
+								}
 							}
 						}
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.could_not_get_plugin_jar"));
-						e.printStackTrace();
 					}
-				} else {
-					PseudoAPI.plugin.getChat().sendPluginMessage(Bukkit.getConsoleSender(), LanguageManager.getLanguage().getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
-					for (Player pl : Bukkit.getOnlinePlayers()) {
-						if (pl.hasPermission("pseudoapi.update.notify")) {
-							PseudoAPI.plugin.getChat().sendPluginMessage(pl, LanguageManager.getLanguage(pl).getMessage("pseudoapi.version_already_updated", p.getName(), p.getVersion(), version));
-						}
-					}
+				} catch (IOException | SAXException | ParserConfigurationException e1) {
+					e1.printStackTrace();
 				}
 			}
 			if (updates > 0) {
