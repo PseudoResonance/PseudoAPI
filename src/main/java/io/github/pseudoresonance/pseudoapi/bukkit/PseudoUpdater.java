@@ -39,6 +39,7 @@ public class PseudoUpdater {
 	private static int updateTaskID = -1;
 
 	private static final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	private static final String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0";
 
 	public static void registerPlugin(PseudoPlugin plugin) {
 		plugins.add(plugin);
@@ -89,7 +90,7 @@ public class PseudoUpdater {
 					for (Player p : Bukkit.getOnlinePlayers()) {
 						p.kickPlayer(LanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates"));
 					}
-					if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot")) {
+					if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot") || Bukkit.getServer().getVersion().toLowerCase().contains("paper")) {
 						Bukkit.getServer().spigot().restart();
 					} else {
 						Bukkit.getServer().shutdown();
@@ -99,7 +100,7 @@ public class PseudoUpdater {
 		} else {
 			for (Player p : Bukkit.getOnlinePlayers())
 				PseudoAPI.plugin.getChat().sendPluginMessage(p, Config.errorTextColor + LanguageManager.getLanguage(p).getMessage("pseudoapi.server_restarting_for_updates_now"));
-			if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot")) {
+			if (Bukkit.getServer().getVersion().toLowerCase().contains("spigot") || Bukkit.getServer().getVersion().toLowerCase().contains("paper")) {
 				Bukkit.getServer().spigot().restart();
 			} else {
 				Bukkit.getServer().shutdown();
@@ -207,7 +208,7 @@ public class PseudoUpdater {
 					try {
 						DocumentBuilder db = dbf.newDocumentBuilder();
 						URLConnection con = new URL(versionURL).openConnection();
-						con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0");
+						con.setRequestProperty("User-Agent", userAgent);
 						con.connect();
 						try (InputStream is = con.getInputStream()) {
 							Document doc = db.parse(is);
@@ -318,7 +319,7 @@ public class PseudoUpdater {
 				try {
 					DocumentBuilder db = dbf.newDocumentBuilder();
 					URLConnection con = new URL(versionURL).openConnection();
-					con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0");
+					con.setRequestProperty("User-Agent", userAgent);
 					con.connect();
 					try (InputStream is = con.getInputStream()) {
 						Document doc = db.parse(is);
@@ -420,8 +421,16 @@ public class PseudoUpdater {
 			int successfulUpdates = 0;
 			for (UpdateData d : files) {
 				try {
-					Files.copy(new URL(d.getURL()).openStream(), d.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
-					successfulUpdates++;
+					URLConnection con = new URL(d.getURL()).openConnection();
+					con.setRequestProperty("User-Agent", userAgent);
+					con.connect();
+					try (InputStream is = con.getInputStream()) {
+						Files.copy(is, d.getNewFile().toPath(), StandardCopyOption.REPLACE_EXISTING);
+						successfulUpdates++;
+					} catch (Exception e) {
+						PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", d.getNewFile().getAbsolutePath()));
+						e.printStackTrace();
+					}
 				} catch (Exception e) {
 					PseudoAPI.plugin.getChat().sendPluginError(Bukkit.getConsoleSender(), Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.completed_update_check", d.getNewFile().getAbsolutePath()));
 					e.printStackTrace();
