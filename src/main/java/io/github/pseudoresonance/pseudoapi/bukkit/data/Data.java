@@ -63,7 +63,6 @@ public class Data {
 			Chat.sendConsoleMessage(ChatColor.RED + LanguageManager.getLanguage().getMessage("pseudoapi.no_server_backend"));
 			serverBackend = globalBackend;
 		}
-		PseudoAPI.reloadAll();
 	}
 
 }

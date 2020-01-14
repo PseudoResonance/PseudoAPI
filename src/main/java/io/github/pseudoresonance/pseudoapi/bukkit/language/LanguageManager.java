@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoAPI;
 import io.github.pseudoresonance.pseudoapi.bukkit.PseudoPlugin;
 import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
+import net.md_5.bungee.api.ChatColor;
 import io.github.pseudoresonance.pseudoapi.bukkit.Chat.Errors;
 
 public class LanguageManager {
@@ -167,7 +168,7 @@ public class LanguageManager {
 						}
 						ConfigurationSection cs = yaml.getConfigurationSection(namespace);
 						for (String key : cs.getKeys(false)) {
-							langMap.put(namespace + "." + key, cs.getString(key));
+							langMap.put(namespace + "." + key, ChatColor.translateAlternateColorCodes('&', cs.getString(key)));
 						}
 					}
 					language.addLanguageMap(langMap);

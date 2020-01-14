@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Language {
@@ -17,9 +18,10 @@ public class Language {
 	private final String lang;
 	private final ConcurrentHashMap<String, String> languageMap = new ConcurrentHashMap<String, String>();
 
-	private Pattern dateFormatPattern = Pattern.compile("\\{\\$date\\.date\\$\\}");
-	private Pattern dateTimeFormatPattern = Pattern.compile("\\{\\$date\\.dateTime\\$\\}");
-	private Pattern timeFormatPattern = Pattern.compile("\\{\\$date\\.time\\$\\}");
+	private static Pattern dateFormatPattern = Pattern.compile("\\{\\$date\\.date\\$\\}");
+	private static Pattern dateTimeFormatPattern = Pattern.compile("\\{\\$date\\.dateTime\\$\\}");
+	private static Pattern timeFormatPattern = Pattern.compile("\\{\\$date\\.time\\$\\}");
+	private static Pattern pattern = Pattern.compile("\\{\\$([0-9]+)\\$\\}");
 
 	private Locale locale = null;
 
@@ -27,7 +29,7 @@ public class Language {
 	private DateTimeFormatter dateTimeFormat = null;
 	private DateTimeFormatter timeFormat = null;
 
-	private Pattern relativeFormatPattern = Pattern.compile("\\{\\$1\\$\\}");
+	private static Pattern relativeFormatPattern = Pattern.compile("\\{\\$1\\$\\}");
 
 	private boolean relativeFormatAscending = false;
 	private String relativeNanoseconds = "";
@@ -84,13 +86,19 @@ public class Language {
 	 */
 	public String getMessage(String key, Object... args) {
 		String msg = languageMap.get(key);
-		if (msg == null) {
+		if (msg == null)
 			msg = LanguageManager.getLanguage().getUnprocessedMessage(key);
-		}
 		if (msg != null) {
-			for (int i = 0; i < args.length; i++) {
-				msg = Pattern.compile("\\{\\$" + (i + 1) + "\\$\\}").matcher(msg).replaceFirst(args[i].toString());
+			StringBuffer sb = new StringBuffer();
+			Matcher match = pattern.matcher(msg);
+			while (match.find()) {
+				int i = Integer.valueOf(match.group(1));
+				i--;
+				if (i < args.length && i >= 0)
+					match.appendReplacement(sb, args[i].toString());
 			}
+			match.appendTail(sb);
+			msg = sb.toString();
 			msg = dateFormatPattern.matcher(msg).replaceAll(languageMap.get("date.dateFormatHumanReadable"));
 			msg = dateTimeFormatPattern.matcher(msg).replaceAll(languageMap.get("date.dateTimeFormatHumanReadable"));
 			msg = timeFormatPattern.matcher(msg).replaceAll(languageMap.get("date.timeFormatHumanReadable"));
