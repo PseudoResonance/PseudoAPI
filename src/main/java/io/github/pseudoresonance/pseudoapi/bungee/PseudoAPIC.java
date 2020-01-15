@@ -14,7 +14,6 @@ public class PseudoAPIC extends Command {
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		if (args.length == 0) {
-			
 			sender.sendMessage(new ComponentBuilder(BungeeLanguageManager.getLanguage(sender).getMessage("pseudoapi.plugin_info_authors", PseudoAPI.plugin.getDescription().getName(), PseudoAPI.plugin.getDescription().getAuthor(), PseudoAPI.plugin.getDescription().getVersion())).color(ChatColor.AQUA).create());
 		} else if (args.length > 0) {
 			if (args[0].equalsIgnoreCase("help")) {

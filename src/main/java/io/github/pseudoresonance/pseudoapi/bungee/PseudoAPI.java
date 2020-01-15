@@ -27,6 +27,7 @@ public class PseudoAPI extends Plugin {
 		config = new Config(this);
 		config.updateConfig();
 		config.reloadConfig();
+		BungeeLanguageManager.copyDefaultPluginLanguageFiles(false);
 		registerCommands();
 		initializeListeners();
 		PlayerDataController.update();

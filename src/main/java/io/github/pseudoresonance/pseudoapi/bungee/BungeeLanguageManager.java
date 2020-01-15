@@ -15,7 +15,6 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.lang3.LocaleUtils;
 
-import io.github.pseudoresonance.pseudoapi.bukkit.language.Language;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -26,15 +25,15 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 public class BungeeLanguageManager {
 	
-	private static final HashMap<String, Language> languages = new HashMap<String, Language>();
+	private static final HashMap<String, BungeeLanguage> languages = new HashMap<String, BungeeLanguage>();
 	
 	private static String defaultLanguage;
 	
-	public static Language getLanguage() {
+	public static BungeeLanguage getLanguage() {
 		return getLanguage(defaultLanguage);
 	}
 	
-	public static Language getLanguage(CommandSender sender) {
+	public static BungeeLanguage getLanguage(CommandSender sender) {
 		if (sender instanceof ProxiedPlayer) {
 			ProxiedPlayer p = (ProxiedPlayer) sender;
 			Object localeO = PlayerDataController.getPlayerSetting(p.getUniqueId().toString(), "locale");
@@ -46,14 +45,14 @@ public class BungeeLanguageManager {
 		return getLanguage();
 	}
 	
-	public static Language getLanguage(String lang) {
-		Language language = languages.get(lang.toLowerCase());
+	public static BungeeLanguage getLanguage(String lang) {
+		BungeeLanguage language = languages.get(lang.toLowerCase());
 		if (language == null)
 			language = languages.get(defaultLanguage);
 		return language;
 	}
 	
-	public static boolean registerLanguage(String lang, Language language) {
+	public static boolean registerLanguage(String lang, BungeeLanguage language) {
 		if (!languages.containsKey(lang.toLowerCase())) {
 			languages.put(lang.toLowerCase(), language);
 			return true;
@@ -64,7 +63,7 @@ public class BungeeLanguageManager {
 	public static void setDefaultLanguage(String lang) {
 		defaultLanguage = lang;
 		if (getLanguage(lang) == null)
-			registerLanguage(lang, new Language(lang));
+			registerLanguage(lang, new BungeeLanguage(lang));
 	}
 	
 	public static void copyDefaultPluginLanguageFiles(boolean overwrite) {
@@ -107,9 +106,9 @@ public class BungeeLanguageManager {
 				lang = locale.toLanguageTag();
 				try {
 					Configuration yaml = YamlConfiguration.getProvider(YamlConfiguration.class).load(f);
-					Language language = getLanguage(lang);
+					BungeeLanguage language = getLanguage(lang);
 					if (language == null) {
-						language = new Language(lang);
+						language = new BungeeLanguage(lang);
 						registerLanguage(lang, language);
 					}
 					HashMap<String, String> langMap = new HashMap<String, String>();
