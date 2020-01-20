@@ -93,7 +93,7 @@ StartupDelay: 60
 
 # How often should update checks occur (in minutes)
 # Set to 0 to disable
-UpdateFrequency: 60
+UpdateFrequency: 720
 
 # Should updates be downloaded when found?
 DownloadUpdates: true
