@@ -89,15 +89,21 @@ public class Language {
 		if (msg == null)
 			msg = LanguageManager.getLanguage().getUnprocessedMessage(key);
 		if (msg != null) {
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			Matcher match = pattern.matcher(msg);
+			int msgI = 0;
+			int i = 0;
 			while (match.find()) {
-				int i = Integer.valueOf(match.group(1));
+				i = Integer.valueOf(match.group(1));
 				i--;
+				sb.append(msg.substring(msgI, match.start()));
 				if (i < args.length && i >= 0)
-					match.appendReplacement(sb, args[i].toString());
+					sb.append(args[i].toString());
+				else
+					sb.append(match.group(0));
+				msgI = match.end();
 			}
-			match.appendTail(sb);
+			sb.append(msg.substring(msgI, msg.length()));
 			msg = sb.toString();
 			msg = dateFormatPattern.matcher(msg).replaceAll(languageMap.get("date.dateFormatHumanReadable"));
 			msg = dateTimeFormatPattern.matcher(msg).replaceAll(languageMap.get("date.dateTimeFormatHumanReadable"));
