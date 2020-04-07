@@ -13,6 +13,9 @@ import java.sql.Timestamp;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.sql.DataSource;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -22,10 +25,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Consumer;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.Config;
 import io.github.pseudoresonance.pseudoapi.bukkit.Chat;
@@ -79,7 +82,7 @@ public class PlayerDataController {
 		dataTypes.add(col);
 		if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				for (Column column : serverDataTypes) {
 					if (column.getName().equalsIgnoreCase(col.getName())) {
@@ -168,7 +171,7 @@ public class PlayerDataController {
 			}
 		} else if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (Statement s = c.createStatement()) {
 					ArrayList<Column> newColumns = new ArrayList<Column>();
@@ -470,7 +473,7 @@ public class PlayerDataController {
 			}
 		} else if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (Statement st = c.createStatement()) {
 					try (ResultSet rs = st.executeQuery("SELECT uuid,username FROM `" + sb.getPrefix() + "Players` ORDER BY `lastjoinleave` DESC;")) {
@@ -546,7 +549,7 @@ public class PlayerDataController {
 					}
 				} else if (b instanceof SQLBackend) {
 					SQLBackend sb = (SQLBackend) b;
-					BasicDataSource data = sb.getDataSource();
+					DataSource data = sb.getDataSource();
 					try (Connection c = data.getConnection()) {
 						String columnList = "";
 						String valueList = "";
@@ -632,7 +635,7 @@ public class PlayerDataController {
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
 						ps.setString(1, uuid);
@@ -743,7 +746,7 @@ public class PlayerDataController {
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("SELECT " + key + " FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
 						ps.setString(1, uuid);
@@ -790,7 +793,7 @@ public class PlayerDataController {
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("SELECT * FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
 						ps.setString(1, uuid);
@@ -810,6 +813,150 @@ public class PlayerDataController {
 						}
 					} catch (SQLException e) {
 						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					}
+				} catch (SQLException e) {
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				}
+			}
+			return null;
+		});
+	}
+
+	/**
+	 * Prepares a statement that expects to return values
+	 * 
+	 * @param statement Statement to use - Substitute `%TABLE_NAME%` for the table name
+	 * @param cons Consumer to process {@link ResultSet} with
+	 * @param params Parameters to use
+	 * @return A {@link java.sql.ResultSet} containing the results of the query
+	 */
+	public static CompletableFuture<Void> prepareQuery(String statement, Consumer<ResultSet> cons, Object... params) {
+		return CompletableFuture.runAsync(() -> {
+			if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				DataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					String st = statement.replaceFirst("`%TABLE_NAME%`", sb.getPrefix() + "Players");
+					try (PreparedStatement ps = c.prepareStatement(st)) {
+						for (int i = 1; i <= params.length; i++) {
+							ps.setObject(i, params);
+						}
+						try (ResultSet rs = ps.executeQuery()) {
+							cons.accept(rs);
+							return;
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when executing prepared statement from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						}
+					} catch (SQLException e) {
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					}
+				} catch (SQLException e) {
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				}
+			}
+			return;
+		});
+	}
+
+	/**
+	 * Prepares a statement that does not return data
+	 * 
+	 * @param statement Statement to use - Substitute `%TABLE_NAME%` for the table name
+	 * @param params Parameters to use
+	 * @return A boolean as defined by {@link java.sql.PreparedStatement#execute}
+	 */
+	public static CompletableFuture<Boolean> prepareStatement(String statement, Object... params) {
+		return CompletableFuture.supplyAsync(() -> {
+			if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				DataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					String st = statement.replaceFirst("`%TABLE_NAME%`", sb.getPrefix() + "Players");
+					try (PreparedStatement ps = c.prepareStatement(st)) {
+						for (int i = 1; i <= params.length; i++) {
+							ps.setObject(i, params);
+						}
+						try {
+							return ps.execute();
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when executing prepared statement from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						}
+					} catch (SQLException e) {
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when preparing statement in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					}
+				} catch (SQLException e) {
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				}
+			}
+			return null;
+		});
+	}
+
+	/**
+	 * Executes a statement that expects to return values
+	 * 
+	 * @param statement Statement to use - Substitute `%TABLE_NAME%` for the table name
+	 * @param cons Consumer to process {@link ResultSet} with
+	 * @return A {@link java.sql.ResultSet} containing the results of the query
+	 */
+	public static CompletableFuture<Void> executeQuery(String statement, Consumer<ResultSet> cons) {
+		return CompletableFuture.runAsync(() -> {
+			if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				DataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					String st = statement.replaceFirst("`%TABLE_NAME%`", sb.getPrefix() + "Players");
+					try (Statement s = c.createStatement()) {
+						try (ResultSet rs = s.executeQuery(st)) {
+							cons.accept(rs);
+							return;
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when executing statement from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						}
+					} catch (SQLException e) {
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+					}
+				} catch (SQLException e) {
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error while accessing database: " + sb.getName());
+					PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+				}
+			}
+			return;
+		});
+	}
+
+	/**
+	 * Executes a statement that does not return data
+	 * 
+	 * @param statement Statement to use - Substitute `%TABLE_NAME%` for the table name
+	 * @return A boolean as defined by {@link java.sql.Statement#execute}
+	 */
+	public static CompletableFuture<Boolean> executeStatement(String statement) {
+		return CompletableFuture.supplyAsync(() -> {
+			if (b instanceof SQLBackend) {
+				SQLBackend sb = (SQLBackend) b;
+				DataSource data = sb.getDataSource();
+				try (Connection c = data.getConnection()) {
+					String st = statement.replaceFirst("`%TABLE_NAME%`", sb.getPrefix() + "Players");
+					try (Statement s = c.createStatement()) {
+						try {
+							return s.execute(st);
+						} catch (SQLException e) {
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when executing statement from table: " + sb.getPrefix() + "Players in database: " + sb.getName());
+							PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
+						}
+					} catch (SQLException e) {
+						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "Error when creating statement in database: " + sb.getName());
 						PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, "SQLError " + e.getErrorCode() + ": (State: " + e.getSQLState() + ") - " + e.getMessage());
 					}
 				} catch (SQLException e) {

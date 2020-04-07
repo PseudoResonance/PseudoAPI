@@ -258,6 +258,31 @@ public abstract class PluginConfig {
 	}
 
 	/**
+	 * Returns the corresponding enum from given key in given {@link FileConfiguration}
+	 * 
+	 * @param <E> Enum of type given in default value
+	 * @param fc {@link FileConfiguration} where config is stored
+	 * @param key Key
+	 * @param def Default value
+	 * @return Corresponding enum from given key
+	 */
+	@SuppressWarnings("unchecked")
+	public static <E extends Enum<E>> E getEnum(FileConfiguration fc, String key, E def) {
+		if (fc.contains(key)) {
+			Object ret = Enum.valueOf(def.getClass(), fc.getString(key).toUpperCase());
+			if (ret != null)
+				return (E) ret;
+			else {
+				Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+				return def;
+			}
+		} else {
+			Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");
+			return def;
+		}
+	}
+
+	/**
 	 * Returns Object from given key in given {@link FileConfiguration}
 	 * 
 	 * @param fc {@link FileConfiguration} where config is stored

@@ -24,8 +24,6 @@ import io.github.pseudoresonance.pseudoapi.bukkit.listeners.BlockL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.CommandL;
 import io.github.pseudoresonance.pseudoapi.bukkit.listeners.PlayerJoinLeaveL;
 import io.github.pseudoresonance.pseudoapi.bukkit.messaging.PluginMessenger;
-import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.PlayerDataController;
-import io.github.pseudoresonance.pseudoapi.bukkit.playerdata.ServerPlayerDataController;
 import io.github.pseudoresonance.pseudoapi.bukkit.tabcompleters.PseudoAPITC;
 import io.github.pseudoresonance.pseudoapi.bungee.BungeeLanguageManager;
 

@@ -85,10 +85,13 @@ public class ConfigFile {
 		}
 		configFile = new File(this.FOLDER, this.FILENAME);
 		if (!configFile.exists()) {
-			try {
-				configFile.createNewFile();
-			} catch (IOException e) {
-
+			saveDefaultConfig();
+			if (!configFile.exists()) {
+				try {
+					configFile.createNewFile();
+				} catch (Exception e) {
+					
+				}
 			}
 		}
 		config = YamlConfiguration.loadConfiguration(configFile);

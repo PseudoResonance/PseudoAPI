@@ -1,11 +1,13 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.data;
 
-import java.sql.SQLException;
-import org.apache.commons.dbcp2.BasicDataSource;
+import javax.sql.DataSource;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 public class MySQLBackend implements SQLBackend {
 
-	private BasicDataSource dataSource;
+	private HikariDataSource dataSource;
 
 	private boolean enabled = false;
 
@@ -24,16 +26,27 @@ public class MySQLBackend implements SQLBackend {
 	/**
 	 * Constructs new {@link MySQLBackend} with the given parameters
 	 * 
-	 * @param name Backend name
-	 * @param host MySQL server host
-	 * @param port MySQL server port
-	 * @param username MySQL username
-	 * @param password MySQL password
-	 * @param database MySQL database name
-	 * @param prefix MySQL table prefix
-	 * @param useSSL Whether or not to use SSL when connecting to MySQL server
-	 * @param verifyServerCertificate Whether or not to verify server certificates when connecting to MySQL server
-	 * @param requireSSL Whether or not SSL is required when connecting to MySQL server
+	 * @param name
+	 *            Backend name
+	 * @param host
+	 *            MySQL server host
+	 * @param port
+	 *            MySQL server port
+	 * @param username
+	 *            MySQL username
+	 * @param password
+	 *            MySQL password
+	 * @param database
+	 *            MySQL database name
+	 * @param prefix
+	 *            MySQL table prefix
+	 * @param useSSL
+	 *            Whether or not to use SSL when connecting to MySQL server
+	 * @param verifyServerCertificate
+	 *            Whether or not to verify server certificates when connecting to
+	 *            MySQL server
+	 * @param requireSSL
+	 *            Whether or not SSL is required when connecting to MySQL server
 	 */
 	public MySQLBackend(String name, String host, int port, String username, String password, String database, String prefix, boolean useSSL, boolean verifyServerCertificate, boolean requireSSL) {
 		this.name = name;
@@ -62,17 +75,17 @@ public class MySQLBackend implements SQLBackend {
 		this.url = "jdbc:mysql://" + host + ":" + port + "/" + database + suffix;
 	}
 
-	public BasicDataSource getDataSource() {
+	public DataSource getDataSource() {
 		if (enabled) {
 			if (dataSource == null) {
-				BasicDataSource ds = new BasicDataSource();
-				ds.setUrl(this.url);
-				ds.setUsername(this.username);
-				ds.setPassword(this.password);
-				ds.setMinIdle(1);
-				ds.setMaxIdle(10);
-				ds.setMaxOpenPreparedStatements(100);
-				dataSource = ds;
+				HikariConfig config = new HikariConfig();
+				config.setJdbcUrl(this.url);
+				config.setUsername(this.username);
+				config.setPassword(this.password);
+				config.addDataSourceProperty("cachePrepStmts", "true");
+				config.addDataSourceProperty("prepStmtCacheSize", "250");
+				config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+				dataSource = new HikariDataSource(config);
 			}
 			return dataSource;
 		} else
@@ -87,15 +100,11 @@ public class MySQLBackend implements SQLBackend {
 	public void stop() {
 		enabled = false;
 		if (dataSource != null) {
-			try {
-				dataSource.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			dataSource.close();
 			dataSource = null;
 		}
 	}
-	
+
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -168,9 +177,11 @@ public class MySQLBackend implements SQLBackend {
 	}
 
 	/**
-	 * Returns whether or not to verify server certificates when connecting to MySQL server
+	 * Returns whether or not to verify server certificates when connecting to MySQL
+	 * server
 	 * 
-	 * @return Whether or not to verify server certificates when connecting to MySQL server
+	 * @return Whether or not to verify server certificates when connecting to MySQL
+	 *         server
 	 */
 	public boolean getVerifyServerCertificate() {
 		return this.verifyServerCertificate;

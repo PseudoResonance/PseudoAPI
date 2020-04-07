@@ -16,7 +16,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import javax.sql.DataSource;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -67,7 +68,7 @@ public class ServerPlayerDataController {
 		dataTypes.add(col);
 		if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				for (Column column : serverDataTypes) {
 					if (column.getName().equalsIgnoreCase(col.getName())) {
@@ -149,7 +150,7 @@ public class ServerPlayerDataController {
 			}
 		} else if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (Statement s = c.createStatement()) {
 					ArrayList<Column> newColumns = new ArrayList<Column>();
@@ -365,7 +366,7 @@ public class ServerPlayerDataController {
 					}
 				} else if (b instanceof SQLBackend) {
 					SQLBackend sb = (SQLBackend) b;
-					BasicDataSource data = sb.getDataSource();
+					DataSource data = sb.getDataSource();
 					try (Connection c = data.getConnection()) {
 						String columnList = "";
 						String valueList = "";
@@ -451,7 +452,7 @@ public class ServerPlayerDataController {
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
 						ps.setString(1, uuid);
@@ -562,7 +563,7 @@ public class ServerPlayerDataController {
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("SELECT " + key + " FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
 						ps.setString(1, uuid);
@@ -609,7 +610,7 @@ public class ServerPlayerDataController {
 				}
 			} else if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("SELECT * FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
 						ps.setString(1, uuid);

@@ -1,15 +1,15 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.data;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import javax.sql.DataSource;
 
 public interface SQLBackend extends Backend {
 	
 	/**
-	 * Returns {@link BasicDataSource} of SQL backend for accessing data manually
+	 * Returns {@link DataSource} of SQL backend for accessing data manually
 	 * 
-	 * @return {@link BasicDataSource} of SQL backend
+	 * @return {@link DataSource} of SQL backend
 	 */
-	public BasicDataSource getDataSource();
+	public DataSource getDataSource();
 	
 	/**
 	 * Returns table prefix to be used in SQL database

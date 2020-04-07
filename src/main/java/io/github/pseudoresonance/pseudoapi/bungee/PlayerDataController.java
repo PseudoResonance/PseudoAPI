@@ -16,8 +16,9 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
-import org.apache.commons.dbcp2.BasicDataSource;
 
 import io.github.pseudoresonance.pseudoapi.bukkit.data.Backend;
 import io.github.pseudoresonance.pseudoapi.bukkit.data.MySQLBackend;
@@ -54,7 +55,7 @@ public class PlayerDataController {
 		dataTypes.add(col);
 		if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				for (Column column : serverDataTypes) {
 					if (column.getName().equalsIgnoreCase(col.getName())) {
@@ -120,7 +121,7 @@ public class PlayerDataController {
 	protected static void setup() {
 		if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (Statement s = c.createStatement()) {
 					ArrayList<Column> newColumns = new ArrayList<Column>();
@@ -377,7 +378,7 @@ public class PlayerDataController {
 	private static void getUUIDS() {
 		if (b instanceof SQLBackend) {
 			SQLBackend sb = (SQLBackend) b;
-			BasicDataSource data = sb.getDataSource();
+			DataSource data = sb.getDataSource();
 			try (Connection c = data.getConnection()) {
 				try (Statement st = c.createStatement()) {
 					try (ResultSet rs = st.executeQuery("SELECT uuid,username FROM `" + sb.getPrefix() + "Players` ORDER BY `lastjoinleave` DESC;")) {
@@ -430,7 +431,7 @@ public class PlayerDataController {
 					playerData.put(uuid, original);
 				if (b instanceof SQLBackend) {
 					SQLBackend sb = (SQLBackend) b;
-					BasicDataSource data = sb.getDataSource();
+					DataSource data = sb.getDataSource();
 					try (Connection c = data.getConnection()) {
 						String columnList = "";
 						String valueList = "";
@@ -495,7 +496,7 @@ public class PlayerDataController {
 				playerData.put(uuid, original);
 			if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("INSERT INTO `" + sb.getPrefix() + "Players` (`uuid`,`" + key + "`) VALUES (?,?) ON DUPLICATE KEY UPDATE `" + key + "`=?;")) {
 						ps.setString(1, uuid);
@@ -563,7 +564,7 @@ public class PlayerDataController {
 		return CompletableFuture.supplyAsync(() -> {
 			if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("SELECT " + key + " FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
 						ps.setString(1, uuid);
@@ -593,7 +594,7 @@ public class PlayerDataController {
 		return CompletableFuture.supplyAsync(() -> {
 			if (b instanceof SQLBackend) {
 				SQLBackend sb = (SQLBackend) b;
-				BasicDataSource data = sb.getDataSource();
+				DataSource data = sb.getDataSource();
 				try (Connection c = data.getConnection()) {
 					try (PreparedStatement ps = c.prepareStatement("SELECT * FROM `" + sb.getPrefix() + "Players` WHERE `uuid`=? LIMIT 1;")) {
 						ps.setString(1, uuid);
