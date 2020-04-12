@@ -1,6 +1,7 @@
 package io.github.pseudoresonance.pseudoapi.bungee;
 
 import java.math.BigInteger;
+import java.net.InetSocketAddress;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -287,7 +288,7 @@ public class PlayerDataController {
 				playerData.put(uuid, new HashMap<String, Object>());
 		}
 		HashMap<String, Object> settings = new HashMap<String, Object>();
-		settings.put("ip", p.getAddress().getAddress().getHostAddress());
+		settings.put("ip", ((InetSocketAddress) p.getSocketAddress()).getAddress().getHostAddress());
 		settings.put("online", true);
 		settings.put("username", username);
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
