@@ -314,7 +314,7 @@ public class Config {
 					} else if (s.length() == 2 && (s.charAt(0) == '&' || s.charAt(0) == '§')) {
 						sb.append(ChatColor.getByChar(s.charAt(1)));
 					} else {
-						sb.append(Enum.valueOf(ChatColor.class, s.toUpperCase()));
+						sb.append(ChatColor.of(s.toUpperCase()));
 					}
 				} catch (Exception e) {
 					ProxyServer.getInstance().getConsole().sendMessage(new ComponentBuilder("Invalid config option for " + key + "!").color(ChatColor.RED).create());

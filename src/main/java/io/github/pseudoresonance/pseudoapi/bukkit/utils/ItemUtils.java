@@ -3,8 +3,10 @@ package io.github.pseudoresonance.pseudoapi.bukkit.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -32,6 +34,15 @@ public class ItemUtils {
 	private static Class<?> enumItemRarityClass = null;
 	private static Field enumChatFormatField = null;
 	private static Class<?> enumChatFormatClass = null;
+	
+	private static Class<?> itemToolClass = null;
+	private static Field blocksField = null;
+	private static Class<?> craftBlock = null;
+	private static Class<?> nmsBlock = null;
+	private static Class<?> iBlockData = null;
+	private static Method getNMSBlockMethod = null;
+	private static Method getNMSMethod = null;
+	private static Field strengthField = null;
 
 	private static boolean setup() {
 		if (!setup) {
@@ -71,9 +82,33 @@ public class ItemUtils {
 						break;
 					}
 				}
+				
+				itemToolClass = Class.forName("net.minecraft.server." + Utils.getBukkitVersion() + ".ItemTool");
+				for (Field f : itemToolClass.getDeclaredFields()) {
+					if (Set.class.isAssignableFrom(f.getType())) {
+						blocksField = f;
+						blocksField.setAccessible(true);
+						break;
+					}
+				}
+				craftBlock = Class.forName("org.bukkit.craftbukkit." + Utils.getBukkitVersion() + ".block.CraftBlock");
+				nmsBlock = Class.forName("net.minecraft.server." + Utils.getBukkitVersion() + ".Block");
+				iBlockData = Class.forName("net.minecraft.server." + Utils.getBukkitVersion() + ".IBlockData");
+				for (Method m : craftBlock.getDeclaredMethods()) {
+					if (m.getReturnType().equals(nmsBlock)) {
+						getNMSBlockMethod = m;
+						getNMSBlockMethod.setAccessible(true);
+					} else if (m.getReturnType().equals(iBlockData)) {
+						getNMSMethod = m;
+						getNMSMethod.setAccessible(true);
+					}
+				}
+				strengthField = nmsBlock.getDeclaredField("strength");
+				strengthField.setAccessible(true);
+						
 				setup = true;
 				return true;
-			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
 				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.error_failed_itemutils_setup"));
 				e.printStackTrace();
 			}
@@ -114,6 +149,29 @@ public class ItemUtils {
 				closingTC.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new BaseComponent[] { new TextComponent(json) }));
 				return new BaseComponent[] { openingTC, itemTC, closingTC };
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException | InstantiationException e) {
+				e.printStackTrace();
+			}
+		}
+		PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.error_itemutils_failed"));
+		throw new IllegalStateException("ItemUtils unable to run!");
+	}
+
+	public static boolean getCanToolBreakBlock(ItemStack tool, Block block) {
+		if (setup()) {
+			try {
+				Object nmsItemStackObj = asNMSCopyMethod.invoke(null, tool);
+				Object nmsItem = getItem.invoke(nmsItemStackObj);
+				if (itemToolClass.isAssignableFrom(nmsItem.getClass())) {
+					Set<?> blocksList = (Set<?>) blocksField.get(nmsItem);
+					Object nmsBlock = getNMSBlockMethod.invoke(block);
+					if (blocksList.contains(nmsBlock))
+						return true;
+					else {
+						float strength = (float) strengthField.get(nmsBlock);
+						return strength <= 1;
+					}
+				}
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
 				e.printStackTrace();
 			}
 		}

@@ -220,7 +220,7 @@ public abstract class PluginConfig {
 					} else if (s.length() == 2 && (s.charAt(0) == '&' || s.charAt(0) == '§')) {
 						ret.add(ChatColor.getByChar(s.charAt(1)));
 					} else {
-						ret.add(Enum.valueOf(ChatColor.class, s.toUpperCase()));
+						ret.add(ChatColor.of(s.toUpperCase()));
 					}
 				} catch (Exception e) {
 					Chat.sendConsoleMessage(ChatColor.RED + "Invalid config option for " + key + "!");

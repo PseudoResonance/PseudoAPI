@@ -258,25 +258,18 @@ public class Chat {
 		boolean underline = false;
 		boolean italic = false;
 		for (ChatColor c : colors) {
-			switch (c) {
-			case MAGIC:
+			if (c.equals(ChatColor.MAGIC))
 				obfuscated = true;
-				break;
-			case BOLD:
+			else if (c.equals(ChatColor.BOLD))
 				bold = true;
-				break;
-			case STRIKETHROUGH:
+			else if (c.equals(ChatColor.STRIKETHROUGH))
 				strikethrough = true;
-				break;
-			case UNDERLINE:
+			else if (c.equals(ChatColor.UNDERLINE))
 				underline = true;
-				break;
-			case ITALIC:
+			else if (c.equals(ChatColor.ITALIC))
 				italic = true;
-				break;
-			default:
+			else
 				color = c;
-			}
 		}
 		component.setColor(color);
 		component.setObfuscated(obfuscated);
