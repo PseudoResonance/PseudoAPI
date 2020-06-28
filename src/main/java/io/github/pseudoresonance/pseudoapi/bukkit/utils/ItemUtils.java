@@ -42,7 +42,7 @@ public class ItemUtils {
 	private static Class<?> iBlockData = null;
 	private static Method getNMSBlockMethod = null;
 	private static Method getNMSMethod = null;
-	private static Field strengthField = null;
+	private static Method durabilityMethod = null;
 
 	private static boolean setup() {
 		if (!setup) {
@@ -103,12 +103,12 @@ public class ItemUtils {
 						getNMSMethod.setAccessible(true);
 					}
 				}
-				strengthField = nmsBlock.getDeclaredField("strength");
-				strengthField.setAccessible(true);
+				durabilityMethod = nmsBlock.getDeclaredMethod("getDurability");
+				durabilityMethod.setAccessible(true);
 						
 				setup = true;
 				return true;
-			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
+			} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
 				PseudoAPI.plugin.getChat().sendConsolePluginError(Errors.CUSTOM, LanguageManager.getLanguage().getMessage("pseudoapi.error_failed_itemutils_setup"));
 				e.printStackTrace();
 			}
@@ -167,8 +167,8 @@ public class ItemUtils {
 					if (blocksList.contains(nmsBlock))
 						return true;
 					else {
-						float strength = (float) strengthField.get(nmsBlock);
-						return strength <= 1;
+						float strength = (float) durabilityMethod.invoke(nmsBlock);
+						return strength < 1;
 					}
 				}
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
