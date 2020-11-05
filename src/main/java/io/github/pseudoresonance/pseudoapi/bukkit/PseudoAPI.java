@@ -73,6 +73,8 @@ public class PseudoAPI extends PseudoPlugin {
 			}
 		}, Config.startupDelay * 20);
 		initializeMetrics();
+		if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null)
+			new PseudoAPIExpansion(this).register();
 	}
 
 	public void onDisable() {
@@ -84,7 +86,7 @@ public class PseudoAPI extends PseudoPlugin {
 	}
 	
 	private void initializeMetrics() {
-		metrics = new Metrics(this);
+		metrics = new Metrics(this, 6064);
 		metrics.addCustomChart(new Metrics.SimplePie("default_language", () -> {
 	        return Config.defaultLocale;
 	    }));

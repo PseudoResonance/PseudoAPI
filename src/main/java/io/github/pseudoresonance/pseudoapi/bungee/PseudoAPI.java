@@ -45,7 +45,7 @@ public class PseudoAPI extends Plugin {
 	}
 	
 	private void initializeMetrics() {
-		metrics = new Metrics(this);
+		metrics = new Metrics(this, 6065);
 		metrics.addCustomChart(new Metrics.SimplePie("default_language", () -> {
 	        return Config.defaultLocale;
 	    }));
