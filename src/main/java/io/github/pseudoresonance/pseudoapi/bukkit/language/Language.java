@@ -1,11 +1,10 @@
 package io.github.pseudoresonance.pseudoapi.bukkit.language;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -116,10 +115,10 @@ public class Language {
 	/**
 	 * Formats date
 	 * 
-	 * @param date {@link LocalDate} to format
+	 * @param date {@link TemporalAccessor} to format
 	 * @return Formatted date
 	 */
-	public String formatDate(LocalDate date) {
+	public String formatDate(TemporalAccessor date) {
 		return dateFormat.format(date);
 	}
 
@@ -136,10 +135,10 @@ public class Language {
 	/**
 	 * Formats date-time
 	 * 
-	 * @param dateTime {@link LocalDateTime} to format
+	 * @param dateTime {@link TemporalAccessor} to format
 	 * @return Formatted date-time
 	 */
-	public String formatDateTime(LocalDateTime dateTime) {
+	public String formatDateTime(TemporalAccessor dateTime) {
 		return dateTimeFormat.format(dateTime);
 	}
 
@@ -156,10 +155,10 @@ public class Language {
 	/**
 	 * Formats time
 	 * 
-	 * @param time {@link LocalTime} to format
+	 * @param time {@link TemporalAccessor} to format
 	 * @return Formatted time
 	 */
-	public String formatTime(LocalTime time) {
+	public String formatTime(TemporalAccessor time) {
 		return timeFormat.format(time);
 	}
 
@@ -176,13 +175,13 @@ public class Language {
 	/**
 	 * Formats time ago
 	 * 
-	 * @param dateTime {@link LocalDateTime} to format
+	 * @param dateTime {@link TemporalAccessor} to format
 	 * @param addAgo Whether or not to add "ago" to the end of the string
 	 * @param minUnit Minimum time unit to display
 	 * @param maxUnit Maximum time unit to display
 	 * @return Formatted time ago
 	 */
-	public String formatTimeAgo(LocalDateTime dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
+	public String formatTimeAgo(TemporalAccessor dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime, addAgo, minUnit, maxUnit);
 		else
@@ -192,12 +191,12 @@ public class Language {
 	/**
 	 * Formats time ago
 	 * 
-	 * @param dateTime {@link LocalDateTime} to format
+	 * @param dateTime {@link TemporalAccessor} to format
 	 * @param minUnit Minimum time unit to display
 	 * @param maxUnit Maximum time unit to display
 	 * @return Formatted time ago
 	 */
-	public String formatTimeAgo(LocalDateTime dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
+	public String formatTimeAgo(TemporalAccessor dateTime, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime, true, minUnit, maxUnit);
 		else
@@ -232,11 +231,11 @@ public class Language {
 	/**
 	 * Formats time ago
 	 * 
-	 * @param dateTime {@link LocalDateTime} to format
+	 * @param dateTime {@link TemporalAccessor} to format
 	 * @param addAgo Whether or not to add "ago" to the end of the string
 	 * @return Formatted time ago
 	 */
-	public String formatTimeAgo(LocalDateTime dateTime, boolean addAgo) {
+	public String formatTimeAgo(TemporalAccessor dateTime, boolean addAgo) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime, addAgo);
 		else
@@ -246,10 +245,10 @@ public class Language {
 	/**
 	 * Formats time ago
 	 * 
-	 * @param dateTime {@link LocalDateTime} to format
+	 * @param dateTime {@link TemporalAccessor} to format
 	 * @return Formatted time ago
 	 */
-	public String formatTimeAgo(LocalDateTime dateTime) {
+	public String formatTimeAgo(TemporalAccessor dateTime) {
 		if (relativeFormatAscending)
 			return timeAgoAscending(dateTime);
 		else
@@ -277,7 +276,7 @@ public class Language {
 		return formatTimeAgo(dateTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
 	}
 
-	private String timeAgoAscending(LocalDateTime dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
+	private String timeAgoAscending(TemporalAccessor dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		LocalDateTime temp = LocalDateTime.from(dateTime);
 		LocalDateTime now = LocalDateTime.now();
 		long years = temp.until(now, ChronoUnit.YEARS);
@@ -363,15 +362,15 @@ public class Language {
 		return ret.substring(0, ret.length() - 1);
 	}
 
-	private String timeAgoAscending(LocalDateTime dateTime, boolean addAgo) {
+	private String timeAgoAscending(TemporalAccessor dateTime, boolean addAgo) {
 		return timeAgoAscending(dateTime, addAgo, ChronoUnit.SECONDS, ChronoUnit.YEARS);
 	}
 
-	private String timeAgoAscending(LocalDateTime dateTime) {
+	private String timeAgoAscending(TemporalAccessor dateTime) {
 		return timeAgoAscending(dateTime, true, ChronoUnit.SECONDS, ChronoUnit.YEARS);
 	}
 
-	private String timeAgoDescending(LocalDateTime dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
+	private String timeAgoDescending(TemporalAccessor dateTime, boolean addAgo, ChronoUnit minUnit, ChronoUnit maxUnit) {
 		LocalDateTime temp = LocalDateTime.from(dateTime);
 		LocalDateTime now = LocalDateTime.now();
 		long years = temp.until(now, ChronoUnit.YEARS);
@@ -457,11 +456,11 @@ public class Language {
 		return ret.substring(0, ret.length() - 1);
 	}
 
-	private String timeAgoDescending(LocalDateTime dateTime, boolean addAgo) {
+	private String timeAgoDescending(TemporalAccessor dateTime, boolean addAgo) {
 		return timeAgoDescending(dateTime, addAgo, ChronoUnit.SECONDS, ChronoUnit.YEARS);
 	}
 
-	private String timeAgoDescending(LocalDateTime dateTime) {
+	private String timeAgoDescending(TemporalAccessor dateTime) {
 		return timeAgoDescending(dateTime, true, ChronoUnit.SECONDS, ChronoUnit.YEARS);
 	}
 
@@ -482,7 +481,6 @@ public class Language {
 			locale = Locale.forLanguageTag(languageMap.get("date.locale"));
 		}
 		if (locale != null && dateFormat == null && languageMap.keySet().contains("date.dateFormat")) {
-
 			dateFormat = DateTimeFormatter.ofPattern(languageMap.get("date.dateFormat"), locale);
 		}
 		if (locale != null && dateTimeFormat == null && languageMap.keySet().contains("date.dateTimeFormat")) {
